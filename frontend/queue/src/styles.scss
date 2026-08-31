@@ -1,0 +1,133 @@
+:root {
+  color-scheme: light;
+
+  --queue-navy: #173f4b;
+  --queue-navy-dark: #102f38;
+  --queue-primary: #28756d;
+  --queue-primary-dark: #1f5f59;
+  --queue-primary-soft: #e8f2f0;
+  --queue-accent: #d3a24c;
+  --queue-background: #f6f7f5;
+  --queue-surface: #ffffff;
+  --queue-text: #233237;
+  --queue-muted: #6d7c80;
+  --queue-border: #dde5e3;
+  --queue-success: #2f7d5b;
+  --queue-warning: #b47a22;
+  --queue-danger: #b65552;
+
+  --queue-radius-sm: 0.625rem;
+  --queue-radius: 0.875rem;
+  --queue-shadow: 0 0.5rem 1.5rem rgba(28, 55, 61, 0.07);
+
+  --bs-body-font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+  --bs-body-color: var(--queue-text);
+  --bs-body-bg: var(--queue-background);
+  --bs-border-color: var(--queue-border);
+  --bs-primary: var(--queue-primary);
+  --bs-primary-rgb: 40, 117, 109;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background: var(--queue-background);
+  color: var(--queue-text);
+  font-family: var(--bs-body-font-family);
+  line-height: 1.65;
+  text-rendering: optimizeLegibility;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--queue-navy);
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+a {
+  color: var(--queue-primary-dark);
+}
+
+a:hover {
+  color: var(--queue-navy);
+}
+
+::selection {
+  background: var(--queue-primary-soft);
+  color: var(--queue-navy-dark);
+}
+
+.btn {
+  border-radius: var(--queue-radius-sm);
+  font-weight: 600;
+  padding-inline: 1.15rem;
+}
+
+.btn-primary {
+  --bs-btn-bg: var(--queue-primary);
+  --bs-btn-border-color: var(--queue-primary);
+  --bs-btn-hover-bg: var(--queue-primary-dark);
+  --bs-btn-hover-border-color: var(--queue-primary-dark);
+  --bs-btn-active-bg: var(--queue-navy);
+  --bs-btn-active-border-color: var(--queue-navy);
+  --bs-btn-disabled-bg: var(--queue-primary);
+  --bs-btn-disabled-border-color: var(--queue-primary);
+}
+
+.btn-outline-primary {
+  --bs-btn-color: var(--queue-primary-dark);
+  --bs-btn-border-color: var(--queue-primary);
+  --bs-btn-hover-bg: var(--queue-primary);
+  --bs-btn-hover-border-color: var(--queue-primary);
+  --bs-btn-active-bg: var(--queue-primary-dark);
+  --bs-btn-active-border-color: var(--queue-primary-dark);
+}
+
+.form-control,
+.form-select {
+  min-height: 2.85rem;
+  border-color: var(--queue-border);
+  border-radius: var(--queue-radius-sm);
+  background-color: var(--queue-surface);
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--queue-primary);
+  box-shadow: 0 0 0 0.2rem rgba(40, 117, 109, 0.14);
+}
+
+.card {
+  border-color: var(--queue-border);
+  border-radius: var(--queue-radius);
+  background-color: var(--queue-surface);
+  box-shadow: var(--queue-shadow);
+}
+
+:focus-visible {
+  outline: 0.2rem solid rgba(40, 117, 109, 0.35);
+  outline-offset: 0.15rem;
+}

@@ -1,0 +1,19 @@
+<nav class="stepper" [attr.aria-label]="'booking.stepper.label' | translate">
+  <ol>
+    @for (stepKey of steps; track stepKey; let stepIndex = $index) {
+      <li
+        [class.is-active]="currentStep() === stepIndex + 1"
+        [class.is-complete]="currentStep() > stepIndex + 1"
+      >
+        <span class="step-number" aria-hidden="true">
+          @if (currentStep() > stepIndex + 1) {
+            <i class="bi bi-check-lg"></i>
+          } @else {
+            {{ stepIndex + 1 }}
+          }
+        </span>
+        <span>{{ stepKey | translate }}</span>
+      </li>
+    }
+  </ol>
+</nav>

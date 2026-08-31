@@ -1,0 +1,122 @@
+<section class="track-page">
+  <div class="container">
+    <header class="track-header text-center mx-auto">
+      <span class="track-eyebrow">
+        <i class="bi bi-search" aria-hidden="true"></i>
+        {{ 'track.eyebrow' | translate }}
+      </span>
+      <h1>{{ 'track.title' | translate }}</h1>
+      <p>{{ 'track.description' | translate }}</p>
+    </header>
+
+    @if (!hasResult()) {
+      <div class="search-card">
+        <form [formGroup]="trackForm" (ngSubmit)="searchTicket()" novalidate>
+          <label class="form-label" for="publicId">{{ 'track.form.label' | translate }}</label>
+
+          <div class="search-row">
+            <div class="ticket-input">
+              <i class="bi bi-ticket-perforated" aria-hidden="true"></i>
+              <input
+                id="publicId"
+                class="form-control form-control-lg"
+                type="text"
+                formControlName="publicId"
+                autocomplete="off"
+                [placeholder]="'track.form.placeholder' | translate"
+                [attr.aria-describedby]="trackForm.controls.publicId.invalid && trackForm.controls.publicId.touched ? 'publicIdError' : 'publicIdHelp'"
+                [class.is-invalid]="trackForm.controls.publicId.invalid && trackForm.controls.publicId.touched"
+              />
+            </div>
+
+            <button class="btn btn-primary btn-lg" type="submit">
+              <i class="bi bi-search" aria-hidden="true"></i>
+              {{ 'track.form.action' | translate }}
+            </button>
+          </div>
+
+          @if (trackForm.controls.publicId.invalid && trackForm.controls.publicId.touched) {
+            <div id="publicIdError" class="invalid-message" role="alert">
+              {{ 'track.form.required' | translate }}
+            </div>
+          } @else {
+            <small id="publicIdHelp" class="form-help">
+              <i class="bi bi-info-circle" aria-hidden="true"></i>
+              {{ 'track.form.help' | translate }}
+            </small>
+          }
+        </form>
+      </div>
+    } @else {
+      <article class="ticket-result">
+        <div class="ticket-result__header">
+          <div>
+            <span class="status-badge">
+              <span aria-hidden="true"></span>
+              {{ 'track.result.status.waiting' | translate }}
+            </span>
+            <small>{{ 'track.result.ticketLabel' | translate }}</small>
+            <h2>G-024</h2>
+          </div>
+
+          <button class="btn btn-sm btn-light" type="button" (click)="searchAgain()">
+            <i class="bi bi-arrow-repeat" aria-hidden="true"></i>
+            {{ 'track.result.searchAgain' | translate }}
+          </button>
+        </div>
+
+        <div class="queue-position text-center">
+          <small>{{ 'track.result.peopleAheadLabel' | translate }}</small>
+          <strong>3</strong>
+          <span>{{ 'track.result.peopleAhead' | translate }}</span>
+        </div>
+
+        <div class="queue-progress" aria-hidden="true">
+          <span></span>
+        </div>
+
+        <div class="ticket-metrics">
+          <div>
+            <i class="bi bi-megaphone" aria-hidden="true"></i>
+            <span>
+              <small>{{ 'track.result.nowServing' | translate }}</small>
+              <strong>G-021</strong>
+            </span>
+          </div>
+          <div>
+            <i class="bi bi-clock" aria-hidden="true"></i>
+            <span>
+              <small>{{ 'track.result.estimated' | translate }}</small>
+              <strong>{{ 'track.result.minutes' | translate: { count: 12 } }}</strong>
+            </span>
+          </div>
+        </div>
+
+        <dl class="ticket-details">
+          <div>
+            <dt>{{ 'track.result.branch' | translate }}</dt>
+            <dd>{{ 'booking.branches.nasrCity.name' | translate }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'track.result.service' | translate }}</dt>
+            <dd>{{ 'booking.services.generalExamination.name' | translate }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'track.result.bookedAt' | translate }}</dt>
+            <dd>{{ 'track.result.sampleTime' | translate }}</dd>
+          </div>
+        </dl>
+
+        <div class="ticket-notice">
+          <i class="bi bi-bell" aria-hidden="true"></i>
+          <span>{{ 'track.result.notice' | translate }}</span>
+        </div>
+
+        <a class="home-link" routerLink="/">
+          <i class="bi bi-house" aria-hidden="true"></i>
+          {{ 'common.home' | translate }}
+        </a>
+      </article>
+    }
+  </div>
+</section>

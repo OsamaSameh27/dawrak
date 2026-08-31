@@ -1,0 +1,86 @@
+<header class="public-header">
+  <nav class="navbar navbar-expand-lg" [attr.aria-label]="'navigation.primary' | translate">
+    <div class="container">
+      <a class="navbar-brand" routerLink="/" (click)="closeMenu()">
+        <span class="brand-icon" aria-hidden="true">
+          <i class="bi bi-ticket-perforated"></i>
+        </span>
+
+        <span class="brand-copy">
+          <strong>{{ 'app.name' | translate }}</strong>
+          <small>{{ 'app.tagline' | translate }}</small>
+        </span>
+      </a>
+
+      <button
+        class="navbar-toggler"
+        type="button"
+        [attr.aria-controls]="'publicNavigation'"
+        [attr.aria-expanded]="isMenuOpen()"
+        [attr.aria-label]="'navigation.toggleMenu' | translate"
+        (click)="toggleMenu()"
+      >
+        <i
+          class="bi"
+          [class.bi-list]="!isMenuOpen()"
+          [class.bi-x-lg]="isMenuOpen()"
+          aria-hidden="true"
+        ></i>
+      </button>
+
+      <div
+        id="publicNavigation"
+        class="collapse navbar-collapse"
+        [class.show]="isMenuOpen()"
+      >
+        <ul class="navbar-nav mx-auto">
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              routerLink="/"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: true }"
+              ariaCurrentWhenActive="page"
+              (click)="closeMenu()"
+            >
+              {{ 'common.home' | translate }}
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              routerLink="/booking"
+              routerLinkActive="active"
+              ariaCurrentWhenActive="page"
+              (click)="closeMenu()"
+            >
+              {{ 'common.bookTicket' | translate }}
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              routerLink="/track"
+              routerLinkActive="active"
+              ariaCurrentWhenActive="page"
+              (click)="closeMenu()"
+            >
+              {{ 'navigation.trackTicket' | translate }}
+            </a>
+          </li>
+        </ul>
+
+        <div class="header-actions">
+          <app-language-switcher />
+
+          <a class="btn login-button" routerLink="/login" (click)="closeMenu()">
+            <i class="bi bi-person" aria-hidden="true"></i>
+            <span>{{ 'common.login' | translate }}</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>

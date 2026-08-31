@@ -1,0 +1,297 @@
+{
+  "meta": {
+    "title": "Dawrak | Queue Management",
+    "description": "A simple system for booking, tracking and managing queues"
+  },
+  "app": {
+    "name": "Dawrak",
+    "tagline": "Your turn without the long wait"
+  },
+  "navigation": {
+    "primary": "Main navigation",
+    "toggleMenu": "Open or close menu",
+    "trackTicket": "Track your turn"
+  },
+  "language": {
+    "label": "Language",
+    "arabic": "Arabic",
+    "english": "English",
+    "switchToArabic": "Switch to Arabic",
+    "switchToEnglish": "Switch to English"
+  },
+  "home": {
+    "hero": {
+      "eyebrow": "Better time management starts here",
+      "title": "Your turn without the long wait",
+      "titleHighlight": "Your turn",
+      "titleRest": "without the long wait",
+      "description": "Book before you leave and follow the queue in real time from wherever you are.",
+      "featuresLabel": "System benefits",
+      "features": {
+        "noCrowds": "Less time in crowded waiting areas",
+        "liveUpdates": "Live updates for your turn"
+      },
+      "preview": {
+        "exampleLabel": "Illustrative example",
+        "title": "Your current ticket",
+        "ticketLabel": "Your ticket number",
+        "nowServing": "Now serving",
+        "peopleAhead": "{{count}} people ahead of you",
+        "estimated": "About {{minutes}} minutes"
+      }
+    },
+    "quickActions": {
+      "eyebrow": "Get started easily",
+      "title": "What would you like to do?",
+      "description": "Choose an action and complete it in a few simple steps.",
+      "book": {
+        "title": "Book a new turn",
+        "description": "Choose a branch and service, then check the wait before booking."
+      },
+      "track": {
+        "title": "Track your ticket",
+        "description": "Enter your ticket number to see your current position."
+      }
+    },
+    "queue": {
+      "eyebrow": "Branch status",
+      "title": "Check the wait before you choose",
+      "description": "These are sample values for the interface and will update automatically after integration."
+    },
+    "services": {
+      "generalExamination": "General examination",
+      "dentalExamination": "Dental examination",
+      "customerService": "Customer service"
+    },
+    "branches": {
+      "nasrCity": "Nasr City branch",
+      "maadi": "Maadi branch",
+      "downtown": "Downtown branch"
+    },
+    "howItWorks": {
+      "eyebrow": "Only three steps",
+      "title": "How does Dawrak work?",
+      "description": "Everything is clear from choosing a service until your turn arrives.",
+      "steps": {
+        "choose": {
+          "title": "Choose a branch and service",
+          "description": "View the available branches and select the service you need."
+        },
+        "ticket": {
+          "title": "Get your ticket number",
+          "description": "Confirm your booking to see your ticket and estimated wait."
+        },
+        "follow": {
+          "title": "Follow until your turn",
+          "description": "See how many people are ahead and get notified before you are called."
+        }
+      }
+    },
+    "cta": {
+      "title": "Ready to save time?",
+      "description": "Choose a service and book your turn in under a minute.",
+      "action": "Book your turn now"
+    }
+  },
+  "booking": {
+    "eyebrow": "Book a new turn",
+    "title": "Book your turn in a few simple steps",
+    "description": "Choose a branch and service, then check the wait before confirming your booking.",
+    "minutes": "About {{count}} min",
+    "people": "{{count}} people",
+    "stepper": {
+      "label": "Booking steps",
+      "branch": "Choose branch",
+      "service": "Choose service",
+      "confirm": "Confirm booking"
+    },
+    "branchStep": {
+      "eyebrow": "First step",
+      "title": "Choose a convenient branch",
+      "description": "Select the nearest branch. You can change it before confirming."
+    },
+    "branches": {
+      "nasrCity": {
+        "name": "Nasr City branch",
+        "address": "Abbas El Akkad St., Nasr City",
+        "hours": "Today from 9 AM to 8 PM"
+      },
+      "maadi": {
+        "name": "Maadi branch",
+        "address": "Road 9, Maadi",
+        "hours": "Today from 9 AM to 7 PM"
+      },
+      "downtown": {
+        "name": "Downtown branch",
+        "address": "Talaat Harb Sq., Downtown",
+        "hours": "Today from 10 AM to 8 PM"
+      }
+    },
+    "serviceStep": {
+      "eyebrow": "Second step",
+      "title": "Choose the service you need",
+      "description": "The displayed queue counts and times are sample data until integration.",
+      "waiting": "Waiting",
+      "estimate": "Estimated time"
+    },
+    "services": {
+      "generalExamination": {
+        "name": "General examination",
+        "description": "Initial examination and health assessment"
+      },
+      "dentalExamination": {
+        "name": "Dental examination",
+        "description": "Dental checkup and initial consultation"
+      },
+      "customerService": {
+        "name": "Customer service",
+        "description": "Questions and booking detail updates"
+      }
+    },
+    "summary": {
+      "title": "Review your booking",
+      "description": "Make sure the branch and service are right before confirming.",
+      "branch": "Branch",
+      "service": "Service",
+      "waiting": "People waiting",
+      "estimate": "Estimated time",
+      "note": "The estimated wait may change depending on service speed.",
+      "confirm": "Confirm booking"
+    },
+    "success": {
+      "eyebrow": "Booking confirmed",
+      "title": "Your turn is booked",
+      "description": "Keep your ticket number so you can track your turn easily.",
+      "ticketNumber": "Your ticket number",
+      "branch": "Branch",
+      "service": "Service",
+      "peopleAhead": "People ahead",
+      "estimate": "Estimated time",
+      "note": "We will notify you shortly before your turn.",
+      "track": "Track your turn",
+      "newBooking": "Book another turn"
+    }
+  },
+  "track": {
+    "eyebrow": "Track your ticket",
+    "title": "See how close your turn is",
+    "description": "Enter your ticket identifier to see its status and estimated wait immediately.",
+    "form": {
+      "label": "Ticket identifier",
+      "placeholder": "Enter or paste your ticket identifier",
+      "action": "View ticket status",
+      "required": "Enter a valid ticket identifier so we can find your turn.",
+      "help": "You will find the ticket identifier in the booking details you received."
+    },
+    "result": {
+      "status": {
+        "waiting": "Waiting"
+      },
+      "ticketLabel": "Ticket number",
+      "searchAgain": "Another ticket",
+      "peopleAheadLabel": "Still ahead of you",
+      "peopleAhead": "People",
+      "nowServing": "Now serving",
+      "estimated": "Estimated time",
+      "minutes": "About {{count}} minutes",
+      "branch": "Branch",
+      "service": "Service",
+      "bookedAt": "Booked at",
+      "sampleTime": "Today, 11:35 AM",
+      "notice": "Stay near the branch. We will notify you shortly before your turn."
+    }
+  },
+  "auth": {
+    "shared": {
+      "backHome": "Back to home",
+      "email": "Email address",
+      "emailPlaceholder": "name@example.com",
+      "password": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "confirmPassword": "Confirm password",
+      "confirmPasswordPlaceholder": "Enter your password again",
+      "fullName": "Full name",
+      "fullNamePlaceholder": "Enter your full name",
+      "phone": "Mobile number",
+      "optional": "Optional",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password",
+      "readyForIntegration": "The form data is valid. Submission will be enabled when the page is connected to the backend."
+    },
+    "errors": {
+      "emailRequired": "Email address is required.",
+      "emailInvalid": "Enter a valid email address.",
+      "passwordLength": "Password must be at least 8 characters.",
+      "passwordRules": "Use at least 8 characters with uppercase, lowercase and a number.",
+      "passwordMismatch": "The passwords do not match.",
+      "fullName": "Name must be between 2 and 100 characters.",
+      "phone": "Enter 8 to 15 digits, optionally starting with +."
+    },
+    "login": {
+      "asideEyebrow": "All your turns in one place",
+      "asideTitle": "Come back and follow your turn",
+      "asideDescription": "Sign in to track your bookings and receive important notifications.",
+      "benefits": {
+        "tickets": "Access your active tickets",
+        "notifications": "Notifications before your turn",
+        "history": "Review your previous bookings"
+      },
+      "eyebrow": "Welcome back",
+      "title": "Log in",
+      "description": "Enter your account details to continue.",
+      "action": "Log in",
+      "noAccount": "Do not have an account?",
+      "createAccount": "Create a new account"
+    },
+    "register": {
+      "asideEyebrow": "Start in under a minute",
+      "asideTitle": "Save time with Dawrak",
+      "asideDescription": "Create an account to book and follow your turns from anywhere.",
+      "benefits": {
+        "fastBooking": "Faster booking next time",
+        "liveTracking": "Live tracking for your turn",
+        "notifications": "Notifications before service"
+      },
+      "eyebrow": "New account",
+      "title": "Create an account",
+      "description": "Enter your basic details to set up your account.",
+      "passwordHint": "Uppercase, lowercase, a number and at least 8 characters.",
+      "action": "Create account",
+      "hasAccount": "Already have an account?",
+      "login": "Log in"
+    }
+  },
+  "queueStatus": {
+    "waitingLabel": "Waiting",
+    "timeLabel": "Estimated time",
+    "estimatedMinutes": "About {{minutes}} min",
+    "closedEstimate": "Not available",
+    "book": "Book this service",
+    "unavailable": "Service is currently closed",
+    "status": {
+      "available": "Available",
+      "busy": "Busy",
+      "closed": "Closed"
+    }
+  },
+  "footer": {
+    "description": "A simple way to book and follow your turn without a long wait.",
+    "linksLabel": "Footer links",
+    "quickLinks": "Quick links",
+    "copyright": "© {{year}} Dawrak. All rights reserved.",
+    "madeForTime": "Designed because your time matters"
+  },
+  "common": {
+    "home": "Home",
+    "login": "Log in",
+    "register": "Create account",
+    "bookTicket": "Book your turn",
+    "back": "Back",
+    "next": "Next",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "loading": "Loading...",
+    "noData": "No data available"
+  }
+}

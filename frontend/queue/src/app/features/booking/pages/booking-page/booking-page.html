@@ -1,0 +1,93 @@
+<section class="booking-page">
+  <div class="container">
+    <header class="booking-header text-center mx-auto">
+      <span class="booking-eyebrow">
+        <i class="bi bi-ticket-perforated" aria-hidden="true"></i>
+        {{ 'booking.eyebrow' | translate }}
+      </span>
+      <h1>{{ 'booking.title' | translate }}</h1>
+      <p>{{ 'booking.description' | translate }}</p>
+    </header>
+
+    <app-booking-stepper [currentStep]="currentStep()" />
+
+    <div class="booking-panel">
+      @switch (currentStep()) {
+        @case (1) {
+          <app-branch-selector
+            [branches]="branches"
+            [selectedId]="selectedBranchId()"
+            (branchSelected)="selectBranch($event)"
+          />
+
+          <div class="booking-actions justify-content-end">
+            <button
+              class="btn btn-primary btn-lg"
+              type="button"
+              [disabled]="!selectedBranchId()"
+              (click)="nextStep()"
+            >
+              {{ 'common.next' | translate }}
+              <i class="bi bi-arrow-left-short directional-icon" aria-hidden="true"></i>
+            </button>
+          </div>
+        }
+
+        @case (2) {
+          <app-service-selector
+            [services]="services"
+            [selectedId]="selectedServiceId()"
+            (serviceSelected)="selectService($event)"
+          />
+
+          <div class="booking-actions">
+            <button class="btn btn-light btn-lg" type="button" (click)="previousStep()">
+              <i class="bi bi-arrow-right-short directional-icon" aria-hidden="true"></i>
+              {{ 'common.back' | translate }}
+            </button>
+            <button
+              class="btn btn-primary btn-lg"
+              type="button"
+              [disabled]="!selectedServiceId()"
+              (click)="nextStep()"
+            >
+              {{ 'common.next' | translate }}
+              <i class="bi bi-arrow-left-short directional-icon" aria-hidden="true"></i>
+            </button>
+          </div>
+        }
+
+        @case (3) {
+          @if (selectedBranch(); as branch) {
+            @if (selectedService(); as service) {
+              <app-booking-summary
+                [branchNameKey]="branch.nameKey"
+                [branchAddressKey]="branch.addressKey"
+                [serviceNameKey]="service.nameKey"
+                [waitingCount]="service.waitingCount"
+                [estimatedMinutes]="service.estimatedMinutes"
+                (back)="previousStep()"
+                (confirm)="confirmBooking()"
+              />
+            }
+          }
+        }
+
+        @case (4) {
+          @if (selectedBranch(); as branch) {
+            @if (selectedService(); as service) {
+              <app-booking-success
+                ticketNumber="G-024"
+                [branchNameKey]="branch.nameKey"
+                [serviceNameKey]="service.nameKey"
+                [peopleAhead]="service.waitingCount"
+                [estimatedMinutes]="service.estimatedMinutes"
+                (newBooking)="startNewBooking()"
+              />
+            }
+          }
+        }
+      }
+    </div>
+  </div>
+</section>

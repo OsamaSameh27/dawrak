@@ -1,0 +1,81 @@
+:host {
+  display: block;
+}
+
+.booking-page {
+  min-height: calc(100svh - 4.25rem);
+  padding-block: clamp(2.5rem, 6vw, 5rem);
+  background: rgba(255, 255, 255, 0.38);
+}
+
+.booking-header {
+  max-width: 42rem;
+  margin-bottom: 2rem;
+}
+
+.booking-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--queue-primary-dark);
+  font-size: 0.82rem;
+  font-weight: 750;
+}
+
+.booking-header h1 {
+  margin-block: 0.7rem 0.55rem;
+  font-size: clamp(2rem, 5vw, 3.25rem);
+}
+
+.booking-header p {
+  margin: 0;
+  color: var(--queue-muted);
+}
+
+.booking-panel {
+  max-width: 62rem;
+  margin-inline: auto;
+  padding: clamp(1.15rem, 3vw, 2rem);
+  border: 1px solid var(--queue-border);
+  border-radius: var(--queue-radius);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: var(--queue-shadow);
+}
+
+.booking-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 1.75rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--queue-border);
+}
+
+.booking-actions .btn {
+  display: inline-flex;
+  min-width: 8.5rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  font-size: 0.95rem;
+}
+
+[dir='ltr'] .directional-icon {
+  transform: scaleX(-1);
+}
+
+@media (max-width: 575.98px) {
+  .booking-page {
+    padding-block: 2rem;
+  }
+
+  .booking-panel {
+    padding: 1rem;
+  }
+
+  .booking-actions .btn {
+    min-width: 0;
+    flex: 1;
+  }
+}

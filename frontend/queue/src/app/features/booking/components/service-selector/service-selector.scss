@@ -1,0 +1,128 @@
+.selector-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.selector-heading span {
+  color: var(--queue-primary-dark);
+  font-size: 0.76rem;
+  font-weight: 750;
+}
+
+.selector-heading h2 {
+  margin: 0.3rem 0 0;
+  font-size: clamp(1.35rem, 3vw, 1.8rem);
+}
+
+.selector-heading p {
+  max-width: 24rem;
+  margin: 0;
+  color: var(--queue-muted);
+  font-size: 0.88rem;
+}
+
+.service-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.service-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.9rem;
+  width: 100%;
+  padding: 1rem;
+  border: 1px solid var(--queue-border);
+  border-radius: var(--queue-radius-sm);
+  background: var(--queue-surface);
+  color: var(--queue-text);
+  text-align: start;
+}
+
+.service-card:hover {
+  border-color: rgba(40, 117, 109, 0.55);
+}
+
+.service-card.is-selected {
+  border-color: var(--queue-primary);
+  background: var(--queue-primary-soft);
+}
+
+.service-icon {
+  display: inline-grid;
+  width: 2.7rem;
+  height: 2.7rem;
+  place-items: center;
+  border-radius: 0.7rem;
+  background: var(--queue-primary-soft);
+  color: var(--queue-primary-dark);
+  font-size: 1.05rem;
+}
+
+.service-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.service-copy strong {
+  color: var(--queue-navy);
+}
+
+.service-copy small,
+.service-metrics small {
+  color: var(--queue-muted);
+  font-size: 0.76rem;
+}
+
+.service-metrics {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.service-metrics > span {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.service-metrics strong {
+  color: var(--queue-primary-dark);
+  font-size: 0.9rem;
+}
+
+.selected-icon {
+  position: absolute;
+  inset-block-start: 0.5rem;
+  inset-inline-end: 0.5rem;
+  display: none;
+  color: var(--queue-primary);
+}
+
+.is-selected .selected-icon {
+  display: inline-block;
+}
+
+@media (max-width: 767.98px) {
+  .selector-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .service-card {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .service-metrics {
+    grid-column: 1 / -1;
+    justify-content: space-between;
+    padding-top: 0.65rem;
+    border-top: 1px solid var(--queue-border);
+  }
+}

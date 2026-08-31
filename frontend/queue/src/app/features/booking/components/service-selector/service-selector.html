@@ -1,0 +1,36 @@
+<div class="selector-heading">
+  <div>
+    <span>{{ 'booking.serviceStep.eyebrow' | translate }}</span>
+    <h2>{{ 'booking.serviceStep.title' | translate }}</h2>
+  </div>
+  <p>{{ 'booking.serviceStep.description' | translate }}</p>
+</div>
+
+<div class="service-list">
+  @for (service of services(); track service.id) {
+    <button
+      class="service-card"
+      type="button"
+      [class.is-selected]="selectedId() === service.id"
+      [attr.aria-pressed]="selectedId() === service.id"
+      (click)="serviceSelected.emit(service.id)"
+    >
+      <span class="service-icon"><i class="bi" [class]="service.icon" aria-hidden="true"></i></span>
+      <span class="service-copy">
+        <strong>{{ service.nameKey | translate }}</strong>
+        <small>{{ service.descriptionKey | translate }}</small>
+      </span>
+      <span class="service-metrics">
+        <span>
+          <small>{{ 'booking.serviceStep.waiting' | translate }}</small>
+          <strong>{{ service.waitingCount }}</strong>
+        </span>
+        <span>
+          <small>{{ 'booking.serviceStep.estimate' | translate }}</small>
+          <strong>{{ 'booking.minutes' | translate: { count: service.estimatedMinutes } }}</strong>
+        </span>
+      </span>
+      <i class="bi bi-check-circle-fill selected-icon" aria-hidden="true"></i>
+    </button>
+  }
+</div>

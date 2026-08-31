@@ -1,0 +1,13 @@
+<button
+  class="language-button"
+  type="button"
+  [attr.aria-label]="
+    (currentLanguage() === 'ar'
+      ? 'language.switchToEnglish'
+      : 'language.switchToArabic') | translate
+  "
+  (click)="toggleLanguage()"
+>
+  <i class="bi bi-globe2" aria-hidden="true"></i>
+  <span aria-hidden="true">{{ currentLanguage() === 'ar' ? 'EN' : 'عربي' }}</span>
+</button>

@@ -1,0 +1,59 @@
+<article class="queue-card h-100">
+  <div class="queue-card__top">
+    <span class="service-icon" aria-hidden="true">
+      <i class="bi" [class]="queue().icon"></i>
+    </span>
+
+    <span
+      class="status-badge"
+      [class.status-badge--available]="queue().status === 'available'"
+      [class.status-badge--busy]="queue().status === 'busy'"
+      [class.status-badge--closed]="queue().status === 'closed'"
+    >
+      <span class="status-dot" aria-hidden="true"></span>
+      {{ 'queueStatus.status.' + queue().status | translate }}
+    </span>
+  </div>
+
+  <div class="queue-card__heading">
+    <h3>{{ queue().serviceNameKey | translate }}</h3>
+    <p>
+      <i class="bi bi-geo-alt" aria-hidden="true"></i>
+      {{ queue().branchNameKey | translate }}
+    </p>
+  </div>
+
+  <div class="queue-metrics">
+    <div class="queue-metric">
+      <span>{{ 'queueStatus.waitingLabel' | translate }}</span>
+      <strong>{{ queue().waitingCount }}</strong>
+    </div>
+
+    <div class="queue-metric">
+      <span>{{ 'queueStatus.timeLabel' | translate }}</span>
+      @if (queue().estimatedMinutes !== null) {
+        <strong>
+          {{ 'queueStatus.estimatedMinutes' | translate: { minutes: queue().estimatedMinutes } }}
+        </strong>
+      } @else {
+        <strong>{{ 'queueStatus.closedEstimate' | translate }}</strong>
+      }
+    </div>
+  </div>
+
+  @if (queue().status !== 'closed') {
+    <a
+      class="btn btn-outline-primary queue-card__action"
+      routerLink="/booking"
+      [queryParams]="{ service: queue().id }"
+    >
+      {{ 'queueStatus.book' | translate }}
+      <i class="bi bi-arrow-left-short directional-icon" aria-hidden="true"></i>
+    </a>
+  } @else {
+    <span class="queue-card__unavailable">
+      <i class="bi bi-clock" aria-hidden="true"></i>
+      {{ 'queueStatus.unavailable' | translate }}
+    </span>
+  }
+</article>

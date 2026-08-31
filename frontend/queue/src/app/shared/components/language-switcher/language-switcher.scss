@@ -1,0 +1,32 @@
+.language-button {
+  display: inline-flex;
+  min-width: 4.25rem;
+  min-height: 2.55rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  border: 0;
+  border-radius: var(--queue-radius-sm);
+  background: transparent;
+  color: var(--queue-primary-dark);
+  font-size: 0.88rem;
+  font-weight: 700;
+  padding: 0.45rem 0.7rem;
+  transition: background-color 160ms ease, color 160ms ease;
+}
+
+.language-button:hover,
+.language-button:focus-visible {
+  background: var(--queue-primary-soft);
+  color: var(--queue-navy);
+}
+
+.language-button .bi {
+  font-size: 1rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .language-button {
+    transition: none;
+  }
+}

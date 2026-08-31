@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: smart-queue-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: queue_user
+      POSTGRES_PASSWORD: queue_password
+      POSTGRES_DB: queue_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - queue_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U queue_user -d queue_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  queue_postgres_data:

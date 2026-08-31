@@ -1,0 +1,193 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CUSTOMER
+  STAFF
+  MANAGER
+  ADMIN
+}
+
+enum CounterStatus {
+  OPEN
+  PAUSED
+  CLOSED
+}
+
+enum TicketStatus {
+  WAITING
+  CALLED
+  SERVING
+  COMPLETED
+  SKIPPED
+  NO_SHOW
+  CANCELLED
+}
+
+enum NotificationType {
+  TICKET_CREATED
+  QUEUE_NEAR
+  TICKET_CALLED
+  TICKET_UPDATED
+}
+
+model User {
+  id                  String                @id @default(uuid()) @db.Uuid
+  email               String                @unique
+  passwordHash        String
+  fullName            String
+  phone               String?               @unique
+  role                Role                  @default(CUSTOMER)
+  branchId            String?               @db.Uuid
+  branch              Branch?               @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  refreshTokenHash    String?
+  isActive            Boolean               @default(true)
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  tickets             Ticket[]
+  notifications       Notification[]
+  ticketStatusChanges TicketStatusHistory[] @relation("TicketStatusChangedBy")
+  auditLogs           AuditLog[]
+
+  @@index([branchId, role])
+}
+
+model Branch {
+  id        String    @id @default(uuid()) @db.Uuid
+  name      String
+  code      String    @unique
+  address   String?
+  timezone  String    @default("Africa/Cairo")
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  services  Service[]
+  counters  Counter[]
+  users     User[]
+  tickets   Ticket[]
+
+  @@index([isActive])
+}
+
+model Service {
+  id                    String    @id @default(uuid()) @db.Uuid
+  branchId              String    @db.Uuid
+  branch                Branch    @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  name                  String
+  prefix                String
+  description           String?
+  averageServiceMinutes Int       @default(10)
+  nearTurnThreshold     Int       @default(2)
+  isActive              Boolean   @default(true)
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  counters              Counter[]
+  tickets               Ticket[]
+
+  @@unique([branchId, prefix])
+  @@index([branchId, isActive])
+}
+
+model Counter {
+  id        String        @id @default(uuid()) @db.Uuid
+  branchId  String        @db.Uuid
+  branch    Branch        @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  serviceId String?       @db.Uuid
+  service   Service?      @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+  name      String
+  status    CounterStatus @default(CLOSED)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  tickets   Ticket[]
+
+  @@unique([branchId, name])
+  @@index([serviceId, status])
+}
+
+model Ticket {
+  id               String                @id @default(uuid()) @db.Uuid
+  publicId         String                @unique @default(uuid()) @db.Uuid
+  branchId         String                @db.Uuid
+  branch           Branch                @relation(fields: [branchId], references: [id], onDelete: Restrict)
+  serviceId        String                @db.Uuid
+  service          Service               @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+  counterId        String?               @db.Uuid
+  counter          Counter?              @relation(fields: [counterId], references: [id], onDelete: SetNull)
+  customerId       String?               @db.Uuid
+  customer         User?                 @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  queueDate        DateTime              @db.Date
+  sequence         Int
+  number           String
+  customerName     String
+  customerPhone    String?
+  manageTokenHash  String?
+  idempotencyKey   String?               @unique
+  priority         Int                   @default(0)
+  status           TicketStatus          @default(WAITING)
+  note             String?
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+  calledAt         DateTime?
+  serviceStartedAt DateTime?
+  completedAt      DateTime?
+  cancelledAt      DateTime?
+  statusHistory    TicketStatusHistory[]
+  notifications    Notification[]
+
+  @@unique([serviceId, queueDate, sequence])
+  @@index([serviceId, queueDate, status, priority, sequence])
+  @@index([customerId, createdAt])
+  @@index([branchId, createdAt])
+}
+
+model TicketStatusHistory {
+  id          String        @id @default(uuid()) @db.Uuid
+  ticketId    String        @db.Uuid
+  ticket      Ticket        @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  fromStatus  TicketStatus?
+  toStatus    TicketStatus
+  changedById String?       @db.Uuid
+  changedBy   User?         @relation("TicketStatusChangedBy", fields: [changedById], references: [id], onDelete: SetNull)
+  note        String?
+  createdAt   DateTime      @default(now())
+
+  @@index([ticketId, createdAt])
+}
+
+model Notification {
+  id        String           @id @default(uuid()) @db.Uuid
+  userId    String?          @db.Uuid
+  user      User?            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ticketId  String?          @db.Uuid
+  ticket    Ticket?          @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  type      NotificationType
+  title     String
+  message   String
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+
+  @@index([userId, readAt, createdAt])
+  @@index([ticketId, createdAt])
+}
+
+model AuditLog {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String?  @db.Uuid
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action    String
+  entity    String
+  entityId  String?
+  metadata  Json?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([entity, entityId])
+}

@@ -1,0 +1,45 @@
+<div class="success-card text-center">
+  <span class="success-icon"><i class="bi bi-check-lg" aria-hidden="true"></i></span>
+  <span class="success-eyebrow">{{ 'booking.success.eyebrow' | translate }}</span>
+  <h2>{{ 'booking.success.title' | translate }}</h2>
+  <p>{{ 'booking.success.description' | translate }}</p>
+
+  <div class="ticket-number">
+    <small>{{ 'booking.success.ticketNumber' | translate }}</small>
+    <strong>{{ ticketNumber() }}</strong>
+  </div>
+
+  <div class="ticket-details">
+    <div>
+      <small>{{ 'booking.success.branch' | translate }}</small>
+      <strong>{{ branchNameKey() | translate }}</strong>
+    </div>
+    <div>
+      <small>{{ 'booking.success.service' | translate }}</small>
+      <strong>{{ serviceNameKey() | translate }}</strong>
+    </div>
+    <div>
+      <small>{{ 'booking.success.peopleAhead' | translate }}</small>
+      <strong>{{ peopleAhead() }}</strong>
+    </div>
+    <div>
+      <small>{{ 'booking.success.estimate' | translate }}</small>
+      <strong>{{ 'booking.minutes' | translate: { count: estimatedMinutes() } }}</strong>
+    </div>
+  </div>
+
+  <div class="success-note">
+    <i class="bi bi-bell" aria-hidden="true"></i>
+    {{ 'booking.success.note' | translate }}
+  </div>
+
+  <div class="success-actions">
+    <a class="btn btn-primary btn-lg" routerLink="/track">
+      <i class="bi bi-search" aria-hidden="true"></i>
+      {{ 'booking.success.track' | translate }}
+    </a>
+    <button class="btn btn-light btn-lg" type="button" (click)="newBooking.emit()">
+      {{ 'booking.success.newBooking' | translate }}
+    </button>
+  </div>
+</div>

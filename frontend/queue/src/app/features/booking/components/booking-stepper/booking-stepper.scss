@@ -1,0 +1,63 @@
+:host {
+  display: block;
+  max-width: 62rem;
+  margin: 0 auto 1rem;
+}
+
+.stepper ol {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.65rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stepper li {
+  display: flex;
+  min-height: 3.3rem;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid var(--queue-border);
+  border-radius: var(--queue-radius-sm);
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--queue-muted);
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.step-number {
+  display: inline-grid;
+  width: 1.8rem;
+  height: 1.8rem;
+  flex: 0 0 1.8rem;
+  place-items: center;
+  border-radius: 50%;
+  background: #e7ecea;
+  color: var(--queue-muted);
+  font-size: 0.78rem;
+}
+
+.stepper li.is-active {
+  border-color: rgba(40, 117, 109, 0.45);
+  background: var(--queue-primary-soft);
+  color: var(--queue-primary-dark);
+}
+
+.stepper li.is-active .step-number,
+.stepper li.is-complete .step-number {
+  background: var(--queue-primary);
+  color: #fff;
+}
+
+@media (max-width: 575.98px) {
+  .stepper li {
+    justify-content: center;
+    padding-inline: 0.4rem;
+  }
+
+  .stepper li > span:last-child {
+    display: none;
+  }
+}

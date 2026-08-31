@@ -1,0 +1,29 @@
+<div class="selector-heading">
+  <div>
+    <span>{{ 'booking.branchStep.eyebrow' | translate }}</span>
+    <h2>{{ 'booking.branchStep.title' | translate }}</h2>
+  </div>
+  <p>{{ 'booking.branchStep.description' | translate }}</p>
+</div>
+
+<div class="row g-3">
+  @for (branch of branches(); track branch.id) {
+    <div class="col-md-6 col-xl-4">
+      <button
+        class="choice-card"
+        type="button"
+        [class.is-selected]="selectedId() === branch.id"
+        [attr.aria-pressed]="selectedId() === branch.id"
+        (click)="branchSelected.emit(branch.id)"
+      >
+        <span class="choice-icon"><i class="bi" [class]="branch.icon" aria-hidden="true"></i></span>
+        <span class="choice-copy">
+          <strong>{{ branch.nameKey | translate }}</strong>
+          <small><i class="bi bi-geo-alt" aria-hidden="true"></i>{{ branch.addressKey | translate }}</small>
+          <small><i class="bi bi-clock" aria-hidden="true"></i>{{ branch.hoursKey | translate }}</small>
+        </span>
+        <i class="bi bi-check-circle-fill selected-icon" aria-hidden="true"></i>
+      </button>
+    </div>
+  }
+</div>

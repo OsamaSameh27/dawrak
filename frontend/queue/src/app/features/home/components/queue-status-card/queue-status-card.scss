@@ -1,0 +1,152 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.queue-card {
+  display: flex;
+  flex-direction: column;
+  padding: 1.35rem;
+  border: 1px solid var(--queue-border);
+  border-radius: var(--queue-radius);
+  background: var(--queue-surface);
+  box-shadow: 0 0.35rem 1.25rem rgba(28, 55, 61, 0.055);
+  transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+
+.queue-card:hover {
+  border-color: rgba(40, 117, 109, 0.35);
+  box-shadow: var(--queue-shadow);
+  transform: translateY(-0.15rem);
+}
+
+.queue-card__top,
+.queue-metrics {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.service-icon {
+  display: inline-grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  place-items: center;
+  border-radius: 0.7rem;
+  background: var(--queue-primary-soft);
+  color: var(--queue-primary-dark);
+  font-size: 1.2rem;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: 999px;
+  background: #f1f3f2;
+  color: var(--queue-muted);
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 0.32rem 0.65rem;
+}
+
+.status-dot {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.status-badge--available {
+  background: #e8f4ed;
+  color: var(--queue-success);
+}
+
+.status-badge--busy {
+  background: #fbf2df;
+  color: var(--queue-warning);
+}
+
+.status-badge--closed {
+  background: #f8eaea;
+  color: var(--queue-danger);
+}
+
+.queue-card__heading {
+  margin-block: 1.2rem;
+}
+
+.queue-card__heading h3 {
+  margin-bottom: 0.35rem;
+  font-size: 1.05rem;
+}
+
+.queue-card__heading p {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0;
+  color: var(--queue-muted);
+  font-size: 0.85rem;
+}
+
+.queue-metrics {
+  margin-bottom: 1.15rem;
+  padding-block: 0.9rem;
+  border-block: 1px solid var(--queue-border);
+}
+
+.queue-metric {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.queue-metric + .queue-metric {
+  padding-inline-start: 1rem;
+  border-inline-start: 1px solid var(--queue-border);
+}
+
+.queue-metric span {
+  color: var(--queue-muted);
+  font-size: 0.75rem;
+}
+
+.queue-metric strong {
+  color: var(--queue-navy);
+  font-size: 0.94rem;
+}
+
+.queue-card__action {
+  display: inline-flex;
+  margin-top: auto;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.queue-card__unavailable {
+  display: inline-flex;
+  min-height: 2.5rem;
+  margin-top: auto;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  border-radius: var(--queue-radius-sm);
+  background: #f4f5f4;
+  color: var(--queue-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+[dir='ltr'] .directional-icon {
+  transform: scaleX(-1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .queue-card {
+    transition: none;
+  }
+}

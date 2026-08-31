@@ -1,0 +1,175 @@
+<section class="auth-page">
+  <div class="container">
+    <div class="auth-card">
+      <aside class="auth-intro">
+        <a class="auth-brand" routerLink="/">
+          <span><i class="bi bi-ticket-perforated" aria-hidden="true"></i></span>
+          <strong>{{ 'app.name' | translate }}</strong>
+        </a>
+
+        <div class="auth-intro__copy">
+          <span class="auth-eyebrow">{{ 'auth.register.asideEyebrow' | translate }}</span>
+          <h1>{{ 'auth.register.asideTitle' | translate }}</h1>
+          <p>{{ 'auth.register.asideDescription' | translate }}</p>
+
+          <ul>
+            <li><i class="bi bi-check-circle-fill" aria-hidden="true"></i>{{ 'auth.register.benefits.fastBooking' | translate }}</li>
+            <li><i class="bi bi-check-circle-fill" aria-hidden="true"></i>{{ 'auth.register.benefits.liveTracking' | translate }}</li>
+            <li><i class="bi bi-check-circle-fill" aria-hidden="true"></i>{{ 'auth.register.benefits.notifications' | translate }}</li>
+          </ul>
+        </div>
+      </aside>
+
+      <div class="auth-form-panel">
+        <a class="back-link" routerLink="/">
+          <i class="bi bi-arrow-right-short directional-icon" aria-hidden="true"></i>
+          {{ 'auth.shared.backHome' | translate }}
+        </a>
+
+        <header class="form-heading">
+          <span>{{ 'auth.register.eyebrow' | translate }}</span>
+          <h2>{{ 'auth.register.title' | translate }}</h2>
+          <p>{{ 'auth.register.description' | translate }}</p>
+        </header>
+
+        @if (readyMessage()) {
+          <div class="ready-alert" role="status">
+            <i class="bi bi-info-circle" aria-hidden="true"></i>
+            {{ 'auth.shared.readyForIntegration' | translate }}
+          </div>
+        }
+
+        <form [formGroup]="registerForm" (ngSubmit)="submit()" novalidate>
+          <div class="form-field">
+            <label class="form-label" for="fullName">{{ 'auth.shared.fullName' | translate }}</label>
+            <input
+              id="fullName"
+              class="form-control"
+              type="text"
+              formControlName="fullName"
+              autocomplete="name"
+              [placeholder]="'auth.shared.fullNamePlaceholder' | translate"
+              [class.is-invalid]="isInvalid('fullName')"
+            />
+            @if (isInvalid('fullName')) {
+              <div class="invalid-feedback">{{ 'auth.errors.fullName' | translate }}</div>
+            }
+          </div>
+
+          <div class="field-grid">
+            <div class="form-field">
+              <label class="form-label" for="registerEmail">{{ 'auth.shared.email' | translate }}</label>
+              <input
+                id="registerEmail"
+                class="form-control"
+                type="email"
+                dir="ltr"
+                formControlName="email"
+                autocomplete="email"
+                [placeholder]="'auth.shared.emailPlaceholder' | translate"
+                [class.is-invalid]="isInvalid('email')"
+              />
+              @if (isInvalid('email')) {
+                <div class="invalid-feedback">
+                  @if (registerForm.controls.email.hasError('required')) {
+                    {{ 'auth.errors.emailRequired' | translate }}
+                  } @else {
+                    {{ 'auth.errors.emailInvalid' | translate }}
+                  }
+                </div>
+              }
+            </div>
+
+            <div class="form-field">
+              <label class="form-label" for="phone">
+                {{ 'auth.shared.phone' | translate }}
+                <small>{{ 'auth.shared.optional' | translate }}</small>
+              </label>
+              <input
+                id="phone"
+                class="form-control"
+                type="tel"
+                dir="ltr"
+                formControlName="phone"
+                autocomplete="tel"
+                placeholder="+201001234567"
+                [class.is-invalid]="isInvalid('phone')"
+              />
+              @if (isInvalid('phone')) {
+                <div class="invalid-feedback">{{ 'auth.errors.phone' | translate }}</div>
+              }
+            </div>
+          </div>
+
+          <div class="field-grid">
+            <div class="form-field">
+              <label class="form-label" for="registerPassword">{{ 'auth.shared.password' | translate }}</label>
+              <div class="password-field">
+                <input
+                  id="registerPassword"
+                  class="form-control"
+                  [type]="showPassword() ? 'text' : 'password'"
+                  dir="ltr"
+                  formControlName="password"
+                  autocomplete="new-password"
+                  [placeholder]="'auth.shared.passwordPlaceholder' | translate"
+                  [class.is-invalid]="isInvalid('password')"
+                />
+                <button
+                  class="password-toggle"
+                  type="button"
+                  [attr.aria-label]="(showPassword() ? 'auth.shared.hidePassword' : 'auth.shared.showPassword') | translate"
+                  (click)="showPassword.set(!showPassword())"
+                >
+                  <i class="bi" [class.bi-eye]="!showPassword()" [class.bi-eye-slash]="showPassword()" aria-hidden="true"></i>
+                </button>
+              </div>
+              @if (isInvalid('password')) {
+                <div class="invalid-feedback">{{ 'auth.errors.passwordRules' | translate }}</div>
+              } @else {
+                <small class="form-hint">{{ 'auth.register.passwordHint' | translate }}</small>
+              }
+            </div>
+
+            <div class="form-field">
+              <label class="form-label" for="confirmPassword">{{ 'auth.shared.confirmPassword' | translate }}</label>
+              <div class="password-field">
+                <input
+                  id="confirmPassword"
+                  class="form-control"
+                  [type]="showConfirmPassword() ? 'text' : 'password'"
+                  dir="ltr"
+                  formControlName="confirmPassword"
+                  autocomplete="new-password"
+                  [placeholder]="'auth.shared.confirmPasswordPlaceholder' | translate"
+                  [class.is-invalid]="confirmPasswordInvalid()"
+                />
+                <button
+                  class="password-toggle"
+                  type="button"
+                  [attr.aria-label]="(showConfirmPassword() ? 'auth.shared.hidePassword' : 'auth.shared.showPassword') | translate"
+                  (click)="showConfirmPassword.set(!showConfirmPassword())"
+                >
+                  <i class="bi" [class.bi-eye]="!showConfirmPassword()" [class.bi-eye-slash]="showConfirmPassword()" aria-hidden="true"></i>
+                </button>
+              </div>
+              @if (confirmPasswordInvalid()) {
+                <div class="invalid-feedback">{{ 'auth.errors.passwordMismatch' | translate }}</div>
+              }
+            </div>
+          </div>
+
+          <button class="btn btn-primary btn-lg submit-button" type="submit">
+            {{ 'auth.register.action' | translate }}
+            <i class="bi bi-person-plus directional-icon" aria-hidden="true"></i>
+          </button>
+        </form>
+
+        <p class="auth-switch">
+          {{ 'auth.register.hasAccount' | translate }}
+          <a routerLink="/login">{{ 'auth.register.login' | translate }}</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>

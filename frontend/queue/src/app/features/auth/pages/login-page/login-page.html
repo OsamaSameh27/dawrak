@@ -1,0 +1,108 @@
+<section class="auth-page">
+  <div class="container">
+    <div class="auth-card">
+      <aside class="auth-intro">
+        <a class="auth-brand" routerLink="/">
+          <span><i class="bi bi-ticket-perforated" aria-hidden="true"></i></span>
+          <strong>{{ 'app.name' | translate }}</strong>
+        </a>
+
+        <div class="auth-intro__copy">
+          <span class="auth-eyebrow">{{ 'auth.login.asideEyebrow' | translate }}</span>
+          <h1>{{ 'auth.login.asideTitle' | translate }}</h1>
+          <p>{{ 'auth.login.asideDescription' | translate }}</p>
+
+          <ul>
+            <li><i class="bi bi-check-circle-fill" aria-hidden="true"></i>{{ 'auth.login.benefits.tickets' | translate }}</li>
+            <li><i class="bi bi-check-circle-fill" aria-hidden="true"></i>{{ 'auth.login.benefits.notifications' | translate }}</li>
+            <li><i class="bi bi-check-circle-fill" aria-hidden="true"></i>{{ 'auth.login.benefits.history' | translate }}</li>
+          </ul>
+        </div>
+      </aside>
+
+      <div class="auth-form-panel">
+        <a class="back-link" routerLink="/">
+          <i class="bi bi-arrow-right-short directional-icon" aria-hidden="true"></i>
+          {{ 'auth.shared.backHome' | translate }}
+        </a>
+
+        <header class="form-heading">
+          <span>{{ 'auth.login.eyebrow' | translate }}</span>
+          <h2>{{ 'auth.login.title' | translate }}</h2>
+          <p>{{ 'auth.login.description' | translate }}</p>
+        </header>
+
+        @if (readyMessage()) {
+          <div class="ready-alert" role="status">
+            <i class="bi bi-info-circle" aria-hidden="true"></i>
+            {{ 'auth.shared.readyForIntegration' | translate }}
+          </div>
+        }
+
+        <form [formGroup]="loginForm" (ngSubmit)="submit()" novalidate>
+          <div class="form-field">
+            <label class="form-label" for="loginEmail">{{ 'auth.shared.email' | translate }}</label>
+            <input
+              id="loginEmail"
+              class="form-control"
+              type="email"
+              dir="ltr"
+              formControlName="email"
+              autocomplete="email"
+              [placeholder]="'auth.shared.emailPlaceholder' | translate"
+              [class.is-invalid]="isInvalid('email')"
+            />
+            @if (isInvalid('email')) {
+              <div class="invalid-feedback">
+                @if (loginForm.controls.email.hasError('required')) {
+                  {{ 'auth.errors.emailRequired' | translate }}
+                } @else {
+                  {{ 'auth.errors.emailInvalid' | translate }}
+                }
+              </div>
+            }
+          </div>
+
+          <div class="form-field">
+            <label class="form-label" for="loginPassword">{{ 'auth.shared.password' | translate }}</label>
+            <div class="password-field">
+              <input
+                id="loginPassword"
+                class="form-control"
+                [type]="showPassword() ? 'text' : 'password'"
+                dir="ltr"
+                formControlName="password"
+                autocomplete="current-password"
+                [placeholder]="'auth.shared.passwordPlaceholder' | translate"
+                [class.is-invalid]="isInvalid('password')"
+              />
+              <button
+                class="password-toggle"
+                type="button"
+                [attr.aria-label]="(showPassword() ? 'auth.shared.hidePassword' : 'auth.shared.showPassword') | translate"
+                (click)="showPassword.set(!showPassword())"
+              >
+                <i class="bi" [class.bi-eye]="!showPassword()" [class.bi-eye-slash]="showPassword()" aria-hidden="true"></i>
+              </button>
+            </div>
+            @if (isInvalid('password')) {
+              <div class="invalid-feedback">
+                {{ 'auth.errors.passwordLength' | translate }}
+              </div>
+            }
+          </div>
+
+          <button class="btn btn-primary btn-lg submit-button" type="submit">
+            {{ 'auth.login.action' | translate }}
+            <i class="bi bi-box-arrow-in-left directional-icon" aria-hidden="true"></i>
+          </button>
+        </form>
+
+        <p class="auth-switch">
+          {{ 'auth.login.noAccount' | translate }}
+          <a routerLink="/register">{{ 'auth.login.createAccount' | translate }}</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
