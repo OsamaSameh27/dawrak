@@ -1,0 +1,90 @@
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+.dashboard-shell {
+  display: grid;
+  min-height: 100vh;
+  min-height: 100svh;
+  grid-template-columns: 17.5rem minmax(0, 1fr);
+  background: #f3f6f5;
+}
+
+app-dashboard-sidebar {
+  position: sticky;
+  z-index: 1040;
+  inset-block-start: 0;
+  height: 100vh;
+  height: 100svh;
+}
+
+.dashboard-workspace {
+  min-width: 0;
+}
+
+.dashboard-main {
+  width: 100%;
+  max-width: 100rem;
+  margin-inline: auto;
+  padding: clamp(1.25rem, 3vw, 2.5rem);
+}
+
+.sidebar-backdrop {
+  display: none;
+}
+
+@media (max-width: 991.98px) {
+  .dashboard-shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  app-dashboard-sidebar {
+    position: fixed;
+    inset-block: 0;
+    inset-inline-start: 0;
+    width: min(18rem, calc(100vw - 3rem));
+    transform: translateX(105%);
+    transition: transform 180ms ease;
+  }
+
+  [dir='ltr'] app-dashboard-sidebar {
+    transform: translateX(-105%);
+  }
+
+  .is-sidebar-open app-dashboard-sidebar {
+    transform: translateX(0);
+  }
+
+  .sidebar-backdrop {
+    position: fixed;
+    z-index: 1035;
+    inset: 0;
+    display: block;
+    visibility: hidden;
+    border: 0;
+    background: rgba(16, 47, 56, 0.42);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 180ms ease, visibility 180ms ease;
+  }
+
+  .is-sidebar-open .sidebar-backdrop {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .dashboard-main {
+    padding: 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  app-dashboard-sidebar,
+  .sidebar-backdrop {
+    transition: none;
+  }
+}

@@ -9,8 +9,11 @@
     <span class="row-icon"><i class="bi bi-geo-alt" aria-hidden="true"></i></span>
     <span>
       <small>{{ 'booking.summary.branch' | translate }}</small>
-      <strong>{{ branchNameKey() | translate }}</strong>
-      <small>{{ branchAddressKey() | translate }}</small>
+      <strong dir="auto">{{ branchName() }}</strong>
+
+      @if (branchAddress(); as address) {
+        <small dir="auto">{{ address }}</small>
+      }
     </span>
   </div>
 

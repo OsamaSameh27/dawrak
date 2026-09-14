@@ -5,11 +5,11 @@ import { TranslatePipe } from '@ngx-translate/core';
   selector: 'app-booking-summary',
   imports: [TranslatePipe],
   templateUrl: './booking-summary.html',
-  styleUrl: './booking-summary.scss'
+  styleUrl: './booking-summary.scss',
 })
 export class BookingSummary {
-  readonly branchNameKey = input.required<string>();
-  readonly branchAddressKey = input.required<string>();
+  readonly branchName = input.required<string>();
+  readonly branchAddress = input.required<string | null>();
   readonly serviceNameKey = input.required<string>();
   readonly waitingCount = input.required<number>();
   readonly estimatedMinutes = input.required<number>();

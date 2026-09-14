@@ -108,7 +108,10 @@
     "branchStep": {
       "eyebrow": "First step",
       "title": "Choose a convenient branch",
-      "description": "Select the nearest branch. You can change it before confirming."
+      "description": "Select the nearest branch. You can change it before confirming.",
+      "loadFailed": "Could not load branches. Please try again.",
+      "retry": "Try again",
+      "empty": "No branches are currently available."
     },
     "branches": {
       "nasrCity": {
@@ -225,7 +228,11 @@
       "passwordRules": "Use at least 8 characters with uppercase, lowercase and a number.",
       "passwordMismatch": "The passwords do not match.",
       "fullName": "Name must be between 2 and 100 characters.",
-      "phone": "Enter 8 to 15 digits, optionally starting with +."
+      "phone": "Enter 8 to 15 digits, optionally starting with +.",
+      "loginFailed": "The email address or password is incorrect.",
+      "accountExists": "The email address or phone number is already registered.",
+      "tooManyAttempts": "Too many attempts. Please wait and try again.",
+      "registerFailed": "Could not create the account. Check your details and try again."
     },
     "login": {
       "asideEyebrow": "All your turns in one place",
@@ -259,6 +266,41 @@
       "action": "Create account",
       "hasAccount": "Already have an account?",
       "login": "Log in"
+    }
+  },
+  "dashboard": {
+    "header": {
+      "title": "Dashboard",
+      "toggleSidebar": "Open or close dashboard navigation",
+      "closeSidebar": "Close dashboard navigation"
+    },
+    "navigation": {
+      "label": "Dashboard navigation",
+      "main": "Main",
+      "management": "Management",
+      "overview": "Overview",
+      "queue": "Queue management",
+      "myTickets": "My tickets",
+      "notifications": "Notifications",
+      "branches": "Branches",
+      "services": "Services",
+      "counters": "Counters",
+      "staff": "Staff",
+      "reports": "Reports",
+      "backToSite": "Back to website",
+      "logout": "Log out",
+      "logoutFailed": "Could not complete logout. Please try again, or reload the page if the problem persists."
+    },
+    "pages": {
+      "overview": "Overview",
+      "queue": "Queue management",
+      "myTickets": "My tickets",
+      "notifications": "Notifications",
+      "branches": "Branches",
+      "services": "Services",
+      "counters": "Counters",
+      "staff": "Staff",
+      "reports": "Reports"
     }
   },
   "queueStatus": {

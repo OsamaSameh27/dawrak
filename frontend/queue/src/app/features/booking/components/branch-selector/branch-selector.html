@@ -16,11 +16,18 @@
         [attr.aria-pressed]="selectedId() === branch.id"
         (click)="branchSelected.emit(branch.id)"
       >
-        <span class="choice-icon"><i class="bi" [class]="branch.icon" aria-hidden="true"></i></span>
+        <span class="choice-icon">
+          <i class="bi bi-building" aria-hidden="true"></i>
+        </span>
         <span class="choice-copy">
-          <strong>{{ branch.nameKey | translate }}</strong>
-          <small><i class="bi bi-geo-alt" aria-hidden="true"></i>{{ branch.addressKey | translate }}</small>
-          <small><i class="bi bi-clock" aria-hidden="true"></i>{{ branch.hoursKey | translate }}</small>
+          <strong dir="auto">{{ branch.name }}</strong>
+
+          @if (branch.address) {
+            <small>
+              <i class="bi bi-geo-alt" aria-hidden="true"></i>
+              <span dir="auto">{{ branch.address }}</span>
+            </small>
+          }
         </span>
         <i class="bi bi-check-circle-fill selected-icon" aria-hidden="true"></i>
       </button>

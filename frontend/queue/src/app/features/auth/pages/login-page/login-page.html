@@ -13,9 +13,18 @@
           <p>{{ 'auth.login.asideDescription' | translate }}</p>
 
           <ul>
-            <li><i class="bi bi-check-circle-fill" aria-hidden="true"></i>{{ 'auth.login.benefits.tickets' | translate }}</li>
-            <li><i class="bi bi-check-circle-fill" aria-hidden="true"></i>{{ 'auth.login.benefits.notifications' | translate }}</li>
-            <li><i class="bi bi-check-circle-fill" aria-hidden="true"></i>{{ 'auth.login.benefits.history' | translate }}</li>
+            <li>
+              <i class="bi bi-check-circle-fill" aria-hidden="true"></i
+              >{{ 'auth.login.benefits.tickets' | translate }}
+            </li>
+            <li>
+              <i class="bi bi-check-circle-fill" aria-hidden="true"></i
+              >{{ 'auth.login.benefits.notifications' | translate }}
+            </li>
+            <li>
+              <i class="bi bi-check-circle-fill" aria-hidden="true"></i
+              >{{ 'auth.login.benefits.history' | translate }}
+            </li>
           </ul>
         </div>
       </aside>
@@ -32,10 +41,10 @@
           <p>{{ 'auth.login.description' | translate }}</p>
         </header>
 
-        @if (readyMessage()) {
-          <div class="ready-alert" role="status">
-            <i class="bi bi-info-circle" aria-hidden="true"></i>
-            {{ 'auth.shared.readyForIntegration' | translate }}
+        @if (loginFailed()) {
+          <div class="alert alert-danger d-flex align-items-center gap-2" role="alert">
+            <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
+            {{ 'auth.errors.loginFailed' | translate }}
           </div>
         }
 
@@ -64,7 +73,9 @@
           </div>
 
           <div class="form-field">
-            <label class="form-label" for="loginPassword">{{ 'auth.shared.password' | translate }}</label>
+            <label class="form-label" for="loginPassword">{{
+              'auth.shared.password' | translate
+            }}</label>
             <div class="password-field">
               <input
                 id="loginPassword"
@@ -79,10 +90,18 @@
               <button
                 class="password-toggle"
                 type="button"
-                [attr.aria-label]="(showPassword() ? 'auth.shared.hidePassword' : 'auth.shared.showPassword') | translate"
+                [attr.aria-label]="
+                  (showPassword() ? 'auth.shared.hidePassword' : 'auth.shared.showPassword')
+                    | translate
+                "
                 (click)="showPassword.set(!showPassword())"
               >
-                <i class="bi" [class.bi-eye]="!showPassword()" [class.bi-eye-slash]="showPassword()" aria-hidden="true"></i>
+                <i
+                  class="bi"
+                  [class.bi-eye]="!showPassword()"
+                  [class.bi-eye-slash]="showPassword()"
+                  aria-hidden="true"
+                ></i>
               </button>
             </div>
             @if (isInvalid('password')) {
@@ -92,9 +111,21 @@
             }
           </div>
 
-          <button class="btn btn-primary btn-lg submit-button" type="submit">
-            {{ 'auth.login.action' | translate }}
-            <i class="bi bi-box-arrow-in-left directional-icon" aria-hidden="true"></i>
+          <button
+            class="btn btn-primary btn-lg submit-button"
+            type="submit"
+            [disabled]="isSubmitting()"
+            [attr.aria-busy]="isSubmitting()"
+          >
+            @if (isSubmitting()) {
+              <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+
+              {{ 'common.loading' | translate }}
+            } @else {
+              {{ 'auth.login.action' | translate }}
+
+              <i class="bi bi-box-arrow-in-left directional-icon" aria-hidden="true"></i>
+            }
           </button>
         </form>
 

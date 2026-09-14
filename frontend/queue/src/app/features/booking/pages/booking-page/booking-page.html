@@ -14,17 +14,35 @@
     <div class="booking-panel">
       @switch (currentStep()) {
         @case (1) {
-          <app-branch-selector
-            [branches]="branches"
-            [selectedId]="selectedBranchId()"
-            (branchSelected)="selectBranch($event)"
-          />
+          @if (branchesLoading()) {
+            <div class="d-flex justify-content-center align-items-center gap-2 py-5" role="status">
+              <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+              <span>{{ 'common.loading' | translate }}</span>
+            </div>
+          } @else if (branchesFailed()) {
+            <div class="alert alert-danger" role="alert">
+              {{ 'booking.branchStep.loadFailed' | translate }}
+            </div>
 
+            <button class="btn btn-outline-primary" type="button" (click)="loadBranches()">
+              {{ 'booking.branchStep.retry' | translate }}
+            </button>
+          } @else if (apiBranches().length === 0) {
+            <p class="text-center py-4" role="status">
+              {{ 'booking.branchStep.empty' | translate }}
+            </p>
+          } @else {
+            <app-branch-selector
+              [branches]="apiBranches()"
+              [selectedId]="selectedBranchId()"
+              (branchSelected)="selectBranch($event)"
+            />
+          }
           <div class="booking-actions justify-content-end">
             <button
               class="btn btn-primary btn-lg"
               type="button"
-              [disabled]="!selectedBranchId()"
+              [disabled]="branchesLoading() || branchesFailed() || !selectedBranch()"
               (click)="nextStep()"
             >
               {{ 'common.next' | translate }}
@@ -61,8 +79,8 @@
           @if (selectedBranch(); as branch) {
             @if (selectedService(); as service) {
               <app-booking-summary
-                [branchNameKey]="branch.nameKey"
-                [branchAddressKey]="branch.addressKey"
+                [branchName]="branch.name"
+                [branchAddress]="branch.address"
                 [serviceNameKey]="service.nameKey"
                 [waitingCount]="service.waitingCount"
                 [estimatedMinutes]="service.estimatedMinutes"
@@ -78,7 +96,7 @@
             @if (selectedService(); as service) {
               <app-booking-success
                 ticketNumber="G-024"
-                [branchNameKey]="branch.nameKey"
+                [branchName]="branch.name"
                 [serviceNameKey]="service.nameKey"
                 [peopleAhead]="service.waitingCount"
                 [estimatedMinutes]="service.estimatedMinutes"

@@ -13,9 +13,18 @@
           <p>{{ 'auth.register.asideDescription' | translate }}</p>
 
           <ul>
-            <li><i class="bi bi-check-circle-fill" aria-hidden="true"></i>{{ 'auth.register.benefits.fastBooking' | translate }}</li>
-            <li><i class="bi bi-check-circle-fill" aria-hidden="true"></i>{{ 'auth.register.benefits.liveTracking' | translate }}</li>
-            <li><i class="bi bi-check-circle-fill" aria-hidden="true"></i>{{ 'auth.register.benefits.notifications' | translate }}</li>
+            <li>
+              <i class="bi bi-check-circle-fill" aria-hidden="true"></i
+              >{{ 'auth.register.benefits.fastBooking' | translate }}
+            </li>
+            <li>
+              <i class="bi bi-check-circle-fill" aria-hidden="true"></i
+              >{{ 'auth.register.benefits.liveTracking' | translate }}
+            </li>
+            <li>
+              <i class="bi bi-check-circle-fill" aria-hidden="true"></i
+              >{{ 'auth.register.benefits.notifications' | translate }}
+            </li>
           </ul>
         </div>
       </aside>
@@ -32,16 +41,23 @@
           <p>{{ 'auth.register.description' | translate }}</p>
         </header>
 
-        @if (readyMessage()) {
-          <div class="ready-alert" role="status">
-            <i class="bi bi-info-circle" aria-hidden="true"></i>
-            {{ 'auth.shared.readyForIntegration' | translate }}
+        @if (registerErrorKey(); as errorKey) {
+          <div class="alert alert-danger d-flex align-items-center gap-2" role="alert">
+            <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
+            <span>{{ errorKey | translate }}</span>
           </div>
         }
 
-        <form [formGroup]="registerForm" (ngSubmit)="submit()" novalidate>
+        <form
+          [formGroup]="registerForm"
+          (ngSubmit)="submit()"
+          [attr.aria-busy]="isSubmitting()"
+          novalidate
+        >
           <div class="form-field">
-            <label class="form-label" for="fullName">{{ 'auth.shared.fullName' | translate }}</label>
+            <label class="form-label" for="fullName">{{
+              'auth.shared.fullName' | translate
+            }}</label>
             <input
               id="fullName"
               class="form-control"
@@ -58,7 +74,9 @@
 
           <div class="field-grid">
             <div class="form-field">
-              <label class="form-label" for="registerEmail">{{ 'auth.shared.email' | translate }}</label>
+              <label class="form-label" for="registerEmail">{{
+                'auth.shared.email' | translate
+              }}</label>
               <input
                 id="registerEmail"
                 class="form-control"
@@ -103,7 +121,9 @@
 
           <div class="field-grid">
             <div class="form-field">
-              <label class="form-label" for="registerPassword">{{ 'auth.shared.password' | translate }}</label>
+              <label class="form-label" for="registerPassword">{{
+                'auth.shared.password' | translate
+              }}</label>
               <div class="password-field">
                 <input
                   id="registerPassword"
@@ -118,10 +138,18 @@
                 <button
                   class="password-toggle"
                   type="button"
-                  [attr.aria-label]="(showPassword() ? 'auth.shared.hidePassword' : 'auth.shared.showPassword') | translate"
+                  [attr.aria-label]="
+                    (showPassword() ? 'auth.shared.hidePassword' : 'auth.shared.showPassword')
+                      | translate
+                  "
                   (click)="showPassword.set(!showPassword())"
                 >
-                  <i class="bi" [class.bi-eye]="!showPassword()" [class.bi-eye-slash]="showPassword()" aria-hidden="true"></i>
+                  <i
+                    class="bi"
+                    [class.bi-eye]="!showPassword()"
+                    [class.bi-eye-slash]="showPassword()"
+                    aria-hidden="true"
+                  ></i>
                 </button>
               </div>
               @if (isInvalid('password')) {
@@ -132,7 +160,9 @@
             </div>
 
             <div class="form-field">
-              <label class="form-label" for="confirmPassword">{{ 'auth.shared.confirmPassword' | translate }}</label>
+              <label class="form-label" for="confirmPassword">{{
+                'auth.shared.confirmPassword' | translate
+              }}</label>
               <div class="password-field">
                 <input
                   id="confirmPassword"
@@ -147,10 +177,20 @@
                 <button
                   class="password-toggle"
                   type="button"
-                  [attr.aria-label]="(showConfirmPassword() ? 'auth.shared.hidePassword' : 'auth.shared.showPassword') | translate"
+                  [attr.aria-label]="
+                    (showConfirmPassword()
+                      ? 'auth.shared.hidePassword'
+                      : 'auth.shared.showPassword'
+                    ) | translate
+                  "
                   (click)="showConfirmPassword.set(!showConfirmPassword())"
                 >
-                  <i class="bi" [class.bi-eye]="!showConfirmPassword()" [class.bi-eye-slash]="showConfirmPassword()" aria-hidden="true"></i>
+                  <i
+                    class="bi"
+                    [class.bi-eye]="!showConfirmPassword()"
+                    [class.bi-eye-slash]="showConfirmPassword()"
+                    aria-hidden="true"
+                  ></i>
                 </button>
               </div>
               @if (confirmPasswordInvalid()) {
@@ -159,9 +199,20 @@
             </div>
           </div>
 
-          <button class="btn btn-primary btn-lg submit-button" type="submit">
-            {{ 'auth.register.action' | translate }}
-            <i class="bi bi-person-plus directional-icon" aria-hidden="true"></i>
+          <button
+            class="btn btn-primary btn-lg submit-button"
+            type="submit"
+            [disabled]="isSubmitting()"
+          >
+            @if (isSubmitting()) {
+              <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+
+              {{ 'common.loading' | translate }}
+            } @else {
+              {{ 'auth.register.action' | translate }}
+
+              <i class="bi bi-person-plus directional-icon" aria-hidden="true"></i>
+            }
           </button>
         </form>
 

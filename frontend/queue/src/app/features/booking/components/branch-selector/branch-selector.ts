@@ -1,13 +1,6 @@
 import { Component, input, output } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
-
-interface BranchChoice {
-  id: string;
-  nameKey: string;
-  addressKey: string;
-  hoursKey: string;
-  icon: string;
-}
+import { Branch } from '../../../branches/models/branch.model';
 
 @Component({
   selector: 'app-branch-selector',
@@ -16,7 +9,7 @@ interface BranchChoice {
   styleUrl: './branch-selector.scss',
 })
 export class BranchSelector {
-  readonly branches = input.required<readonly BranchChoice[]>();
+  readonly branches = input.required<readonly Branch[]>();
   readonly selectedId = input<string | null>(null);
   readonly branchSelected = output<string>();
 }

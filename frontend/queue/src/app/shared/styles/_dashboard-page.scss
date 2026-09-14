@@ -1,0 +1,32 @@
+.dashboard-page {
+  min-height: calc(100vh - 9.5rem);
+  min-height: calc(100svh - 9.5rem);
+}
+
+.dashboard-page__header {
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--queue-border);
+}
+
+.dashboard-page__eyebrow {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: var(--queue-primary-dark);
+  font-size: 0.72rem;
+  font-weight: 750;
+}
+
+.dashboard-page h1 {
+  margin: 0;
+  font-size: clamp(1.55rem, 3vw, 2rem);
+}
+
+@media (max-width: 575.98px) {
+  .dashboard-page {
+    min-height: calc(100svh - 6.25rem);
+  }
+
+  .dashboard-page__header {
+    padding-bottom: 1rem;
+  }
+}

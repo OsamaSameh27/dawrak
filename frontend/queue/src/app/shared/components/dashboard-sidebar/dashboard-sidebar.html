@@ -1,0 +1,77 @@
+<aside class="dashboard-sidebar">
+  <a class="sidebar-brand" routerLink="/dashboard" (click)="navigationSelected.emit()">
+    <span class="sidebar-brand__icon" aria-hidden="true">
+      <i class="bi bi-ticket-perforated"></i>
+    </span>
+    <span>
+      <strong>{{ 'app.name' | translate }}</strong>
+      <small>{{ 'dashboard.header.title' | translate }}</small>
+    </span>
+  </a>
+
+  <nav class="sidebar-navigation" [attr.aria-label]="'dashboard.navigation.label' | translate">
+    <div class="navigation-group">
+      <span class="navigation-group__label">{{ 'dashboard.navigation.main' | translate }}</span>
+
+      @for (item of visiblePrimaryItems(); track item.route) {
+        <a
+          class="navigation-link"
+          [routerLink]="item.route"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
+          ariaCurrentWhenActive="page"
+          (click)="navigationSelected.emit()"
+        >
+          <i [class]="'bi ' + item.icon" aria-hidden="true"></i>
+          <span>{{ item.labelKey | translate }}</span>
+        </a>
+      }
+    </div>
+
+    @if (visibleManagementItems().length > 0) {
+      <div class="navigation-group">
+        <span class="navigation-group__label">{{ 'dashboard.navigation.management' | translate }}</span>
+
+        @for (item of visibleManagementItems(); track item.route) {
+          <a
+            class="navigation-link"
+            [routerLink]="item.route"
+            routerLinkActive="active"
+            ariaCurrentWhenActive="page"
+            (click)="navigationSelected.emit()"
+          >
+            <i [class]="'bi ' + item.icon" aria-hidden="true"></i>
+            <span>{{ item.labelKey | translate }}</span>
+          </a>
+        }
+      </div>
+    }
+  </nav>
+
+  @if (logoutFailed()) {
+    <p class="sidebar-logout-error" id="sidebar-logout-error" role="alert">
+      <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
+      <span>{{ 'dashboard.navigation.logoutFailed' | translate }}</span>
+    </p>
+  }
+
+  <button
+    class="sidebar-logout"
+    type="button"
+    [disabled]="isLoggingOut()"
+    [attr.aria-busy]="isLoggingOut()"
+    [attr.aria-describedby]="logoutFailed() ? 'sidebar-logout-error' : null"
+    (click)="logout()"
+  >
+    <span class="sidebar-logout__icon" aria-hidden="true">
+      @if (isLoggingOut()) {
+        <span class="spinner-border spinner-border-sm"></span>
+      } @else {
+        <i class="bi bi-box-arrow-left"></i>
+      }
+    </span>
+    <span>
+      {{ (isLoggingOut() ? 'common.loading' : 'dashboard.navigation.logout') | translate }}
+    </span>
+  </button>
+</aside>
