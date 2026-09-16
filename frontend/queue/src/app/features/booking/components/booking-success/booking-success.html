@@ -16,7 +16,7 @@
     </div>
     <div>
       <small>{{ 'booking.success.service' | translate }}</small>
-      <strong>{{ serviceNameKey() | translate }}</strong>
+      <strong dir="auto">{{ serviceName() }}</strong>
     </div>
     <div>
       <small>{{ 'booking.success.peopleAhead' | translate }}</small>
@@ -34,7 +34,7 @@
   </div>
 
   <div class="success-actions">
-    <a class="btn btn-primary btn-lg" routerLink="/track">
+    <a class="btn btn-primary btn-lg" routerLink="/my-tickets">
       <i class="bi bi-search" aria-hidden="true"></i>
       {{ 'booking.success.track' | translate }}
     </a>

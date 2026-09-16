@@ -10,9 +10,11 @@ import { TranslatePipe } from '@ngx-translate/core';
 export class BookingSummary {
   readonly branchName = input.required<string>();
   readonly branchAddress = input.required<string | null>();
-  readonly serviceNameKey = input.required<string>();
-  readonly waitingCount = input.required<number>();
-  readonly estimatedMinutes = input.required<number>();
+  readonly serviceName = input.required<string>();
+
   readonly back = output<void>();
   readonly confirm = output<void>();
+
+  readonly loading = input(false);
+  readonly errorKey = input<string | null>(null);
 }

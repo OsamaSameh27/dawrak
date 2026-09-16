@@ -9,7 +9,7 @@
       <p>{{ 'track.description' | translate }}</p>
     </header>
 
-    @if (!hasResult()) {
+    @if (!ticket()) {
       <div class="search-card">
         <form [formGroup]="trackForm" (ngSubmit)="searchTicket()" novalidate>
           <label class="form-label" for="publicId">{{ 'track.form.label' | translate }}</label>
@@ -23,15 +23,34 @@
                 type="text"
                 formControlName="publicId"
                 autocomplete="off"
+                [readOnly]="loading()"
+                [attr.aria-invalid]="
+                  trackForm.controls.publicId.invalid && trackForm.controls.publicId.touched
+                "
                 [placeholder]="'track.form.placeholder' | translate"
-                [attr.aria-describedby]="trackForm.controls.publicId.invalid && trackForm.controls.publicId.touched ? 'publicIdError' : 'publicIdHelp'"
-                [class.is-invalid]="trackForm.controls.publicId.invalid && trackForm.controls.publicId.touched"
+                [attr.aria-describedby]="
+                  trackForm.controls.publicId.invalid && trackForm.controls.publicId.touched
+                    ? 'publicIdError'
+                    : 'publicIdHelp'
+                "
+                [class.is-invalid]="
+                  trackForm.controls.publicId.invalid && trackForm.controls.publicId.touched
+                "
               />
             </div>
 
-            <button class="btn btn-primary btn-lg" type="submit">
-              <i class="bi bi-search" aria-hidden="true"></i>
-              {{ 'track.form.action' | translate }}
+            <button
+              class="btn btn-primary btn-lg"
+              type="submit"
+              [disabled]="loading()"
+              [attr.aria-busy]="loading()"
+            >
+              @if (loading()) {
+                <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+              } @else {
+                <i class="bi bi-search" aria-hidden="true"></i>
+              }
+              {{ (loading() ? 'common.loading' : 'track.form.action') | translate }}
             </button>
           </div>
 
@@ -46,17 +65,23 @@
             </small>
           }
         </form>
+        @if (loading()) {
+          <p class="mt-3 mb-0" role="status">{{ 'common.loading' | translate }}</p>
+        }
+        @if (errorKey(); as messageKey) {
+          <div class="alert alert-danger mt-3" role="alert">{{ messageKey | translate }}</div>
+        }
       </div>
-    } @else {
+    } @else if (ticket(); as result) {
       <article class="ticket-result">
         <div class="ticket-result__header">
           <div>
             <span class="status-badge">
               <span aria-hidden="true"></span>
-              {{ 'track.result.status.waiting' | translate }}
+              {{ 'track.result.status.' + result.status.toLowerCase() | translate }}
             </span>
             <small>{{ 'track.result.ticketLabel' | translate }}</small>
-            <h2>G-024</h2>
+            <h2 dir="ltr">{{ result.number }}</h2>
           </div>
 
           <button class="btn btn-sm btn-light" type="button" (click)="searchAgain()">
@@ -65,52 +90,36 @@
           </button>
         </div>
 
-        <div class="queue-position text-center">
-          <small>{{ 'track.result.peopleAheadLabel' | translate }}</small>
-          <strong>3</strong>
-          <span>{{ 'track.result.peopleAhead' | translate }}</span>
-        </div>
-
-        <div class="queue-progress" aria-hidden="true">
-          <span></span>
-        </div>
-
-        <div class="ticket-metrics">
-          <div>
-            <i class="bi bi-megaphone" aria-hidden="true"></i>
-            <span>
-              <small>{{ 'track.result.nowServing' | translate }}</small>
-              <strong>G-021</strong>
-            </span>
+        @if (result.status === 'WAITING') {
+          <div class="queue-position text-center">
+            <small>{{ 'track.result.peopleAheadLabel' | translate }}</small>
+            <strong>{{ result.peopleAhead }}</strong>
+            <span>{{ 'track.result.peopleAhead' | translate }}</span>
           </div>
-          <div>
-            <i class="bi bi-clock" aria-hidden="true"></i>
-            <span>
-              <small>{{ 'track.result.estimated' | translate }}</small>
-              <strong>{{ 'track.result.minutes' | translate: { count: 12 } }}</strong>
-            </span>
+
+          <div class="ticket-metrics">
+            <div>
+              <i class="bi bi-clock" aria-hidden="true"></i>
+              <span>
+                <small>{{ 'track.result.estimated' | translate }}</small>
+                <strong>{{
+                  'track.result.minutes' | translate: { count: result.estimatedWaitMinutes }
+                }}</strong>
+              </span>
+            </div>
           </div>
-        </div>
+        }
 
         <dl class="ticket-details">
           <div>
             <dt>{{ 'track.result.branch' | translate }}</dt>
-            <dd>{{ 'booking.branches.nasrCity.name' | translate }}</dd>
+            <dd dir="auto">{{ result.branch.name }}</dd>
           </div>
           <div>
             <dt>{{ 'track.result.service' | translate }}</dt>
-            <dd>{{ 'booking.services.generalExamination.name' | translate }}</dd>
-          </div>
-          <div>
-            <dt>{{ 'track.result.bookedAt' | translate }}</dt>
-            <dd>{{ 'track.result.sampleTime' | translate }}</dd>
+            <dd dir="auto">{{ result.service.name }}</dd>
           </div>
         </dl>
-
-        <div class="ticket-notice">
-          <i class="bi bi-bell" aria-hidden="true"></i>
-          <span>{{ 'track.result.notice' | translate }}</span>
-        </div>
 
         <a class="home-link" routerLink="/">
           <i class="bi bi-house" aria-hidden="true"></i>

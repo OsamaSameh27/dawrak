@@ -55,6 +55,14 @@ export class QueuesController {
   @Roles(Role.CUSTOMER)
   mine(@CurrentUser() user: AuthenticatedUser) { return this.queues.getMine(user.id); }
 
+  @Get('tickets/mine/active')
+  @ApiBearerAuth()
+  @Roles(Role.CUSTOMER)
+  @ApiOperation({ summary: 'Get only the signed-in customer’s active tickets' })
+  activeMine(@CurrentUser() user: AuthenticatedUser) {
+    return this.queues.getActiveMine(user.id);
+  }
+
   @Post('tickets/:id/cancel')
   @ApiBearerAuth()
   @Roles(Role.CUSTOMER)

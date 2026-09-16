@@ -1,10 +1,13 @@
-import { Component, computed, inject, output, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, output, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { AuthServices } from '../../../features/auth/services/auth.services';
 import { AuthStore } from '../../../features/auth/state/auth-store';
 import { UserRole } from '../../../features/auth/models/auth.models';
-import { finalize, timeout } from 'rxjs';
+import { finalize, interval, timeout } from 'rxjs';
+import { NotificationsState } from '../../../features/notifications/state/notifications-state';
+import { NotificationsServices } from '../../../features/notifications/services/notifications.services';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 interface DashboardNavigationItem {
   readonly icon: string;
@@ -29,6 +32,36 @@ export class DashboardSidebar {
 
   protected readonly isLoggingOut = signal(false);
   protected readonly logoutFailed = signal(false);
+
+  protected readonly unreadNotifications = inject(NotificationsState).unreadCount;
+
+  private readonly notificationsServices = inject(NotificationsServices);
+  private readonly notificationsState = inject(NotificationsState);
+  private readonly destroyRef = inject(DestroyRef);
+
+  ngOnInit(): void {
+    this.refreshUnreadCount();
+
+    interval(15000)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.refreshUnreadCount();
+      });
+  }
+
+  private refreshUnreadCount(): void {
+    this.notificationsServices
+      .getNotifications(true)
+      .pipe(timeout(10000), takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          this.notificationsState.setUnreadCount(response.unreadCount);
+        },
+        error: () => {
+          // نحتفظ بالعدد القديم لو التحديث فشل مؤقتًا.
+        },
+      });
+  }
 
   protected logout(): void {
     if (this.isLoggingOut()) {
@@ -61,7 +94,6 @@ export class DashboardSidebar {
   }
 
   protected readonly primaryItems: readonly DashboardNavigationItem[] = [
-
     {
       icon: 'bi-grid-1x2',
       labelKey: 'dashboard.navigation.overview',
@@ -129,14 +161,10 @@ export class DashboardSidebar {
       return [];
     }
 
-    return items.filter(
-      (item) => item.roles === undefined || item.roles.includes(role),
-    );
+    return items.filter((item) => item.roles === undefined || item.roles.includes(role));
   }
 
-  protected readonly visiblePrimaryItems = computed(() =>
-    this.filterItems(this.primaryItems),
-  );
+  protected readonly visiblePrimaryItems = computed(() => this.filterItems(this.primaryItems));
 
   protected readonly visibleManagementItems = computed(() =>
     this.filterItems(this.managementItems),

@@ -26,9 +26,16 @@ export const routes: Routes = [
       },
       {
         path: 'track',
+        pathMatch: 'full',
+        redirectTo: 'my-tickets',
+      },
+      {
+        path: 'my-tickets',
+        canActivate: [authGuard, roleGuard],
+        data: { roles: ['CUSTOMER'] },
         loadComponent: () =>
-          import('./features/tickets/pages/track-ticket-page/track-ticket-page').then(
-            (component) => component.TrackTicketPage,
+          import('./features/tickets/pages/current-tickets-page/current-tickets-page').then(
+            (component) => component.CurrentTicketsPage,
           ),
       },
       {

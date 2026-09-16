@@ -11,7 +11,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 export class BookingSuccess {
   readonly ticketNumber = input.required<string>();
   readonly branchName = input.required<string>();
-  readonly serviceNameKey = input.required<string>();
+  readonly serviceName = input.required<string>();
   readonly peopleAhead = input.required<number>();
   readonly estimatedMinutes = input.required<number>();
   readonly newBooking = output<void>();

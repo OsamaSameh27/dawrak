@@ -53,7 +53,7 @@
 
         @case (2) {
           <app-service-selector
-            [services]="services"
+            [services]="apiServices()"
             [selectedId]="selectedServiceId()"
             (serviceSelected)="selectService($event)"
           />
@@ -66,7 +66,7 @@
             <button
               class="btn btn-primary btn-lg"
               type="button"
-              [disabled]="!selectedServiceId()"
+              [disabled]="servicesLoading() || servicesFailed() || !selectedService()"
               (click)="nextStep()"
             >
               {{ 'common.next' | translate }}
@@ -81,9 +81,9 @@
               <app-booking-summary
                 [branchName]="branch.name"
                 [branchAddress]="branch.address"
-                [serviceNameKey]="service.nameKey"
-                [waitingCount]="service.waitingCount"
-                [estimatedMinutes]="service.estimatedMinutes"
+                [serviceName]="service.name"
+                [loading]="bookingLoading()"
+                [errorKey]="bookingError()"
                 (back)="previousStep()"
                 (confirm)="confirmBooking()"
               />
@@ -92,17 +92,15 @@
         }
 
         @case (4) {
-          @if (selectedBranch(); as branch) {
-            @if (selectedService(); as service) {
-              <app-booking-success
-                ticketNumber="G-024"
-                [branchName]="branch.name"
-                [serviceNameKey]="service.nameKey"
-                [peopleAhead]="service.waitingCount"
-                [estimatedMinutes]="service.estimatedMinutes"
-                (newBooking)="startNewBooking()"
-              />
-            }
+          @if (createdTicket(); as ticket) {
+            <app-booking-success
+              [ticketNumber]="ticket.number"
+              [branchName]="ticket.branch.name"
+              [serviceName]="ticket.service.name"
+              [peopleAhead]="ticket.peopleAhead"
+              [estimatedMinutes]="ticket.estimatedWaitMinutes"
+              (newBooking)="startNewBooking()"
+            />
           }
         }
       }

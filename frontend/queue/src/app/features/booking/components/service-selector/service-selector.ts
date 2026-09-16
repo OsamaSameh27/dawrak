@@ -1,5 +1,6 @@
 import { Component, input, output } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
+import { QueueService } from '../../../services/models/queue-service.model';
 
 interface ServiceChoice {
   id: string;
@@ -17,7 +18,7 @@ interface ServiceChoice {
   styleUrl: './service-selector.scss'
 })
 export class ServiceSelector {
-  readonly services = input.required<readonly ServiceChoice[]>();
+  readonly services = input.required<readonly QueueService[]>();
   readonly selectedId = input<string | null>(null);
   readonly serviceSelected = output<string>();
 }

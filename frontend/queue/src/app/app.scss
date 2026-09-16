@@ -1,0 +1,107 @@
+.notification-toast {
+  position: fixed;
+  z-index: 1080;
+  top: 1rem;
+  inset-inline-end: 1rem;
+  display: flex;
+  width: min(25rem, calc(100vw - 2rem));
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px solid var(--queue-border);
+  border-radius: 1rem;
+  background: #fff;
+  box-shadow: 0 1rem 2.5rem rgba(20, 55, 65, 0.18);
+  color: var(--queue-navy);
+  animation: notification-toast-in 260ms cubic-bezier(0.2, 0.75, 0.25, 1);
+}
+
+.notification-toast.is-closing {
+  pointer-events: none;
+  animation: notification-toast-out 220ms ease-in forwards;
+}
+
+.notification-toast__icon {
+  display: grid;
+  width: 2.35rem;
+  height: 2.35rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--queue-primary-soft);
+  color: var(--queue-primary-dark);
+}
+
+.notification-toast__content {
+  min-width: 0;
+  flex: 1;
+}
+
+.notification-toast__content strong {
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.notification-toast__content p {
+  margin: 0;
+  color: var(--queue-muted);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.notification-toast__content a {
+  display: inline-block;
+  margin-top: 0.5rem;
+  color: var(--queue-primary-dark);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.notification-toast__close {
+  border: 0;
+  background: transparent;
+  color: var(--queue-muted);
+}
+
+.notification-toast__close:hover {
+  color: var(--queue-danger);
+}
+
+@keyframes notification-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(-0.75rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes notification-toast-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-0.65rem) scale(0.98);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .notification-toast,
+  .notification-toast.is-closing {
+    animation-duration: 1ms;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .notification-toast {
+    top: 0.75rem;
+    inset-inline: 0.75rem;
+    width: auto;
+  }
+}

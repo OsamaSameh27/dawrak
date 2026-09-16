@@ -24,13 +24,23 @@
         >
           <i [class]="'bi ' + item.icon" aria-hidden="true"></i>
           <span>{{ item.labelKey | translate }}</span>
+          @if (item.route === '/dashboard/notifications' && unreadNotifications() > 0) {
+            <span
+              class="notification-count"
+              [attr.aria-label]="'dashboard.navigation.unreadCount' | translate"
+            >
+              {{ unreadNotifications() > 99 ? '99+' : unreadNotifications() }}
+            </span>
+          }
         </a>
       }
     </div>
 
     @if (visibleManagementItems().length > 0) {
       <div class="navigation-group">
-        <span class="navigation-group__label">{{ 'dashboard.navigation.management' | translate }}</span>
+        <span class="navigation-group__label">{{
+          'dashboard.navigation.management' | translate
+        }}</span>
 
         @for (item of visibleManagementItems(); track item.route) {
           <a

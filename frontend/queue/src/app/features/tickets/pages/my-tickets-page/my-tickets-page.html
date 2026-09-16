@@ -1,6 +1,211 @@
-<section class="dashboard-page" aria-labelledby="my-tickets-title">
+<section class="dashboard-page my-tickets-page" aria-labelledby="my-tickets-title">
   <header class="dashboard-page__header">
-    <span class="dashboard-page__eyebrow">{{ 'dashboard.header.title' | translate }}</span>
-    <h1 id="my-tickets-title">{{ 'dashboard.pages.myTickets' | translate }}</h1>
+    <div>
+      <span class="dashboard-page__eyebrow">
+        {{ 'dashboard.header.title' | translate }}
+      </span>
+
+      <h1 id="my-tickets-title">
+        {{ 'dashboard.pages.myTickets' | translate }}
+      </h1>
+
+      <p class="page-description">
+        {{ 'myTickets.description' | translate }}
+      </p>
+    </div>
+
+    <button
+      class="btn btn-outline-primary"
+      type="button"
+      [disabled]="loading()"
+      (click)="loadTickets()"
+    >
+      <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
+      {{ 'myTickets.refresh' | translate }}
+    </button>
   </header>
+
+  @if (loading()) {
+    <div class="tickets-state" role="status">
+      <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+      <span>{{ 'common.loading' | translate }}</span>
+    </div>
+  } @else if (errorKey(); as messageKey) {
+    <div class="tickets-state" role="alert">
+      <p>{{ messageKey | translate }}</p>
+
+      <button class="btn btn-primary" type="button" (click)="loadTickets()">
+        {{ 'myTickets.retry' | translate }}
+      </button>
+    </div>
+  } @else {
+    @if (currentTickets().length > 0) {
+      <section class="tickets-section" aria-labelledby="current-tickets-title">
+        <header class="section-heading">
+          <h2 id="current-tickets-title">
+            {{ 'myTickets.currentTitle' | translate }}
+          </h2>
+
+          <span>{{ currentTickets().length }}</span>
+        </header>
+
+        <div class="dashboard-tickets-grid">
+          @for (ticket of currentTickets(); track ticket.id) {
+            <article class="dashboard-ticket-card">
+              <header class="ticket-card-header">
+                <div>
+                  <small>{{ 'booking.success.ticketNumber' | translate }}</small>
+                  <h3 dir="ltr">{{ ticket.number }}</h3>
+                </div>
+
+                <span class="ticket-status">
+                  {{ statusKey(ticket.status) | translate }}
+                </span>
+              </header>
+
+              <dl class="ticket-information">
+                <div>
+                  <dt>{{ 'booking.success.branch' | translate }}</dt>
+                  <dd dir="auto">{{ ticket.branch.name }}</dd>
+                </div>
+
+                <div>
+                  <dt>{{ 'booking.success.service' | translate }}</dt>
+                  <dd dir="auto">{{ ticket.service.name }}</dd>
+                </div>
+
+                @if (ticket.counter; as counter) {
+                  <div>
+                    <dt>{{ 'myTickets.counter' | translate }}</dt>
+                    <dd dir="auto">{{ counter.name }}</dd>
+                  </div>
+                }
+              </dl>
+
+              @if (isWaiting(ticket)) {
+                <div class="ticket-wait-details">
+                  <div>
+                    <small>{{ 'booking.success.peopleAhead' | translate }}</small>
+                    <strong>{{ ticket.peopleAhead }}</strong>
+                  </div>
+
+                  <div>
+                    <small>{{ 'booking.success.estimate' | translate }}</small>
+                    <strong>
+                      {{ 'booking.minutes' | translate: { count: ticket.estimatedWaitMinutes } }}
+                    </strong>
+                  </div>
+                </div>
+
+                @if (cancelingTicketId() === ticket.id) {
+                  <div class="cancel-confirmation">
+                    <p>{{ 'myTickets.cancelConfirm' | translate }}</p>
+
+                    <div class="cancel-actions">
+                      <button
+                        class="btn btn-light btn-sm"
+                        type="button"
+                        [disabled]="cancelLoading()"
+                        (click)="dismissCancel()"
+                      >
+                        {{ 'myTickets.keepTicket' | translate }}
+                      </button>
+
+                      <button
+                        class="btn btn-danger btn-sm"
+                        type="button"
+                        [disabled]="cancelLoading()"
+                        (click)="confirmCancel(ticket)"
+                      >
+                        @if (cancelLoading()) {
+                          <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                        }
+                        {{
+                          (cancelLoading() ? 'myTickets.cancelling' : 'myTickets.confirmCancel')
+                            | translate
+                        }}
+                      </button>
+                    </div>
+
+                    @if (cancelErrorKey(); as messageKey) {
+                      <p class="cancel-error" role="alert">
+                        {{ messageKey | translate }}
+                      </p>
+                    }
+                  </div>
+                } @else {
+                  <button
+                    class="btn btn-outline-danger btn-sm cancel-ticket-button"
+                    type="button"
+                    (click)="requestCancel(ticket.id)"
+                  >
+                    <i class="bi bi-x-circle" aria-hidden="true"></i>
+                    {{ 'myTickets.cancel' | translate }}
+                  </button>
+                }
+              } @else {
+                <p class="ticket-status-note">
+                  {{
+                    ticket.status === 'CALLED'
+                      ? ('myTickets.calledNotice' | translate)
+                      : ('myTickets.servingNotice' | translate)
+                  }}
+                </p>
+              }
+            </article>
+          }
+        </div>
+      </section>
+    }
+
+    @if (oldTickets().length > 0) {
+      <section class="tickets-section tickets-history" aria-labelledby="ticket-history-title">
+        <header class="section-heading">
+          <h2 id="ticket-history-title">
+            {{ 'myTickets.historyTitle' | translate }}
+          </h2>
+
+          <span>{{ oldTickets().length }}</span>
+        </header>
+
+        <div class="dashboard-tickets-grid">
+          @for (ticket of oldTickets(); track ticket.id) {
+            <article class="dashboard-ticket-card ticket-card-old">
+              <header class="ticket-card-header">
+                <div>
+                  <small>{{ 'booking.success.ticketNumber' | translate }}</small>
+                  <h3 dir="ltr">{{ ticket.number }}</h3>
+                </div>
+
+                <span class="ticket-status">
+                  {{ statusKey(ticket.status) | translate }}
+                </span>
+              </header>
+
+              <dl class="ticket-information">
+                <div>
+                  <dt>{{ 'booking.success.branch' | translate }}</dt>
+                  <dd dir="auto">{{ ticket.branch.name }}</dd>
+                </div>
+
+                <div>
+                  <dt>{{ 'booking.success.service' | translate }}</dt>
+                  <dd dir="auto">{{ ticket.service.name }}</dd>
+                </div>
+              </dl>
+            </article>
+          }
+        </div>
+      </section>
+    }
+
+    @if (currentTickets().length === 0 && oldTickets().length === 0) {
+      <div class="tickets-state empty-tickets">
+        <i class="bi bi-ticket-perforated" aria-hidden="true"></i>
+
+        <h2>{{ 'myTickets.emptyTitle' | translate }}</h2>
+        <p>{{ 'myTickets.emptyDescription' | translate }}</p>
+      </div>
+    }
+  }
 </section>

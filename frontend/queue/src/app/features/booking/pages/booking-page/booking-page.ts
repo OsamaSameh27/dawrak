@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 
 import { BookingStepper } from '../../components/booking-stepper/booking-stepper';
@@ -11,6 +11,10 @@ import { Branch } from '../../../branches/models/branch.model';
 import { finalize, Subscription, timeout } from 'rxjs';
 import { QueueServices } from '../../../services/services/queue-services';
 import { QueueService } from '../../../services/models/queue-service.model';
+import { TicketsServices } from '../../../tickets/services/tickets.services';
+import { QueueTicket } from '../../../tickets/models/ticket.model';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { HttpErrorResponse } from '@angular/common/http';
 
 type BookingStep = 1 | 2 | 3 | 4;
 
@@ -32,39 +36,12 @@ export class BookingPage {
   protected readonly selectedBranchId = signal<string | null>(null);
   protected readonly selectedServiceId = signal<string | null>(null);
 
-  protected readonly services = [
-    {
-      id: 'general-examination',
-      nameKey: 'booking.services.generalExamination.name',
-      descriptionKey: 'booking.services.generalExamination.description',
-      icon: 'bi-stethoscope',
-      waitingCount: 6,
-      estimatedMinutes: 18,
-    },
-    {
-      id: 'dental-examination',
-      nameKey: 'booking.services.dentalExamination.name',
-      descriptionKey: 'booking.services.dentalExamination.description',
-      icon: 'bi-clipboard2-pulse',
-      waitingCount: 4,
-      estimatedMinutes: 12,
-    },
-    {
-      id: 'customer-service',
-      nameKey: 'booking.services.customerService.name',
-      descriptionKey: 'booking.services.customerService.description',
-      icon: 'bi-headset',
-      waitingCount: 9,
-      estimatedMinutes: 25,
-    },
-  ] as const;
-
   protected readonly selectedBranch = computed(
     () => this.apiBranches().find((branch) => branch.id === this.selectedBranchId()) ?? null,
   );
 
   protected readonly selectedService = computed(
-    () => this.services.find((service) => service.id === this.selectedServiceId()) ?? null,
+    () => this.apiServices().find((service) => service.id === this.selectedServiceId()) ?? null,
   );
 
   protected selectBranch(branchId: string): void {
@@ -83,28 +60,94 @@ export class BookingPage {
   protected nextStep(): void {
     const step = this.currentStep();
 
-    if (step === 1 && this.selectedBranchId()) {
+    if (step === 1 && this.selectedBranch()) {
       this.currentStep.set(2);
-    } else if (step === 2 && this.selectedServiceId()) {
+    } else if (
+      step === 2 &&
+      !this.servicesLoading() &&
+      !this.servicesFailed() &&
+      this.selectedService()
+    ) {
       this.currentStep.set(3);
     }
   }
 
   protected previousStep(): void {
+    if (this.bookingLoading()) {
+      return;
+    }
+
+    this.bookingError.set(null);
+
     const step = this.currentStep();
 
     if (step > 1 && step < 4) {
       this.currentStep.set((step - 1) as BookingStep);
     }
   }
-
   protected confirmBooking(): void {
-    if (this.selectedBranch() && this.selectedService()) {
-      this.currentStep.set(4);
+    const service = this.selectedService();
+
+    if (this.currentStep() !== 3 || !service || this.bookingLoading() || this.createdTicket()) {
+      return;
     }
+
+    let idempotencyKey = this.bookingKeys.get(service.id);
+
+    if (!idempotencyKey) {
+      idempotencyKey = crypto.randomUUID();
+      this.bookingKeys.set(service.id, idempotencyKey);
+    }
+
+    this.bookingLoading.set(true);
+    this.bookingError.set(null);
+
+    this.ticketsServices
+      .createTicket({
+        serviceId: service.id,
+        idempotencyKey,
+      })
+      .pipe(
+        timeout(15000),
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => {
+          this.bookingLoading.set(false);
+        }),
+      )
+      .subscribe({
+        next: (ticket) => {
+          this.createdTicket.set(ticket);
+          this.currentStep.set(4);
+        },
+        error: (error: unknown) => {
+          let messageKey = 'booking.submit.unconfirmed';
+
+          if (error instanceof HttpErrorResponse) {
+            if (error.status === 401) {
+              messageKey = 'booking.submit.loginRequired';
+            } else if (error.status === 403) {
+              messageKey = 'booking.submit.customerOnly';
+            } else if (error.status === 409) {
+              messageKey = 'booking.submit.conflict';
+            } else if (error.status === 400 || error.status === 404) {
+              messageKey = 'booking.submit.invalidSelection';
+            }
+          }
+
+          this.bookingError.set(messageKey);
+        },
+      });
   }
 
   protected startNewBooking(): void {
+    if (this.bookingLoading()) {
+      return;
+    }
+
+    this.bookingKeys.clear();
+    this.createdTicket.set(null);
+    this.bookingError.set(null);
+
     this.servicesSubscription?.unsubscribe();
 
     this.selectedBranchId.set(null);
@@ -194,4 +237,13 @@ export class BookingPage {
         },
       });
   }
+
+  private readonly ticketsServices = inject(TicketsServices);
+  private readonly destroyRef = inject(DestroyRef);
+
+  private readonly bookingKeys = new Map<string, string>();
+
+  protected readonly bookingLoading = signal(false);
+  protected readonly bookingError = signal<string | null>(null);
+  protected readonly createdTicket = signal<QueueTicket | null>(null);
 }

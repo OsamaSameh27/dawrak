@@ -1,2 +1,40 @@
-
 <router-outlet></router-outlet>
+
+@if (toastNotification(); as notification) {
+  <aside
+    class="notification-toast"
+    [class.is-closing]="toastClosing()"
+    role="status"
+    aria-live="polite"
+  >
+    <div class="notification-toast__icon">
+      <i class="bi bi-bell-fill" aria-hidden="true"></i>
+    </div>
+
+    <div class="notification-toast__content">
+      <strong>
+        {{ notification.title | translate: notificationParams(notification) }}
+      </strong>
+
+      <p>
+        {{ notification.message | translate: notificationParams(notification) }}
+      </p>
+
+      <a
+        routerLink="/dashboard/notifications"
+        (click)="dismissToast()"
+      >
+        {{ 'notificationsPage.viewAll' | translate }}
+      </a>
+    </div>
+
+    <button
+      class="notification-toast__close"
+      type="button"
+      [attr.aria-label]="'notificationsPage.close' | translate"
+      (click)="dismissToast()"
+    >
+      <i class="bi bi-x-lg" aria-hidden="true"></i>
+    </button>
+  </aside>
+}

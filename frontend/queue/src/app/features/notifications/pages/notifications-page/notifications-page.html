@@ -1,6 +1,104 @@
-<section class="dashboard-page" aria-labelledby="notifications-title">
-  <header class="dashboard-page__header">
-    <span class="dashboard-page__eyebrow">{{ 'dashboard.header.title' | translate }}</span>
-    <h1 id="notifications-title">{{ 'dashboard.pages.notifications' | translate }}</h1>
+<section class="dashboard-page notifications-page" aria-labelledby="notifications-title">
+  <header class="dashboard-page__header notifications-header">
+    <div>
+      <span class="dashboard-page__eyebrow">
+        {{ 'dashboard.header.title' | translate }}
+      </span>
+
+      <h1 id="notifications-title">
+        {{ 'dashboard.pages.notifications' | translate }}
+      </h1>
+
+      <p>{{ 'notificationsPage.description' | translate }}</p>
+    </div>
+
+    <button
+      class="btn btn-outline-primary"
+      type="button"
+      [disabled]="loading() || markingAll() || unreadCount() === 0"
+      (click)="markAllRead()"
+    >
+      @if (markingAll()) {
+        <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+      } @else {
+        <i class="bi bi-check2-all" aria-hidden="true"></i>
+      }
+
+      {{
+        (markingAll()
+          ? 'notificationsPage.markingAll'
+          : 'notificationsPage.markAll') | translate
+      }}
+    </button>
   </header>
+
+  @if (actionErrorKey(); as actionError) {
+    <div class="alert alert-danger mt-3" role="alert">
+      {{ actionError | translate }}
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="notifications-state" role="status">
+      <span class="spinner-border" aria-hidden="true"></span>
+      <span>{{ 'notificationsPage.loading' | translate }}</span>
+    </div>
+  } @else if (errorKey(); as messageKey) {
+    <div class="notifications-state" role="alert">
+      <p>{{ messageKey | translate }}</p>
+      <button class="btn btn-primary" type="button" (click)="loadNotifications()">
+        {{ 'notificationsPage.retry' | translate }}
+      </button>
+    </div>
+  } @else if (notifications().length === 0) {
+    <div class="notifications-state empty-state">
+      <i class="bi bi-bell-slash" aria-hidden="true"></i>
+      <h2>{{ 'notificationsPage.emptyTitle' | translate }}</h2>
+      <p>{{ 'notificationsPage.emptyDescription' | translate }}</p>
+    </div>
+  } @else {
+    <div class="notifications-list">
+      @for (notification of notifications(); track notification.id) {
+        <article class="notification-card" [class.is-unread]="!notification.readAt">
+          <span class="notification-icon">
+            <i class="bi bi-bell" aria-hidden="true"></i>
+          </span>
+
+          <div class="notification-content">
+            <div class="notification-heading">
+              <h2>{{ notification.title | translate: notificationParams(notification) }}</h2>
+
+              @if (!notification.readAt) {
+                <span>{{ 'notificationsPage.unread' | translate }}</span>
+              }
+            </div>
+
+            <p>{{ notification.message | translate: notificationParams(notification) }}</p>
+
+            <time [attr.datetime]="notification.createdAt">
+              {{ notification.createdAt | date: 'medium' }}
+            </time>
+          </div>
+
+          @if (!notification.readAt) {
+            <button
+              class="notification-mark-read"
+              type="button"
+              [disabled]="markingId() === notification.id"
+              [attr.aria-label]="'notificationsPage.markRead' | translate"
+              [attr.title]="'notificationsPage.markRead' | translate"
+              (click)="markRead(notification)"
+            >
+              @if (markingId() === notification.id) {
+                <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+              } @else {
+                <i class="bi bi-check2" aria-hidden="true"></i>
+              }
+              <span class="visually-hidden">{{ 'notificationsPage.markRead' | translate }}</span>
+            </button>
+          }
+        </article>
+      }
+    </div>
+  }
 </section>

@@ -62,12 +62,12 @@
           <li class="nav-item">
             <a
               class="nav-link"
-              routerLink="/track"
+              routerLink="/my-tickets"
               routerLinkActive="active"
               ariaCurrentWhenActive="page"
               (click)="closeMenu()"
             >
-              {{ 'navigation.trackTicket' | translate }}
+              {{ 'navigation.myTickets' | translate }}
             </a>
           </li>
         </ul>
@@ -75,10 +75,17 @@
         <div class="header-actions">
           <app-language-switcher />
 
-          <a class="btn login-button" routerLink="/login" (click)="closeMenu()">
-            <i class="bi bi-person" aria-hidden="true"></i>
-            <span>{{ 'common.login' | translate }}</span>
-          </a>
+          @if (authStore.isAuthenticated()) {
+            <a class="btn login-button" routerLink="/dashboard" (click)="closeMenu()">
+              <i class="bi bi-speedometer2" aria-hidden="true"></i>
+              <span>{{ 'dashboard.header.title' | translate }}</span>
+            </a>
+          } @else {
+            <a class="btn login-button" routerLink="/login" (click)="closeMenu()">
+              <i class="bi bi-person" aria-hidden="true"></i>
+              <span>{{ 'common.login' | translate }}</span>
+            </a>
+          }
         </div>
       </div>
     </div>

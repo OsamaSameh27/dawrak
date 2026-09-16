@@ -3,3 +3,239 @@
 :host {
   display: block;
 }
+
+.my-tickets-page {
+  padding-block: clamp(1.5rem, 4vw, 2.75rem);
+}
+
+.dashboard-page__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.25rem;
+}
+
+.page-description {
+  margin: 0.55rem 0 0;
+  color: var(--queue-muted);
+  font-size: 0.86rem;
+}
+
+.dashboard-page__header > .btn {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.tickets-state {
+  display: flex;
+  min-height: 12rem;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-top: 1.5rem;
+  padding: 2rem;
+  border: 1px solid var(--queue-border);
+  border-radius: var(--queue-radius);
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--queue-muted);
+  text-align: center;
+}
+
+.tickets-state p {
+  margin: 0;
+}
+
+.empty-tickets i {
+  color: var(--queue-primary);
+  font-size: 2.25rem;
+}
+
+.empty-tickets h2 {
+  margin: 0;
+  color: var(--queue-navy);
+  font-size: 1.2rem;
+}
+
+.tickets-section {
+  margin-top: 1.75rem;
+}
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.9rem;
+}
+
+.section-heading h2 {
+  margin: 0;
+  color: var(--queue-navy);
+  font-size: 1.12rem;
+}
+
+.section-heading > span {
+  display: inline-grid;
+  min-width: 1.7rem;
+  min-height: 1.7rem;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--queue-primary-soft);
+  color: var(--queue-primary-dark);
+  font-size: 0.75rem;
+  font-weight: 750;
+}
+
+.dashboard-tickets-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.dashboard-ticket-card {
+  min-width: 0;
+  padding: 1.15rem;
+  border: 1px solid var(--queue-border);
+  border-radius: var(--queue-radius-sm);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: var(--queue-shadow);
+}
+
+.ticket-card-old {
+  opacity: 0.86;
+  box-shadow: none;
+}
+
+.ticket-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.ticket-card-header small,
+.ticket-information dt,
+.ticket-wait-details small {
+  color: var(--queue-muted);
+  font-size: 0.72rem;
+}
+
+.ticket-card-header h3 {
+  margin: 0.25rem 0 0;
+  color: var(--queue-navy);
+  font-size: 1.55rem;
+}
+
+.ticket-status {
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  background: var(--queue-primary-soft);
+  color: var(--queue-primary-dark);
+  font-size: 0.7rem;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.ticket-information {
+  display: grid;
+  gap: 0.65rem;
+  margin: 1rem 0;
+  padding-block: 0.9rem;
+  border-block: 1px dashed var(--queue-border);
+}
+
+.ticket-information div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.ticket-information dt,
+.ticket-information dd {
+  margin: 0;
+}
+
+.ticket-information dd {
+  color: var(--queue-navy);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-align: end;
+}
+
+.ticket-wait-details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.ticket-wait-details strong {
+  display: block;
+  margin-top: 0.25rem;
+  color: var(--queue-primary-dark);
+  font-size: 0.95rem;
+}
+
+.ticket-status-note {
+  margin: 0;
+  color: var(--queue-primary-dark);
+  font-size: 0.8rem;
+}
+
+.cancel-ticket-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 1rem;
+}
+
+.cancel-confirmation {
+  margin-top: 1rem;
+  padding: 0.85rem;
+  border: 1px solid #f0d4d4;
+  border-radius: var(--queue-radius-sm);
+  background: #fff7f7;
+}
+
+.cancel-confirmation p {
+  margin: 0 0 0.7rem;
+  color: #7c3030;
+  font-size: 0.8rem;
+}
+
+.cancel-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.cancel-actions .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.cancel-error {
+  margin: 0.65rem 0 0 !important;
+  color: var(--queue-danger) !important;
+  font-size: 0.75rem !important;
+}
+
+@media (max-width: 767.98px) {
+  .dashboard-page__header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .dashboard-page__header > .btn {
+    align-self: flex-start;
+  }
+
+  .dashboard-tickets-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

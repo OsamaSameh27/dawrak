@@ -8,6 +8,7 @@
     "tagline": "Your turn without the long wait"
   },
   "navigation": {
+    "myTickets": "My tickets",
     "primary": "Main navigation",
     "toggleMenu": "Open or close menu",
     "trackTicket": "Track your turn"
@@ -49,8 +50,8 @@
         "description": "Choose a branch and service, then check the wait before booking."
       },
       "track": {
-        "title": "Track your ticket",
-        "description": "Enter your ticket number to see your current position."
+          "title": "My current tickets",
+          "description": "View your current tickets and queue status without searching by ticket number."
       }
     },
     "queue": {
@@ -161,6 +162,15 @@
       "note": "The estimated wait may change depending on service speed.",
       "confirm": "Confirm booking"
     },
+    "submit": {
+      "loading": "Confirming your booking...",
+      "retry": "Try again",
+      "unconfirmed": "We could not confirm the booking outcome. It may already have been created; retry from this page without reloading it.",
+      "loginRequired": "Log in with a customer account to confirm your booking.",
+      "customerOnly": "Only customer accounts can confirm bookings here.",
+      "conflict": "The request conflicts with an existing booking or an earlier request. Check your tickets before starting a new booking.",
+      "invalidSelection": "The booking details are invalid or the service is no longer available. Go back and review your branch and service selection."
+    },
     "success": {
       "eyebrow": "Booking confirmed",
       "title": "Your turn is booked",
@@ -171,9 +181,47 @@
       "peopleAhead": "People ahead",
       "estimate": "Estimated time",
       "note": "We will notify you shortly before your turn.",
-      "track": "Track your turn",
+      "track": "View my tickets",
       "newBooking": "Book another turn"
     }
+  },
+  "currentTickets": {
+    "eyebrow": "All your current turns in one place",
+    "title": "My tickets",
+    "description": "View tickets that are waiting, called or being served. Finished tickets are not shown here.",
+    "refresh": "Refresh tickets",
+    "loading": "Loading your tickets...",
+    "retry": "Try again",
+    "loadFailed": "Could not load your tickets. Please try again.",
+    "loginRequired": "Log in to view your current tickets.",
+    "customerOnly": "This page is available to customer accounts only.",
+    "emptyTitle": "No current tickets",
+    "emptyDescription": "Book a new turn and your ticket will appear here.",
+    "updateNote": "Your ticket status updates automatically every 15 seconds.",
+    "counter": "Counter",
+    "calledNotice": "You have been called. Go to the assigned counter or check with branch staff.",
+    "servingNotice": "Your service is in progress."
+  },
+  "myTickets": {
+    "description": "Here you can find all your current and previous tickets.",
+    "refresh": "Refresh tickets",
+    "retry": "Try again",
+    "loginRequired": "You need to log in to view your tickets.",
+    "customerOnly": "Tickets are available to customer accounts only.",
+    "loadFailed": "Could not load your tickets. Please try again.",
+    "currentTitle": "Current tickets",
+    "historyTitle": "Ticket history",
+    "counter": "Counter",
+    "calledNotice": "You have been called. Go to the assigned counter.",
+    "servingNotice": "Your service is currently in progress.",
+    "emptyTitle": "No tickets found",
+    "emptyDescription": "You have not booked a ticket yet.",
+    "cancel": "Cancel ticket",
+    "cancelConfirm": "Are you sure you want to cancel this ticket?",
+    "keepTicket": "Keep ticket",
+    "confirmCancel": "Confirm cancellation",
+    "cancelling": "Cancelling...",
+    "cancelFailed": "Could not cancel the ticket. Please try again."
   },
   "track": {
     "eyebrow": "Track your ticket",
@@ -186,9 +234,19 @@
       "required": "Enter a valid ticket identifier so we can find your turn.",
       "help": "You will find the ticket identifier in the booking details you received."
     },
+    "errors": {
+      "notFound": "No ticket was found with this identifier. Check it and try again.",
+      "loadFailed": "Could not load the ticket. Please try again."
+    },
     "result": {
       "status": {
-        "waiting": "Waiting"
+        "waiting": "Waiting",
+        "called": "You have been called",
+        "serving": "Being served",
+        "completed": "Completed",
+        "skipped": "Skipped",
+        "no_show": "No-show",
+        "cancelled": "Cancelled"
       },
       "ticketLabel": "Ticket number",
       "searchAgain": "Another ticket",
@@ -282,6 +340,7 @@
       "queue": "Queue management",
       "myTickets": "My tickets",
       "notifications": "Notifications",
+      "unreadCount": "Number of unread notifications",
       "branches": "Branches",
       "services": "Services",
       "counters": "Counters",
@@ -301,6 +360,51 @@
       "counters": "Counters",
       "staff": "Staff",
       "reports": "Reports"
+    }
+  },
+  "notificationsPage": {
+    "description": "Keep up with the latest updates about your tickets.",
+    "markAll": "Mark all as read",
+    "markingAll": "Updating notifications...",
+    "loading": "Loading notifications...",
+    "retry": "Try again",
+    "emptyTitle": "No notifications",
+    "emptyDescription": "Updates about your tickets will appear here.",
+    "unread": "Unread",
+    "markRead": "Mark as read",
+    "loginRequired": "Sign in to view your notifications.",
+    "loadFailed": "Could not load notifications.",
+    "actionFailed": "Could not update the notification. Please try again.",
+    "viewAll": "View all notifications",
+    "close": "Close notification"
+  },
+  "notifications": {
+    "types": {
+      "ticketCreated": {
+        "title": "Ticket created",
+        "message": "Your ticket {{ticketNumber}} was created successfully."
+      },
+      "queueNear": {
+        "title": "Your turn is near",
+        "message": "Your ticket {{ticketNumber}} is nearly up."
+      },
+      "ticketCalled": {
+        "title": "It is your turn",
+        "message": "Your ticket {{ticketNumber}} was called at {{counterName}}."
+      },
+      "ticketUpdated": {
+        "title": "Ticket updated",
+        "message": "Your ticket {{ticketNumber}} is now: {{status}}."
+      }
+    },
+    "status": {
+      "waiting": "Waiting",
+      "called": "Called",
+      "serving": "Being served",
+      "completed": "Completed",
+      "skipped": "Skipped",
+      "no_show": "No show",
+      "cancelled": "Cancelled"
     }
   },
   "queueStatus": {

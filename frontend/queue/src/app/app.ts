@@ -1,13 +1,114 @@
-import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { NgForOf } from "../../node_modules/@angular/common/types/_common_module-chunk";
+import { Component, DestroyRef, effect, inject, signal } from '@angular/core';
+import { RouterLink, RouterOutlet } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+
+import { NotificationItem } from './features/notifications/models/notification.model';
+import { NotificationsRealtimeService } from './features/notifications/services/notifications-realtime.service';
+import { NotificationsState } from './features/notifications/state/notifications-state';
+import { AuthStore } from './features/auth/state/auth-store';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, RouterLink, TranslatePipe],
   templateUrl: './app.html',
-  styleUrl: './app.scss'
+  styleUrl: './app.scss',
 })
 export class App {
-  protected readonly title = signal('queue');
+  private readonly authStore = inject(AuthStore);
+  private readonly realtime = inject(NotificationsRealtimeService);
+  private readonly notificationsState = inject(NotificationsState);
+  private readonly translate = inject(TranslateService);
+  private readonly destroyRef = inject(DestroyRef);
+
+  protected readonly toastNotification = signal<NotificationItem | null>(null);
+  protected readonly toastClosing = signal(false);
+
+  private toastTimer: ReturnType<typeof setTimeout> | null = null;
+  private toastCloseTimer: ReturnType<typeof setTimeout> | null = null;
+
+  private readonly authConnectionEffect = effect(() => {
+    if (!this.authStore.initialized()) {
+      return;
+    }
+
+    if (this.authStore.isAuthenticated()) {
+      this.realtime.connect();
+    } else {
+      this.realtime.disconnect();
+    }
+  });
+
+  constructor() {
+    this.realtime.notification$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((notification) => {
+        if (this.toastCloseTimer) {
+          clearTimeout(this.toastCloseTimer);
+          this.toastCloseTimer = null;
+        }
+
+        this.toastClosing.set(false);
+        this.toastNotification.set(notification);
+        this.notificationsState.increaseUnreadCount();
+
+        if (this.toastTimer) {
+          clearTimeout(this.toastTimer);
+        }
+
+        this.toastTimer = setTimeout(() => {
+          this.beginToastClose();
+        }, 7000);
+      });
+  }
+
+  protected dismissToast(): void {
+    if (this.toastTimer) {
+      clearTimeout(this.toastTimer);
+      this.toastTimer = null;
+    }
+
+    this.beginToastClose();
+  }
+
+  private beginToastClose(): void {
+    if (!this.toastNotification() || this.toastClosing()) {
+      return;
+    }
+
+    this.toastClosing.set(true);
+
+    if (this.toastCloseTimer) {
+      clearTimeout(this.toastCloseTimer);
+    }
+
+    this.toastCloseTimer = setTimeout(() => {
+      this.toastNotification.set(null);
+      this.toastClosing.set(false);
+      this.toastCloseTimer = null;
+    }, 220);
+  }
+
+  protected notificationParams(
+    notification: NotificationItem,
+  ): Record<string, string> {
+    const data = notification.data ?? {};
+    const params: Record<string, string> = {};
+
+    if (data.ticketNumber) {
+      params['ticketNumber'] = data.ticketNumber;
+    }
+
+    if (data.counterName) {
+      params['counterName'] = data.counterName;
+    }
+
+    if (data.status) {
+      params['status'] = this.translate.instant(
+        `notifications.status.${data.status.toLowerCase()}`,
+      );
+    }
+
+    return params;
+  }
 }

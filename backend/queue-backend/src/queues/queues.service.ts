@@ -15,7 +15,7 @@ import { CreateMyTicketDto } from './dto/create-my-ticket.dto';
 import { calculateEstimatedWait, canTransition } from './queue.domain';
 import { QueueGateway } from './queue.gateway';
 
-const ACTIVE_TICKET_STATUSES = [TicketStatus.WAITING, TicketStatus.CALLED, TicketStatus.SERVING];
+const ACTIVE_TICKET_STATUSES: TicketStatus[] = [TicketStatus.WAITING, TicketStatus.CALLED, TicketStatus.SERVING];
 
 @Injectable()
 export class QueuesService {
@@ -29,7 +29,7 @@ export class QueuesService {
     const manageToken = dto.idempotencyKey
       ? createHmac('sha256', this.config.getOrThrow<string>('JWT_REFRESH_SECRET')).update(dto.idempotencyKey).digest('hex')
       : randomBytes(32).toString('hex');
-    const ticket = await this.createTicket({
+    const { ticket } = await this.createTicket({
       serviceId: dto.serviceId,
       customerName: dto.customerName.trim(),
       customerPhone: dto.customerPhone,
@@ -43,7 +43,7 @@ export class QueuesService {
 
   async createMine(user: AuthenticatedUser, dto: CreateMyTicketDto) {
     const account = await this.prisma.user.findUniqueOrThrow({ where: { id: user.id } });
-    const ticket = await this.createTicket({
+    const { ticket, created } = await this.createTicket({
       serviceId: dto.serviceId,
       customerId: user.id,
       customerName: account.fullName,
@@ -51,6 +51,13 @@ export class QueuesService {
       note: dto.note,
       idempotencyKey: dto.idempotencyKey,
     });
+    if (created) {
+      const notification = await this.prisma.notification.findFirst({
+        where: { ticketId: ticket.id, userId: user.id, type: NotificationType.TICKET_CREATED },
+        orderBy: { createdAt: 'desc' },
+      });
+      if (notification) this.gateway.emitNotification(user.id, notification);
+    }
     await this.broadcast(ticket.serviceId, ticket.publicId);
     return this.getPublicTicket(ticket.publicId);
   }
@@ -81,6 +88,17 @@ export class QueuesService {
       take: 50,
     });
     return Promise.all(tickets.map((ticket) => this.getPublicTicket(ticket.publicId)));
+  }
+
+  async getActiveMine(userId: string) {
+    const tickets = await this.prisma.ticket.findMany({
+      where: { customerId: userId, status: { in: ACTIVE_TICKET_STATUSES } },
+      select: { publicId: true },
+      orderBy: { createdAt: 'desc' },
+    });
+    const currentTickets = await Promise.all(tickets.map((ticket) => this.getPublicTicket(ticket.publicId)));
+    // A ticket may finish while its details are being loaded.
+    return currentTickets.filter((ticket) => ACTIVE_TICKET_STATUSES.includes(ticket.status));
   }
 
   async listOperational(actor: AuthenticatedUser, serviceId: string) {
@@ -174,12 +192,21 @@ export class QueuesService {
           notifications: {
             create: {
               userId: next.customerId, type: NotificationType.TICKET_CALLED,
-              title: 'Your turn', message: `${next.number} is now called at ${counter.name}`,
+              title: 'notifications.types.ticketCalled.title',
+              message: 'notifications.types.ticketCalled.message',
+              data: { ticketNumber: next.number, counterName: counter.name },
             },
           },
         },
       });
     });
+    if (ticket.customerId) {
+      const notification = await this.prisma.notification.findFirst({
+        where: { ticketId: ticket.id, userId: ticket.customerId, type: NotificationType.TICKET_CALLED },
+        orderBy: { createdAt: 'desc' },
+      });
+      if (notification) this.gateway.emitNotification(ticket.customerId, notification);
+    }
     await this.notifyNearTickets(serviceId, queueDate, service.nearTurnThreshold);
     await this.broadcast(serviceId, ticket.publicId, true);
     return this.getPublicTicket(ticket.publicId);
@@ -239,7 +266,7 @@ export class QueuesService {
       const existing = await this.prisma.ticket.findUnique({ where: { idempotencyKey: input.idempotencyKey } });
       if (existing) {
         this.assertIdempotentMatch(existing, input);
-        return existing;
+        return { ticket: existing, created: false };
       }
     }
     const service = await this.prisma.service.findFirst({
@@ -261,14 +288,14 @@ export class QueuesService {
         const existing = await tx.ticket.findUnique({ where: { idempotencyKey: input.idempotencyKey } });
         if (existing) {
           this.assertIdempotentMatch(existing, input);
-          return existing;
+          return { ticket: existing, created: false };
         }
       }
       const last = await tx.ticket.findFirst({
         where: { serviceId: service.id, queueDate }, orderBy: { sequence: 'desc' }, select: { sequence: true },
       });
       const sequence = (last?.sequence ?? 0) + 1;
-      return tx.ticket.create({
+      const ticket = await tx.ticket.create({
         data: {
           branchId: service.branchId, serviceId: service.id, queueDate, sequence,
           number: `${service.prefix}-${sequence.toString().padStart(3, '0')}`,
@@ -279,11 +306,14 @@ export class QueuesService {
           notifications: input.customerId ? {
             create: {
               userId: input.customerId, type: NotificationType.TICKET_CREATED,
-              title: 'Ticket created', message: 'Your queue ticket has been created',
+              title: 'notifications.types.ticketCreated.title',
+              message: 'notifications.types.ticketCreated.message',
+              data: { ticketNumber: `${service.prefix}-${sequence.toString().padStart(3, '0')}` },
             },
           } : undefined,
         },
       });
+      return { ticket, created: true };
     });
   }
 
@@ -307,12 +337,21 @@ export class QueuesService {
           notifications: {
             create: {
               userId: current.customerId, type: NotificationType.TICKET_UPDATED,
-              title: 'Ticket updated', message: `${current.number} is now ${toStatus}`,
+              title: 'notifications.types.ticketUpdated.title',
+              message: 'notifications.types.ticketUpdated.message',
+              data: { ticketNumber: current.number, status: toStatus },
             },
           },
         },
       });
     });
+    if (ticket.customerId) {
+      const notification = await this.prisma.notification.findFirst({
+        where: { ticketId: ticket.id, userId: ticket.customerId, type: NotificationType.TICKET_UPDATED },
+        orderBy: { createdAt: 'desc' },
+      });
+      if (notification) this.gateway.emitNotification(ticket.customerId, notification);
+    }
     await this.broadcast(updated.serviceId, updated.publicId);
     return this.getPublicTicket(updated.publicId);
   }
@@ -371,12 +410,15 @@ export class QueuesService {
         where: { ticketId: ticket.id, type: NotificationType.QUEUE_NEAR }, select: { id: true },
       });
       if (!exists) {
-        await this.prisma.notification.create({
+        const notification = await this.prisma.notification.create({
           data: {
             userId: ticket.customerId, ticketId: ticket.id, type: NotificationType.QUEUE_NEAR,
-            title: 'Your turn is near', message: `${ticket.number} is approaching`,
+            title: 'notifications.types.queueNear.title',
+            message: 'notifications.types.queueNear.message',
+            data: { ticketNumber: ticket.number },
           },
         });
+        if (ticket.customerId) this.gateway.emitNotification(ticket.customerId, notification);
       }
     }
   }

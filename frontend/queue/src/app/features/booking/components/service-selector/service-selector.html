@@ -15,21 +15,18 @@
       [attr.aria-pressed]="selectedId() === service.id"
       (click)="serviceSelected.emit(service.id)"
     >
-      <span class="service-icon"><i class="bi" [class]="service.icon" aria-hidden="true"></i></span>
+      <span class="service-icon">
+        <i class="bi bi-grid" aria-hidden="true"></i>
+      </span>
+
       <span class="service-copy">
-        <strong>{{ service.nameKey | translate }}</strong>
-        <small>{{ service.descriptionKey | translate }}</small>
+        <strong dir="auto">{{ service.name }}</strong>
+
+        @if (service.description) {
+          <small dir="auto">{{ service.description }}</small>
+        }
       </span>
-      <span class="service-metrics">
-        <span>
-          <small>{{ 'booking.serviceStep.waiting' | translate }}</small>
-          <strong>{{ service.waitingCount }}</strong>
-        </span>
-        <span>
-          <small>{{ 'booking.serviceStep.estimate' | translate }}</small>
-          <strong>{{ 'booking.minutes' | translate: { count: service.estimatedMinutes } }}</strong>
-        </span>
-      </span>
+
       <i class="bi bi-check-circle-fill selected-icon" aria-hidden="true"></i>
     </button>
   }

@@ -1,0 +1,120 @@
+<section class="current-tickets-page" aria-labelledby="current-tickets-title">
+  <div class="container">
+    <header class="page-heading">
+      <div>
+        <span class="eyebrow"
+          ><i class="bi bi-ticket-perforated" aria-hidden="true"></i>
+          {{ 'currentTickets.eyebrow' | translate }}</span
+        >
+        <h1 id="current-tickets-title">{{ 'currentTickets.title' | translate }}</h1>
+        <p>{{ 'currentTickets.description' | translate }}</p>
+      </div>
+      <button
+        class="btn btn-outline-primary refresh-button"
+        type="button"
+        [disabled]="loading()"
+        (click)="loadTickets()"
+      >
+        <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
+        {{ 'currentTickets.refresh' | translate }}
+      </button>
+    </header>
+
+    @if (loading()) {
+      <div class="state-card" role="status">
+        <span class="spinner-border text-primary" aria-hidden="true"></span>
+        <p>{{ 'currentTickets.loading' | translate }}</p>
+      </div>
+    } @else if (errorKey(); as messageKey) {
+      <div class="state-card">
+        <p role="alert">{{ messageKey | translate }}</p>
+        @if (messageKey === 'currentTickets.loginRequired') {
+          <a
+            class="btn btn-primary"
+            routerLink="/login"
+            [queryParams]="{ returnUrl: '/my-tickets' }"
+            >{{ 'common.login' | translate }}</a
+          >
+        } @else if (messageKey === 'currentTickets.customerOnly') {
+          <a class="btn btn-primary" routerLink="/dashboard">{{
+            'dashboard.header.title' | translate
+          }}</a>
+        } @else {
+          <button class="btn btn-primary" type="button" (click)="loadTickets()">
+            {{ 'currentTickets.retry' | translate }}
+          </button>
+        }
+      </div>
+    } @else if (tickets().length === 0) {
+      <div class="state-card empty-state">
+        <i class="bi bi-ticket-perforated" aria-hidden="true"></i>
+        <h2>{{ 'currentTickets.emptyTitle' | translate }}</h2>
+        <p>{{ 'currentTickets.emptyDescription' | translate }}</p>
+        <a class="btn btn-primary" routerLink="/booking">{{ 'common.bookTicket' | translate }}</a>
+      </div>
+    } @else {
+      <p class="update-note">
+        <i class="bi bi-info-circle" aria-hidden="true"></i>
+        {{ 'currentTickets.updateNote' | translate }}
+      </p>
+      <div class="tickets-grid">
+        @for (ticket of tickets(); track ticket.id) {
+          <article class="ticket-card" [attr.aria-labelledby]="'ticket-' + ticket.id">
+            <header class="ticket-card__header">
+              <div>
+                <small>{{ 'booking.success.ticketNumber' | translate }}</small>
+                <h2 [id]="'ticket-' + ticket.id" dir="ltr">{{ ticket.number }}</h2>
+              </div>
+              <span
+                class="ticket-status"
+                [class.is-called]="ticket.status === 'CALLED'"
+                [class.is-serving]="ticket.status === 'SERVING'"
+              >
+                {{ 'track.result.status.' + ticket.status.toLowerCase() | translate }}
+              </span>
+            </header>
+            <dl class="ticket-details">
+              <div>
+                <dt>{{ 'booking.success.branch' | translate }}</dt>
+                <dd dir="auto">{{ ticket.branch.name }}</dd>
+              </div>
+              <div>
+                <dt>{{ 'booking.success.service' | translate }}</dt>
+                <dd dir="auto">{{ ticket.service.name }}</dd>
+              </div>
+              @if (ticket.counter; as counter) {
+                <div>
+                  <dt>{{ 'currentTickets.counter' | translate }}</dt>
+                  <dd dir="auto">{{ counter.name }}</dd>
+                </div>
+              }
+            </dl>
+            @if (ticket.status === 'WAITING') {
+              <div class="ticket-wait">
+                <div>
+                  <small>{{ 'booking.success.peopleAhead' | translate }}</small
+                  ><strong>{{ ticket.peopleAhead }}</strong>
+                </div>
+                <div>
+                  <small>{{ 'booking.success.estimate' | translate }}</small
+                  ><strong>{{
+                    'booking.minutes' | translate: { count: ticket.estimatedWaitMinutes }
+                  }}</strong>
+                </div>
+              </div>
+            } @else {
+              <p class="service-notice">
+                {{
+                  (ticket.status === 'CALLED'
+                    ? 'currentTickets.calledNotice'
+                    : 'currentTickets.servingNotice'
+                  ) | translate
+                }}
+              </p>
+            }
+          </article>
+        }
+      </div>
+    }
+  </div>
+</section>

@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { finalize } from 'rxjs';
 import { AuthServices } from '../../services/auth.services';
@@ -28,6 +28,7 @@ export class LoginPage {
   private readonly authServices = inject(AuthServices);
   private readonly authStore = inject(AuthStore);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   protected isInvalid(controlName: 'email' | 'password'): boolean {
     const control = this.loginForm.controls[controlName];
@@ -59,7 +60,14 @@ export class LoginPage {
       .subscribe({
         next: (session) => {
           this.authStore.setSession(session);
-          void this.router.navigateByUrl('/dashboard');
+          const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+          // Only accept the known customer destination, never an arbitrary URL.
+          const destination =
+            session.user.role === 'CUSTOMER' &&
+            (returnUrl === '/my-tickets' || returnUrl?.startsWith('/my-tickets?'))
+              ? '/my-tickets'
+              : '/dashboard';
+          void this.router.navigateByUrl(destination);
         },
         error: () => {
           this.loginFailed.set(true);

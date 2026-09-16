@@ -170,6 +170,26 @@
   flex-shrink: 0;
 }
 
+.navigation-link {
+  position: relative;
+}
+
+.notification-count {
+  display: inline-flex;
+  min-width: 1.35rem;
+  height: 1.35rem;
+  align-items: center;
+  justify-content: center;
+  margin-inline-start: auto;
+  padding-inline: 0.25rem;
+  border-radius: 999px;
+  background: var(--queue-danger);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 750;
+  line-height: 1;
+}
+
 @media (max-width: 991.98px) {
   .sidebar-brand {
     min-height: 4.25rem;
