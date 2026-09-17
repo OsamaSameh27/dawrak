@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard/
+Disallow: /booking
+Disallow: /my-tickets
+Disallow: /login
+Disallow: /register
+
+Sitemap: https://daw-rak.vercel.app/sitemap.xml

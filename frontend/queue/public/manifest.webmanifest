@@ -1,0 +1,20 @@
+{
+  "name": "دورك | Dawrak",
+  "short_name": "دورك",
+  "description": "احجز دورك وتابع الطوابير والخدمات بدون انتظار طويل.",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f2f8f7",
+  "theme_color": "#28756d",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

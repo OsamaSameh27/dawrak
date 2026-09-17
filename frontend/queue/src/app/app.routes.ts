@@ -12,6 +12,7 @@ export const routes: Routes = [
       {
         path: '',
         pathMatch: 'full',
+        data: { seoKey: 'home' },
         loadComponent: () =>
           import('./features/home/pages/home-page/home-page').then(
             (component) => component.HomePage,
@@ -20,7 +21,7 @@ export const routes: Routes = [
       {
         path: 'booking',
         canActivate: [authGuard, roleGuard],
-        data: { roles: ['CUSTOMER'] },
+        data: { roles: ['CUSTOMER'], seoKey: 'booking', noIndex: true },
         loadComponent: () =>
           import('./features/booking/pages/booking-page/booking-page').then(
             (component) => component.BookingPage,
@@ -34,7 +35,7 @@ export const routes: Routes = [
       {
         path: 'my-tickets',
         canActivate: [authGuard, roleGuard],
-        data: { roles: ['CUSTOMER'] },
+        data: { roles: ['CUSTOMER'], seoKey: 'currentTickets', noIndex: true },
         loadComponent: () =>
           import('./features/tickets/pages/current-tickets-page/current-tickets-page').then(
             (component) => component.CurrentTicketsPage,
@@ -42,6 +43,7 @@ export const routes: Routes = [
       },
       {
         path: 'login',
+        data: { seoKey: 'login', noIndex: true },
         loadComponent: () =>
           import('./features/auth/pages/login-page/login-page').then(
             (component) => component.LoginPage,
@@ -49,6 +51,7 @@ export const routes: Routes = [
       },
       {
         path: 'register',
+        data: { seoKey: 'register', noIndex: true },
         loadComponent: () =>
           import('./features/auth/pages/register-page/register-page').then(
             (component) => component.RegisterPage,
@@ -58,6 +61,7 @@ export const routes: Routes = [
   },
   {
     path: 'dashboard',
+    data: { seoKey: 'dashboard', noIndex: true },
     canActivate: [authGuard],
     canActivateChild: [authGuard],
     loadComponent: () =>
@@ -68,6 +72,7 @@ export const routes: Routes = [
       {
         path: '',
         pathMatch: 'full',
+        data: { seoKey: 'dashboard' },
         loadComponent: () =>
           import('./features/dashboard/pages/dashboard-overview-page/dashboard-overview-page').then(
             (component) => component.DashboardOverviewPage,
@@ -78,6 +83,7 @@ export const routes: Routes = [
         canActivate: [roleGuard],
         data: {
           roles: ['STAFF'],
+          seoKey: 'queueManagement',
         },
         loadComponent: () =>
           import('./features/queues/pages/queue-management-page/queue-management-page').then(
@@ -87,7 +93,7 @@ export const routes: Routes = [
       {
         path: 'monitoring',
         canActivate: [roleGuard],
-        data: { roles: ['MANAGER', 'ADMIN'] },
+        data: { roles: ['MANAGER', 'ADMIN'], seoKey: 'monitoring' },
         loadComponent: () =>
           import('./features/queues/pages/queue-monitoring-page/queue-monitoring-page').then(
             (component) => component.QueueMonitoringPage,
@@ -98,6 +104,7 @@ export const routes: Routes = [
         canActivate: [roleGuard],
         data: {
           roles: ['CUSTOMER'],
+          seoKey: 'ticketHistory',
         },
         loadComponent: () =>
           import('./features/tickets/pages/my-tickets-page/my-tickets-page').then(
@@ -109,6 +116,7 @@ export const routes: Routes = [
         canActivate: [roleGuard],
         data: {
           roles: ['MANAGER', 'ADMIN'],
+          seoKey: 'branches',
         },
         loadComponent: () =>
           import('./features/branches/pages/branches-page/branches-page').then(
@@ -120,6 +128,7 @@ export const routes: Routes = [
         canActivate: [roleGuard],
         data: {
           roles: ['MANAGER', 'ADMIN'],
+          seoKey: 'services',
         },
         loadComponent: () =>
           import('./features/services/pages/services-page/services-page').then(
@@ -130,7 +139,8 @@ export const routes: Routes = [
         path: 'counters',
         canActivate: [roleGuard],
         data: {
-          roles: [ 'MANAGER', 'ADMIN'],
+          roles: ['MANAGER', 'ADMIN'],
+          seoKey: 'counters',
         },
         loadComponent: () =>
           import('./features/counters/pages/counters-page/counters-page').then(
@@ -142,6 +152,7 @@ export const routes: Routes = [
         canActivate: [roleGuard],
         data: {
           roles: ['MANAGER', 'ADMIN'],
+          seoKey: 'staff',
         },
         loadComponent: () =>
           import('./features/users/pages/staff-page/staff-page').then(
@@ -153,6 +164,7 @@ export const routes: Routes = [
         canActivate: [roleGuard],
         data: {
           roles: ['MANAGER', 'ADMIN'],
+          seoKey: 'reports',
         },
         loadComponent: () =>
           import('./features/reports/pages/reports-page/reports-page').then(
@@ -161,6 +173,7 @@ export const routes: Routes = [
       },
       {
         path: 'notifications',
+        data: { seoKey: 'notifications' },
         loadComponent: () =>
           import('./features/notifications/pages/notifications-page/notifications-page').then(
             (component) => component.NotificationsPage,

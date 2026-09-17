@@ -19,7 +19,7 @@ export class LanguageService {
 
   readonly currentLanguage = this.currentLanguageSignal.asReadonly();
   readonly direction = computed<AppDirection>(() =>
-    this.currentLanguageSignal() === 'ar' ? 'rtl' : 'ltr'
+    this.currentLanguageSignal() === 'ar' ? 'rtl' : 'ltr',
   );
 
   async initialize(): Promise<void> {
@@ -44,7 +44,6 @@ export class LanguageService {
     this.updateBootstrapDirection(language);
 
     await firstValueFrom(this.translate.use(language));
-    this.updatePageMetadata();
 
     if (isPlatformBrowser(this.platformId)) {
       localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
@@ -57,33 +56,20 @@ export class LanguageService {
     }
 
     const savedLanguage = localStorage.getItem(LANGUAGE_STORAGE_KEY);
-    return savedLanguage === 'en' || savedLanguage === 'ar'
-      ? savedLanguage
-      : DEFAULT_LANGUAGE;
+    return savedLanguage === 'en' || savedLanguage === 'ar' ? savedLanguage : DEFAULT_LANGUAGE;
   }
 
   private updateBootstrapDirection(language: AppLanguage): void {
     const stylesheet = this.document.getElementById(
-      BOOTSTRAP_STYLESHEET_ID
+      BOOTSTRAP_STYLESHEET_ID,
     ) as HTMLLinkElement | null;
 
     if (!stylesheet) {
       return;
     }
 
-    const bootstrapFile = language === 'ar'
-      ? 'bootstrap.rtl.min.css'
-      : 'bootstrap.min.css';
+    const bootstrapFile = language === 'ar' ? 'bootstrap.rtl.min.css' : 'bootstrap.min.css';
 
     stylesheet.href = `assets/bootstrap/${bootstrapFile}`;
-  }
-
-  private updatePageMetadata(): void {
-    this.document.title = this.translate.instant('meta.title');
-
-    const description = this.document.querySelector<HTMLMetaElement>(
-      'meta[name="description"]'
-    );
-    description?.setAttribute('content', this.translate.instant('meta.description'));
   }
 }

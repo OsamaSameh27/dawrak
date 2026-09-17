@@ -3,6 +3,70 @@
     "title": "Dawrak | Queue Management",
     "description": "A simple system for booking, tracking and managing queues"
   },
+  "seo": {
+    "pages": {
+      "home": {
+        "title": "Dawrak | Book and Track Queues Without the Long Wait",
+        "description": "Book the right branch and service, then follow the wait and your ticket status in real time without the crowds."
+      },
+      "booking": {
+        "title": "Book a New Turn | Dawrak",
+        "description": "Choose a branch and service and check the wait before confirming your booking."
+      },
+      "currentTickets": {
+        "title": "My Current Tickets | Dawrak",
+        "description": "Follow current tickets, people ahead and the estimated time until your turn."
+      },
+      "login": {
+        "title": "Log In | Dawrak",
+        "description": "Log in to follow your tickets or access your operations workspace."
+      },
+      "register": {
+        "title": "Create an Account | Dawrak",
+        "description": "Create a customer account to book turns and receive live ticket updates."
+      },
+      "dashboard": {
+        "title": "Dashboard | Dawrak",
+        "description": "An overview of your account and the queue operations available to your role."
+      },
+      "queueManagement": {
+        "title": "Queue Management | Dawrak",
+        "description": "Operate a counter, call customers and manage the service journey."
+      },
+      "monitoring": {
+        "title": "Queue Monitoring | Dawrak",
+        "description": "Monitor counters, shifts and queues in real time."
+      },
+      "ticketHistory": {
+        "title": "My Ticket History | Dawrak",
+        "description": "Review current and previous tickets and their details."
+      },
+      "branches": {
+        "title": "Branch Management | Dawrak",
+        "description": "Manage branch details, locations and operating status."
+      },
+      "services": {
+        "title": "Service Management | Dawrak",
+        "description": "Manage branch services and average service times."
+      },
+      "counters": {
+        "title": "Counter Management | Dawrak",
+        "description": "Configure branch counters and assign their services."
+      },
+      "staff": {
+        "title": "Staff Management | Dawrak",
+        "description": "Manage manager and staff accounts and access."
+      },
+      "reports": {
+        "title": "Performance Reports | Dawrak",
+        "description": "Review branch and service performance and waiting times."
+      },
+      "notifications": {
+        "title": "Notifications | Dawrak",
+        "description": "Follow the latest important alerts and account updates."
+      }
+    }
+  },
   "app": {
     "name": "Dawrak",
     "tagline": "Your turn without the long wait"

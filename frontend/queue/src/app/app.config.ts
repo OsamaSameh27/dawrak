@@ -12,6 +12,7 @@ import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 
 import { routes } from './app.routes';
 import { LanguageService } from './core/i18n/language.service';
+import { SeoService } from './core/seo/seo.service';
 import { initializeAuth } from './features/auth/initializers/auth-initializer';
 
 export const appConfig: ApplicationConfig = {
@@ -28,6 +29,7 @@ export const appConfig: ApplicationConfig = {
       }),
     }),
     provideAppInitializer(() => inject(LanguageService).initialize()),
-    provideAppInitializer(initializeAuth)
+    provideAppInitializer(() => inject(SeoService).initialize()),
+    provideAppInitializer(initializeAuth),
   ],
 };
