@@ -58,10 +58,10 @@
     }
   </nav>
 
-  @if (logoutFailed()) {
+  @if (logoutErrorKey()) {
     <p class="sidebar-logout-error" id="sidebar-logout-error" role="alert">
       <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
-      <span>{{ 'dashboard.navigation.logoutFailed' | translate }}</span>
+      <span>{{ logoutErrorKey()! | translate }}</span>
     </p>
   }
 
@@ -70,7 +70,7 @@
     type="button"
     [disabled]="isLoggingOut()"
     [attr.aria-busy]="isLoggingOut()"
-    [attr.aria-describedby]="logoutFailed() ? 'sidebar-logout-error' : null"
+    [attr.aria-describedby]="logoutErrorKey() ? 'sidebar-logout-error' : null"
     (click)="logout()"
   >
     <span class="sidebar-logout__icon" aria-hidden="true">

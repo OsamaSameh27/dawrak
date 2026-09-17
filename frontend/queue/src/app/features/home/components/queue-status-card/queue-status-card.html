@@ -16,10 +16,10 @@
   </div>
 
   <div class="queue-card__heading">
-    <h3>{{ queue().serviceNameKey | translate }}</h3>
+    <h3>{{ queue().serviceNameAr | localizedText: queue().serviceNameEn }}</h3>
     <p>
       <i class="bi bi-geo-alt" aria-hidden="true"></i>
-      {{ queue().branchNameKey | translate }}
+      {{ queue().branchNameAr | localizedText: queue().branchNameEn }}
     </p>
   </div>
 
@@ -41,7 +41,7 @@
     </div>
   </div>
 
-  @if (queue().status !== 'closed') {
+  @if (queue().status !== 'closed' && canBook()) {
     <a
       class="btn btn-outline-primary queue-card__action"
       routerLink="/booking"
@@ -50,10 +50,15 @@
       {{ 'queueStatus.book' | translate }}
       <i class="bi bi-arrow-left-short directional-icon" aria-hidden="true"></i>
     </a>
-  } @else {
+  } @else if (queue().status === 'closed') {
     <span class="queue-card__unavailable">
       <i class="bi bi-clock" aria-hidden="true"></i>
       {{ 'queueStatus.unavailable' | translate }}
+    </span>
+  } @else {
+    <span class="queue-card__unavailable queue-card__unavailable--readonly">
+      <i class="bi bi-eye" aria-hidden="true"></i>
+      {{ 'queueStatus.readOnly' | translate }}
     </span>
   }
 </article>

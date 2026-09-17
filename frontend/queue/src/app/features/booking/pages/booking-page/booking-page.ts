@@ -15,6 +15,7 @@ import { TicketsServices } from '../../../tickets/services/tickets.services';
 import { QueueTicket } from '../../../tickets/models/ticket.model';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpErrorResponse } from '@angular/common/http';
+import { LocalizedTextPipe } from '../../../../shared/pipes/localized-text.pipe';
 
 type BookingStep = 1 | 2 | 3 | 4;
 
@@ -27,6 +28,7 @@ type BookingStep = 1 | 2 | 3 | 4;
     BookingSummary,
     BookingSuccess,
     TranslatePipe,
+    LocalizedTextPipe,
   ],
   templateUrl: './booking-page.html',
   styleUrl: './booking-page.scss',

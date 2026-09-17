@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 
 import { environment } from '../../../../environments/environment';
 import { CreateTicketRequest, QueueTicket } from '../models/ticket.model';
+import { HomeQueueOverview } from '../../home/models/queue-status.model';
 
 @Service()
 export class TicketsServices {
@@ -27,6 +28,10 @@ export class TicketsServices {
 
   getMyTickets(): Observable<QueueTicket[]> {
     return this.http.get<QueueTicket[]>(`${this.baseUrl}/tickets/mine`);
+  }
+
+  getHomeOverview(): Observable<HomeQueueOverview[]> {
+    return this.http.get<HomeQueueOverview[]>(`${this.baseUrl}/public/overview`);
   }
 
   cancelMyTicket(ticketId: string): Observable<QueueTicket> {

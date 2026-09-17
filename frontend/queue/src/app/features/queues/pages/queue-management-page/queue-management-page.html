@@ -1,6 +1,359 @@
-<section class="dashboard-page" aria-labelledby="queue-management-title">
-  <header class="dashboard-page__header">
-    <span class="dashboard-page__eyebrow">{{ 'dashboard.header.title' | translate }}</span>
-    <h1 id="queue-management-title">{{ 'dashboard.pages.queue' | translate }}</h1>
+<section
+  class="dashboard-page queue-management-page"
+  aria-labelledby="queue-management-title"
+>
+  <header class="dashboard-page__header queue-management-header">
+    <div>
+      <span class="dashboard-page__eyebrow">
+        {{ 'dashboard.header.title' | translate }}
+      </span>
+
+      <h1 id="queue-management-title">
+        {{ 'dashboard.pages.queue' | translate }}
+      </h1>
+
+      <p>{{ 'queueManagement.description' | translate }}</p>
+    </div>
   </header>
+
+  @if (sessionErrorKey() && !selectedCounter()) {
+    <div class="session-alert" role="alert">
+      <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
+      <span>{{ sessionErrorKey() | translate }}</span>
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="queue-state" role="status">
+      <span class="spinner-border" aria-hidden="true"></span>
+      <span>{{ 'queueManagement.loadingCounters' | translate }}</span>
+    </div>
+  } @else if (errorKey(); as messageKey) {
+    <div class="queue-state queue-state--error" role="alert">
+      <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
+      <p>{{ messageKey | translate }}</p>
+
+      <button class="btn btn-primary" type="button" (click)="loadCounters()">
+        {{ 'queueManagement.retry' | translate }}
+      </button>
+    </div>
+  } @else if (counters().length === 0) {
+    <div class="queue-state queue-state--empty">
+      <i class="bi bi-window-stack" aria-hidden="true"></i>
+      <p>{{ 'queueManagement.noCounters' | translate }}</p>
+    </div>
+  } @else if (selectedCounter(); as counter) {
+    <section class="counter-workspace">
+      <header class="counter-workspace__header">
+        <div>
+          <span>{{ 'queueManagement.workspace.eyebrow' | translate }}</span>
+          <h2>
+            {{ 'common.counterNumber' | translate: { number: counter.number } }}
+          </h2>
+          <p>
+            {{ counter.service?.nameAr | localizedText: counter.service?.nameEn }}
+          </p>
+        </div>
+
+        <button
+          class="btn counter-workspace__back"
+          type="button"
+          [disabled]="releasingCounter()"
+          (click)="leaveCounter()"
+        >
+          @if (releasingCounter()) {
+            <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+            {{ 'queueManagement.workspace.endingSession' | translate }}
+          } @else {
+            <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
+            {{ 'queueManagement.workspace.endSession' | translate }}
+          }
+        </button>
+      </header>
+
+      @if (sessionErrorKey(); as messageKey) {
+        <div class="session-alert" role="alert">
+          <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
+          <span>{{ messageKey | translate }}</span>
+        </div>
+      }
+
+      <div class="counter-workspace__content">
+        <section class="counter-control-panel">
+          <div class="counter-control-panel__heading">
+            <div>
+              <span>{{ 'queueManagement.workspace.statusEyebrow' | translate }}</span>
+              <h3>{{ 'queueManagement.workspace.statusTitle' | translate }}</h3>
+            </div>
+
+            <span
+              class="counter-status counter-status--large"
+              [class.counter-status--open]="counter.status === 'OPEN'"
+              [class.counter-status--paused]="counter.status === 'PAUSED'"
+              [class.counter-status--closed]="counter.status === 'CLOSED'"
+            >
+              <span class="counter-status__dot" aria-hidden="true"></span>
+              {{ counterStatusKey(counter.status) | translate }}
+            </span>
+          </div>
+
+          <p class="counter-control-panel__description">
+            {{
+              ('queueManagement.workspace.statusHint.' + counter.status.toLowerCase())
+                | translate
+            }}
+          </p>
+
+          @if (workspaceErrorKey(); as messageKey) {
+            <div class="workspace-alert" role="alert">
+              <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
+              <span>{{ messageKey | translate }}</span>
+            </div>
+          }
+
+          <div class="counter-control-panel__actions">
+            @if (counter.status === 'CLOSED') {
+              <button
+                class="btn counter-action counter-action--open"
+                type="button"
+                [disabled]="statusLoading() !== null"
+                (click)="changeCounterStatus('OPEN')"
+              >
+                @if (statusLoading() === 'OPEN') {
+                  <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                  {{ 'queueManagement.workspace.updating' | translate }}
+                } @else {
+                  <i class="bi bi-play-circle" aria-hidden="true"></i>
+                  {{ 'queueManagement.workspace.openCounter' | translate }}
+                }
+              </button>
+            } @else if (counter.status === 'OPEN') {
+              <button
+                class="btn counter-action counter-action--pause"
+                type="button"
+                [disabled]="statusLoading() !== null"
+                (click)="changeCounterStatus('PAUSED')"
+              >
+                @if (statusLoading() === 'PAUSED') {
+                  <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                  {{ 'queueManagement.workspace.updating' | translate }}
+                } @else {
+                  <i class="bi bi-pause-circle" aria-hidden="true"></i>
+                  {{ 'queueManagement.workspace.pauseCounter' | translate }}
+                }
+              </button>
+
+              <button
+                class="btn counter-action counter-action--close"
+                type="button"
+                [disabled]="statusLoading() !== null || activeTicket() !== null"
+                (click)="changeCounterStatus('CLOSED')"
+              >
+                @if (statusLoading() === 'CLOSED') {
+                  <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                  {{ 'queueManagement.workspace.updating' | translate }}
+                } @else {
+                  <i class="bi bi-stop-circle" aria-hidden="true"></i>
+                  {{ 'queueManagement.workspace.closeCounter' | translate }}
+                }
+              </button>
+            } @else {
+              <button
+                class="btn counter-action counter-action--open"
+                type="button"
+                [disabled]="statusLoading() !== null"
+                (click)="changeCounterStatus('OPEN')"
+              >
+                @if (statusLoading() === 'OPEN') {
+                  <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                  {{ 'queueManagement.workspace.updating' | translate }}
+                } @else {
+                  <i class="bi bi-play-circle" aria-hidden="true"></i>
+                  {{ 'queueManagement.workspace.resumeCounter' | translate }}
+                }
+              </button>
+
+              <button
+                class="btn counter-action counter-action--close"
+                type="button"
+                [disabled]="statusLoading() !== null || activeTicket() !== null"
+                (click)="changeCounterStatus('CLOSED')"
+              >
+                @if (statusLoading() === 'CLOSED') {
+                  <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                  {{ 'queueManagement.workspace.updating' | translate }}
+                } @else {
+                  <i class="bi bi-stop-circle" aria-hidden="true"></i>
+                  {{ 'queueManagement.workspace.closeCounter' | translate }}
+                }
+              </button>
+            }
+          </div>
+
+          @if (activeTicket()) {
+            <p class="counter-control-panel__note">
+              <i class="bi bi-info-circle" aria-hidden="true"></i>
+              {{ 'queueManagement.workspace.activeTicketCloseHint' | translate }}
+            </p>
+          }
+        </section>
+
+        <aside class="queue-overview" aria-label="Queue overview">
+          <div class="queue-overview__item">
+            <span class="queue-overview__icon">
+              <i class="bi bi-people" aria-hidden="true"></i>
+            </span>
+            <div>
+              <span>{{ 'queueManagement.tickets.waitingCount' | translate }}</span>
+              <strong>{{ waitingTickets().length }}</strong>
+            </div>
+          </div>
+
+          <div class="queue-overview__item">
+            <span class="queue-overview__icon">
+              <i class="bi bi-ticket-perforated" aria-hidden="true"></i>
+            </span>
+            <div>
+              <span>{{ 'queueManagement.tickets.currentTicket' | translate }}</span>
+              <strong>{{ activeTicket()?.number || '—' }}</strong>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <app-queue-ticket-panel
+        [counter]="counter"
+        [tickets]="tickets()"
+        [loading]="ticketsLoading()"
+        [callNextLoading]="callNextLoading()"
+        [ticketActionLoading]="ticketActionLoading()"
+        [errorKey]="ticketsErrorKey()"
+        (refreshRequested)="loadTickets()"
+        (callNextRequested)="callNext()"
+        (recallRequested)="recallTicket($event)"
+        (startRequested)="startTicket($event)"
+        (completeRequested)="completeTicket($event)"
+        (skipRequested)="skipTicket($event)"
+        (noShowRequested)="markNoShow($event)"
+      />
+    </section>
+  } @else {
+    <div class="counter-grid">
+      @for (counter of counters(); track counter.id) {
+        <article
+          class="counter-card"
+          [class.is-open]="counter.status === 'OPEN'"
+          [class.is-paused]="counter.status === 'PAUSED'"
+        >
+          <header class="counter-card__header">
+            <span class="counter-card__icon" aria-hidden="true">
+              <i class="bi bi-window-stack"></i>
+            </span>
+
+            <div class="counter-card__heading">
+              <span>{{ 'queueManagement.counter' | translate }}</span>
+              <h2>
+                {{ 'common.counterNumber' | translate: { number: counter.number } }}
+              </h2>
+            </div>
+
+            <span
+              class="counter-status"
+              [class.counter-status--open]="counter.status === 'OPEN'"
+              [class.counter-status--paused]="counter.status === 'PAUSED'"
+              [class.counter-status--closed]="counter.status === 'CLOSED'"
+            >
+              <span class="counter-status__dot" aria-hidden="true"></span>
+              {{ counterStatusKey(counter.status) | translate }}
+            </span>
+          </header>
+
+          <div class="counter-card__body">
+            <div class="counter-detail">
+              <i class="bi bi-ui-checks-grid" aria-hidden="true"></i>
+
+              <div>
+                <span>{{ 'queueManagement.service' | translate }}</span>
+                <strong>
+                  {{
+                    (counter.service?.nameAr | localizedText: counter.service?.nameEn) ||
+                      ('queueManagement.noService' | translate)
+                  }}
+                </strong>
+              </div>
+            </div>
+
+            <div
+              class="counter-ticket"
+              [class.has-active-ticket]="counter.tickets.length > 0"
+            >
+              <div>
+                <span>{{ 'queueManagement.activeTicket' | translate }}</span>
+
+                @if (counter.tickets[0]; as activeTicket) {
+                  <strong>{{ activeTicket.number }}</strong>
+                } @else {
+                  <strong>{{ 'queueManagement.noActiveTicket' | translate }}</strong>
+                }
+              </div>
+
+              @if (counter.tickets[0]) {
+                <i class="bi bi-ticket-perforated" aria-hidden="true"></i>
+              } @else {
+                <i class="bi bi-dash-circle" aria-hidden="true"></i>
+              }
+            </div>
+
+            @if (counter.session; as session) {
+              <div class="counter-operator" [class.is-mine]="session.claimedByMe">
+                <i class="bi bi-person-badge" aria-hidden="true"></i>
+                <div>
+                  <span>
+                    {{
+                      (session.claimedByMe
+                        ? 'queueManagement.session.youAreOperating'
+                        : 'queueManagement.session.operatedBy') | translate
+                    }}
+                  </span>
+                  <strong>{{ session.staff.fullName }}</strong>
+                </div>
+              </div>
+            }
+          </div>
+
+          <footer class="counter-card__footer">
+            <button
+              class="btn counter-select-button"
+              type="button"
+              [disabled]="
+                !counter.serviceId ||
+                (counter.session !== null && !counter.session.claimedByMe) ||
+                claimingCounterId() !== null
+              "
+              (click)="selectCounter(counter)"
+            >
+              <span>
+                @if (claimingCounterId() === counter.id) {
+                  {{ 'queueManagement.session.claiming' | translate }}
+                } @else if (!counter.serviceId) {
+                  {{ 'queueManagement.counterUnavailable' | translate }}
+                } @else if (counter.session && !counter.session.claimedByMe) {
+                  {{ 'queueManagement.session.occupied' | translate }}
+                } @else if (counter.session?.claimedByMe) {
+                  {{ 'queueManagement.session.continueWork' | translate }}
+                } @else {
+                  {{ 'queueManagement.selectCounter' | translate }}
+                }
+              </span>
+              @if (claimingCounterId() === counter.id) {
+                <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+              } @else {
+                <i class="bi bi-arrow-left" aria-hidden="true"></i>
+              }
+            </button>
+          </footer>
+        </article>
+      }
+    </div>
+  }
 </section>

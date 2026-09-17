@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, computed, DestroyRef, inject, output, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -31,7 +32,7 @@ export class DashboardSidebar {
   private readonly router = inject(Router);
 
   protected readonly isLoggingOut = signal(false);
-  protected readonly logoutFailed = signal(false);
+  protected readonly logoutErrorKey = signal<string | null>(null);
 
   protected readonly unreadNotifications = inject(NotificationsState).unreadCount;
 
@@ -68,7 +69,7 @@ export class DashboardSidebar {
       return;
     }
 
-    this.logoutFailed.set(false);
+    this.logoutErrorKey.set(null);
     this.isLoggingOut.set(true);
 
     this.authServices
@@ -87,8 +88,12 @@ export class DashboardSidebar {
             replaceUrl: true,
           });
         },
-        error: () => {
-          this.logoutFailed.set(true);
+        error: (error: unknown) => {
+          this.logoutErrorKey.set(
+            error instanceof HttpErrorResponse && error.status === 409
+              ? 'dashboard.navigation.logoutActiveTicket'
+              : 'dashboard.navigation.logoutFailed',
+          );
         },
       });
   }
@@ -104,7 +109,13 @@ export class DashboardSidebar {
       icon: 'bi-people',
       labelKey: 'dashboard.navigation.queue',
       route: '/dashboard/queue',
-      roles: ['STAFF', 'MANAGER', 'ADMIN'],
+      roles: ['STAFF'],
+    },
+    {
+      icon: 'bi-activity',
+      labelKey: 'dashboard.navigation.monitoring',
+      route: '/dashboard/monitoring',
+      roles: ['MANAGER', 'ADMIN'],
     },
     {
       icon: 'bi-ticket-perforated',
@@ -136,7 +147,7 @@ export class DashboardSidebar {
       icon: 'bi-window-stack',
       labelKey: 'dashboard.navigation.counters',
       route: '/dashboard/counters',
-      roles: ['STAFF', 'MANAGER', 'ADMIN'],
+      roles: [ 'MANAGER', 'ADMIN'],
     },
     {
       icon: 'bi-person-badge',

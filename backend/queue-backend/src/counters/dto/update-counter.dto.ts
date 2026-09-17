@@ -1,16 +1,17 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString, IsUUID, MaxLength, MinLength } from 'class-validator';
+import { IsInt, IsOptional, IsUUID, Max, Min, ValidateIf } from 'class-validator';
 
 export class UpdateCounterDto {
   @ApiPropertyOptional()
   @IsOptional()
+  @ValidateIf((_object, value) => value !== null)
   @IsUUID()
-  serviceId?: string;
+  serviceId?: string | null;
 
   @ApiPropertyOptional()
   @IsOptional()
-  @IsString()
-  @MinLength(1)
-  @MaxLength(50)
-  name?: string;
+  @IsInt()
+  @Min(1)
+  @Max(999)
+  number?: number;
 }

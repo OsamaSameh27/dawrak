@@ -54,6 +54,8 @@ model User {
   notifications       Notification[]
   ticketStatusChanges TicketStatusHistory[] @relation("TicketStatusChangedBy")
   auditLogs           AuditLog[]
+  counterSession      CounterSession?
+  counterShifts       CounterShift[]
 
   @@index([branchId, role])
 }
@@ -61,8 +63,14 @@ model User {
 model Branch {
   id        String    @id @default(uuid()) @db.Uuid
   name      String
+  nameAr    String
+  nameEn    String
   code      String    @unique
   address   String?
+  addressAr String?
+  addressEn String?
+  latitude  Float?
+  longitude Float?
   timezone  String    @default("Africa/Cairo")
   isActive  Boolean   @default(true)
   createdAt DateTime  @default(now())
@@ -75,13 +83,49 @@ model Branch {
   @@index([isActive])
 }
 
+model CounterSession {
+  id         String   @id @default(uuid()) @db.Uuid
+  counterId  String   @unique @db.Uuid
+  counter    Counter  @relation(fields: [counterId], references: [id], onDelete: Cascade)
+  staffId    String   @unique @db.Uuid
+  staff      User     @relation(fields: [staffId], references: [id], onDelete: Cascade)
+  shiftId    String   @unique @db.Uuid
+  shift      CounterShift @relation(fields: [shiftId], references: [id], onDelete: Cascade)
+  startedAt  DateTime @default(now())
+  lastSeenAt DateTime @default(now())
+
+  @@index([lastSeenAt])
+}
+
+model CounterShift {
+  id        String          @id @default(uuid()) @db.Uuid
+  counterId String          @db.Uuid
+  counter   Counter         @relation(fields: [counterId], references: [id], onDelete: Cascade)
+  staffId   String          @db.Uuid
+  staff     User            @relation(fields: [staffId], references: [id], onDelete: Restrict)
+  startedAt DateTime        @default(now())
+  openedAt  DateTime?
+  endedAt   DateTime?
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  session   CounterSession?
+  tickets   Ticket[]
+
+  @@index([counterId, startedAt])
+  @@index([staffId, startedAt])
+}
+
 model Service {
   id                    String    @id @default(uuid()) @db.Uuid
   branchId              String    @db.Uuid
   branch                Branch    @relation(fields: [branchId], references: [id], onDelete: Cascade)
   name                  String
+  nameAr                String
+  nameEn                String
   prefix                String
   description           String?
+  descriptionAr         String?
+  descriptionEn         String?
   averageServiceMinutes Int       @default(10)
   nearTurnThreshold     Int       @default(2)
   isActive              Boolean   @default(true)
@@ -101,12 +145,16 @@ model Counter {
   serviceId String?       @db.Uuid
   service   Service?      @relation(fields: [serviceId], references: [id], onDelete: SetNull)
   name      String
+  number    Int
   status    CounterStatus @default(CLOSED)
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
   tickets   Ticket[]
+  session   CounterSession?
+  shifts    CounterShift[]
 
   @@unique([branchId, name])
+  @@unique([branchId, number])
   @@index([serviceId, status])
 }
 
@@ -119,6 +167,8 @@ model Ticket {
   service          Service               @relation(fields: [serviceId], references: [id], onDelete: Restrict)
   counterId        String?               @db.Uuid
   counter          Counter?              @relation(fields: [counterId], references: [id], onDelete: SetNull)
+  counterShiftId   String?               @db.Uuid
+  counterShift     CounterShift?         @relation(fields: [counterShiftId], references: [id], onDelete: SetNull)
   customerId       String?               @db.Uuid
   customer         User?                 @relation(fields: [customerId], references: [id], onDelete: SetNull)
   queueDate        DateTime              @db.Date
@@ -136,6 +186,7 @@ model Ticket {
   calledAt         DateTime?
   serviceStartedAt DateTime?
   completedAt      DateTime?
+  serviceDurationSeconds Int?
   cancelledAt      DateTime?
   statusHistory    TicketStatusHistory[]
   notifications    Notification[]
@@ -144,6 +195,7 @@ model Ticket {
   @@index([serviceId, queueDate, status, priority, sequence])
   @@index([customerId, createdAt])
   @@index([branchId, createdAt])
+  @@index([counterShiftId, createdAt])
 }
 
 model TicketStatusHistory {

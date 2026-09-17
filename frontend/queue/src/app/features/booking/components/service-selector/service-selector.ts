@@ -1,6 +1,7 @@
 import { Component, input, output } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { QueueService } from '../../../services/models/queue-service.model';
+import { LocalizedTextPipe } from '../../../../shared/pipes/localized-text.pipe';
 
 interface ServiceChoice {
   id: string;
@@ -13,7 +14,7 @@ interface ServiceChoice {
 
 @Component({
   selector: 'app-service-selector',
-  imports: [TranslatePipe],
+  imports: [TranslatePipe, LocalizedTextPipe],
   templateUrl: './service-selector.html',
   styleUrl: './service-selector.scss'
 })

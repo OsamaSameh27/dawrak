@@ -20,7 +20,7 @@
       </span>
 
       <span class="service-copy">
-        <strong dir="auto">{{ service.name }}</strong>
+        <strong>{{ service.nameAr | localizedText: service.nameEn }}</strong>
 
         @if (service.description) {
           <small dir="auto">{{ service.description }}</small>

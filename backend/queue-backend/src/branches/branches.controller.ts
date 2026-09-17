@@ -18,6 +18,14 @@ export class BranchesController {
   @Get()
   list() { return this.branches.listPublic(); }
 
+  @Get('management')
+  @ApiBearerAuth()
+  @Roles(Role.MANAGER, Role.ADMIN)
+  @ApiOperation({ summary: 'List branches for dashboard management' })
+  listManaged(@CurrentUser() actor: AuthenticatedUser) {
+    return this.branches.listManaged(actor);
+  }
+
   @Public()
   @Get(':id')
   get(@Param('id', ParseUUIDPipe) id: string) { return this.branches.getPublic(id); }
@@ -30,7 +38,7 @@ export class BranchesController {
 
   @Patch(':id')
   @ApiBearerAuth()
-  @Roles(Role.MANAGER, Role.ADMIN)
+  @Roles(Role.ADMIN)
   update(
     @CurrentUser() actor: AuthenticatedUser,
     @Param('id', ParseUUIDPipe) id: string,

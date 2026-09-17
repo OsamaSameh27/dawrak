@@ -20,12 +20,12 @@
           <i class="bi bi-building" aria-hidden="true"></i>
         </span>
         <span class="choice-copy">
-          <strong dir="auto">{{ branch.name }}</strong>
+          <strong>{{ branch.nameAr | localizedText: branch.nameEn }}</strong>
 
-          @if (branch.address) {
+          @if (branch.addressAr || branch.addressEn) {
             <small>
               <i class="bi bi-geo-alt" aria-hidden="true"></i>
-              <span dir="auto">{{ branch.address }}</span>
+              <span>{{ branch.addressAr | localizedText: branch.addressEn }}</span>
             </small>
           }
         </span>

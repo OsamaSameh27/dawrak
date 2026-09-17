@@ -1,13 +1,13 @@
-export type NotificationType =
-  | 'TICKET_CREATED'
-  | 'QUEUE_NEAR'
-  | 'TICKET_CALLED'
-  | 'TICKET_UPDATED';
+export type NotificationType = 'TICKET_CREATED' | 'QUEUE_NEAR' | 'TICKET_CALLED' | 'TICKET_UPDATED';
 
 export interface NotificationData {
   ticketNumber?: string;
   counterName?: string;
+  counterNumber?: number;
   status?: string;
+  branchCode?: string;
+  staffName?: string;
+  managerName?: string;
 }
 
 export interface NotificationItem {

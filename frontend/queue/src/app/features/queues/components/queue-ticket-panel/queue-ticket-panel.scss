@@ -1,0 +1,59 @@
+:host { display: block; margin: 0 1.25rem 1.25rem; }
+.ticket-operations { padding: 1.25rem; border: 1px solid var(--queue-border); border-radius: var(--queue-radius-sm); background: #fbfcfc; }
+.ticket-operations__header, .waiting-list__header, .current-ticket-panel > header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.ticket-operations__header { margin-bottom: 1rem; }
+.ticket-operations__header span, .waiting-list__header span, .current-ticket-panel > header > span:first-child { color: var(--queue-primary-dark); font-size: .73rem; font-weight: 750; }
+h3, h4 { margin: .15rem 0 0; color: var(--queue-navy); font-size: 1.05rem; }
+.ticket-refresh-button { display: inline-flex; align-items: center; gap: .45rem; border: 1px solid var(--queue-border); color: var(--queue-navy); font-size: .82rem; }
+.spin-icon { animation: queue-spin 800ms linear infinite; }
+.workspace-alert { display: flex; align-items: center; gap: .55rem; margin-bottom: 1rem; padding: .75rem .9rem; border: 1px solid rgba(182,85,82,.25); border-radius: var(--queue-radius-sm); background: rgba(182,85,82,.08); color: var(--queue-danger); font-size: .86rem; }
+.tickets-loading, .current-ticket-panel__empty { display: grid; min-height: 9rem; place-items: center; align-content: center; gap: .5rem; color: var(--queue-muted); text-align: center; }
+.ticket-operations__grid { display: grid; grid-template-columns: minmax(0,1.2fr) minmax(15rem,.8fr); gap: 1rem; }
+.current-ticket-panel, .call-next-panel, .waiting-list { border: 1px solid var(--queue-border); border-radius: var(--queue-radius-sm); background: var(--queue-surface); }
+.current-ticket-panel { min-height: 12rem; padding: 1rem; }
+.current-ticket-panel.has-ticket { border-color: rgba(40,117,109,.32); }
+.ticket-status-badge { padding: .32rem .55rem; border-radius: 999px; background: var(--queue-primary-soft); color: var(--queue-primary-dark); font-size: .7rem; font-weight: 750; }
+.current-ticket-panel__number { display: block; margin: 1rem 0; color: var(--queue-navy); font-size: clamp(2rem,5vw,3rem); letter-spacing: .04em; }
+.current-ticket-panel__details { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .75rem; margin: 0; }
+.current-ticket-panel__details div { padding: .7rem; border-radius: .65rem; background: #f5f8f7; }
+dt { color: var(--queue-muted); font-size: .68rem; font-weight: 500; }
+dd { margin: .15rem 0 0; color: var(--queue-navy); font-size: .86rem; font-weight: 750; }
+.ticket-actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--queue-border); }
+.ticket-action { display: inline-flex; align-items: center; justify-content: center; gap: .35rem; border: 1px solid var(--queue-border); color: var(--queue-navy); font-size: .76rem; font-weight: 700; }
+.ticket-action--primary { border-color: var(--queue-primary); background: var(--queue-primary); color: #fff; }
+.ticket-action--success { border-color: var(--queue-success); background: var(--queue-success); color: #fff; }
+.ticket-action--danger { color: var(--queue-danger); }
+.ticket-action:disabled { opacity: .55; }
+.current-ticket-panel__empty i { color: var(--queue-primary); font-size: 1.8rem; }
+.current-ticket-panel__empty p { margin: 0; }
+.call-next-panel { display: flex; align-items: center; flex-direction: column; justify-content: center; gap: .75rem; padding: 1.25rem; text-align: center; }
+.call-next-panel__icon { display: grid; width: 3rem; height: 3rem; place-items: center; border-radius: 50%; background: var(--queue-primary-soft); color: var(--queue-primary-dark); font-size: 1.25rem; }
+.call-next-panel h4 { margin: 0; font-size: 1rem; }
+.call-next-panel p { margin: .35rem 0 0; color: var(--queue-muted); font-size: .82rem; line-height: 1.6; }
+.call-next-button { display: inline-flex; width: 100%; min-height: 2.8rem; align-items: center; justify-content: center; gap: .5rem; border-color: var(--queue-primary); background: var(--queue-primary); color: #fff; font-weight: 750; }
+.call-next-button:hover:not(:disabled) { background: var(--queue-primary-dark); color: #fff; }
+.call-next-button:disabled { border-color: var(--queue-border); background: #edf1f0; color: var(--queue-muted); }
+.waiting-list { margin-top: 1rem; overflow: hidden; }
+.waiting-list__header { padding: .9rem 1rem; border-bottom: 1px solid var(--queue-border); }
+.waiting-list__header > strong { display: grid; min-width: 2rem; height: 2rem; place-items: center; border-radius: 999px; background: var(--queue-primary-soft); color: var(--queue-primary-dark); font-size: .8rem; }
+.waiting-list__empty { display: flex; min-height: 6rem; align-items: center; justify-content: center; gap: .5rem; color: var(--queue-muted); }
+.waiting-list__empty i { color: var(--queue-success); }
+.waiting-list__items { display: grid; max-height: 19rem; overflow-y: auto; }
+.waiting-ticket { display: grid; grid-template-columns: auto minmax(0,1fr) auto; align-items: center; gap: .75rem; padding: .8rem 1rem; }
+.waiting-ticket + .waiting-ticket { border-top: 1px solid var(--queue-border); }
+.waiting-ticket__position { display: grid; width: 1.8rem; height: 1.8rem; place-items: center; border-radius: 50%; background: #f1f4f4; color: var(--queue-muted); font-size: .72rem; font-weight: 750; }
+.waiting-ticket div > * { display: block; }
+.waiting-ticket strong { color: var(--queue-navy); font-size: .9rem; }
+.waiting-ticket div span { margin-top: .12rem; color: var(--queue-muted); font-size: .74rem; }
+.waiting-ticket > i { color: var(--queue-warning); }
+@keyframes queue-spin { to { transform: rotate(360deg); } }
+@media (max-width: 575.98px) {
+  :host { margin: 0 .85rem .85rem; }
+  .ticket-operations { padding: .85rem; }
+  .ticket-operations__header { align-items: stretch; flex-direction: column; }
+  .ticket-refresh-button { justify-content: center; }
+  .ticket-operations__grid, .current-ticket-panel__details { grid-template-columns: 1fr; }
+  .ticket-action { flex: 1 1 calc(50% - .5rem); }
+}
+@media (min-width: 576px) and (max-width: 991.98px) { .ticket-operations__grid { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { .spin-icon { animation: none; } }

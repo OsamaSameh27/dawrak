@@ -5,9 +5,10 @@ import {
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService, JwtSignOptions } from "@nestjs/jwt";
-import { Role } from "@prisma/client";
+import { CounterStatus, Role, TicketStatus } from "@prisma/client";
 import * as bcrypt from "bcryptjs";
 import { PrismaService } from "../prisma/prisma.service";
+import { QueueGateway } from "../queues/queue.gateway";
 import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
 
@@ -34,6 +35,7 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
+    private readonly gateway: QueueGateway,
   ) {}
 
   async register(dto: RegisterDto): Promise<void> {
@@ -116,6 +118,43 @@ export class AuthService {
   }
 
   async logout(userId: string): Promise<void> {
+    const counterSession = await this.prisma.counterSession.findUnique({
+      where: { staffId: userId },
+      include: { counter: { select: { branchId: true } } },
+    });
+    if (counterSession) {
+      const activeTicket = await this.prisma.ticket.findFirst({
+        where: {
+          counterId: counterSession.counterId,
+          status: { in: [TicketStatus.CALLED, TicketStatus.SERVING] },
+        },
+        select: { id: true },
+      });
+      if (activeTicket) {
+        throw new ConflictException(
+          "Finish or skip the active ticket before logging out",
+        );
+      }
+
+      await this.prisma.$transaction([
+        this.prisma.user.updateMany({
+          where: { id: userId },
+          data: { refreshTokenHash: null },
+        }),
+        this.prisma.counterShift.update({
+          where: { id: counterSession.shiftId },
+          data: { endedAt: new Date() },
+        }),
+        this.prisma.counterSession.delete({ where: { id: counterSession.id } }),
+        this.prisma.counter.update({
+          where: { id: counterSession.counterId },
+          data: { status: CounterStatus.CLOSED },
+        }),
+      ]);
+      this.gateway.emitCountersUpdated(counterSession.counter.branchId);
+      return;
+    }
+
     await this.prisma.user.updateMany({
       where: { id: userId },
       data: { refreshTokenHash: null },

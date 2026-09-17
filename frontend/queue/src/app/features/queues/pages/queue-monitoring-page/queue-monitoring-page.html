@@ -1,0 +1,204 @@
+<section class="monitor-page" aria-labelledby="monitor-title">
+  <header class="monitor-header">
+    <div>
+      <span>{{ 'queueMonitoring.eyebrow' | translate }}</span>
+      <h1 id="monitor-title">{{ 'queueMonitoring.title' | translate }}</h1>
+      <p>{{ 'queueMonitoring.description' | translate }}</p>
+    </div>
+    <div class="monitor-summary">
+      <span
+        ><strong>{{ openCount() }}</strong
+        >{{ 'queueMonitoring.openCounters' | translate }}</span
+      >
+      <span
+        ><strong>{{ occupiedCount() }}</strong
+        >{{ 'queueMonitoring.activeOperators' | translate }}</span
+      >
+    </div>
+  </header>
+
+  @if (loading()) {
+    <div class="monitor-state">
+      <span class="spinner-border spinner-border-sm"></span
+      >{{ 'queueMonitoring.loading' | translate }}
+    </div>
+  } @else if (loadError()) {
+    <div class="monitor-state monitor-state--error">
+      <i class="bi bi-exclamation-circle"></i>{{ 'queueMonitoring.loadFailed' | translate
+      }}<button type="button" (click)="loadCounters()">{{ 'common.retry' | translate }}</button>
+    </div>
+  } @else {
+    <div class="counter-grid">
+      @for (counter of counters(); track counter.id) {
+        <button
+          class="counter-card"
+          type="button"
+          [class.counter-card--selected]="selectedCounterId() === counter.id"
+          (click)="selectCounter(counter)"
+        >
+          <span class="counter-card__top">
+            <strong>{{
+              'queueMonitoring.counterNumber' | translate: { number: counter.number }
+            }}</strong>
+            <small [class]="'status status--' + counter.status.toLowerCase()">{{
+              'queueManagement.status.' + counter.status.toLowerCase() | translate
+            }}</small>
+          </span>
+          <span class="counter-service">{{
+            counter.service
+              ? (counter.service.nameAr | localizedText: counter.service.nameEn)
+              : ('queueMonitoring.noService' | translate)
+          }}</span>
+          @if (counter.session) {
+            <span class="operator"
+              ><i class="bi bi-person-badge"></i>{{ counter.session.staff.fullName }}</span
+            >
+            <span class="timer"
+              ><i class="bi bi-stopwatch"></i>{{ duration(counter.session.startedAt) }}</span
+            >
+            <span class="served">{{
+              'queueMonitoring.servedCount' | translate: { count: counter.session.servedCount }
+            }}</span>
+          } @else {
+            <span class="operator operator--empty"
+              ><i class="bi bi-person-x"></i>{{ 'queueMonitoring.noOperator' | translate }}</span
+            >
+          }
+          @if (counter.tickets[0]; as ticket) {
+            <span class="active-ticket">
+              <small>{{ 'queueMonitoring.currentCustomer' | translate }}</small>
+              <strong>{{ ticket.number }} · {{ ticket.customerName }}</strong>
+              <em>{{
+                ticket.status === 'SERVING'
+                  ? duration(ticket.serviceStartedAt)
+                  : ('queueMonitoring.waitingToStart' | translate)
+              }}</em>
+            </span>
+          }
+        </button>
+      }
+    </div>
+
+    @if (selectedCounter(); as counter) {
+      <section class="history-panel">
+        <header>
+          <div>
+            <span>{{ 'queueMonitoring.historyEyebrow' | translate }}</span>
+            <h2>{{ 'queueMonitoring.historyTitle' | translate: { number: counter.number } }}</h2>
+          </div>
+          <button type="button" (click)="selectCounter(counter)">
+            <i class="bi bi-arrow-clockwise"></i>{{ 'common.refresh' | translate }}
+          </button>
+        </header>
+        @if (historyLoading()) {
+          <div class="monitor-state">
+            <span class="spinner-border spinner-border-sm"></span
+            >{{ 'queueMonitoring.loadingHistory' | translate }}
+          </div>
+        } @else if (historyError()) {
+          <div class="monitor-state monitor-state--error">
+            {{ 'queueMonitoring.historyFailed' | translate }}
+          </div>
+        } @else if (!shifts().length) {
+          <div class="monitor-state">{{ 'queueMonitoring.noHistory' | translate }}</div>
+        } @else {
+          @for (shift of shifts(); track shift.id) {
+            <article
+              class="shift-card"
+              [class.shift-card--expanded]="expandedShiftId() === shift.id"
+            >
+              <button
+                class="shift-summary"
+                type="button"
+                [attr.aria-expanded]="expandedShiftId() === shift.id"
+                (click)="toggleShift(shift.id)"
+              >
+                <span class="shift-operator"
+                  ><i class="bi bi-person-badge"></i
+                  ><span
+                    ><small>{{ 'queueMonitoring.shiftOperator' | translate }}</small
+                    ><strong>{{ shift.staff.fullName }}</strong></span
+                  ></span
+                >
+                <span
+                  ><small>{{ 'queueMonitoring.shiftStarted' | translate }}</small
+                  ><strong>{{ shift.startedAt | date: 'medium' }}</strong></span
+                >
+                <span
+                  ><small>{{ 'queueMonitoring.shiftDuration' | translate }}</small
+                  ><strong dir="ltr">{{ duration(shift.startedAt, shift.endedAt) }}</strong></span
+                >
+                <span
+                  ><small>{{ 'queueMonitoring.shiftCustomers' | translate }}</small
+                  ><strong>{{ shift.tickets.length }}</strong></span
+                >
+                <span class="shift-state" [class.shift-live]="!shift.endedAt">{{
+                  (shift.endedAt ? 'queueMonitoring.shiftEnded' : 'queueMonitoring.shiftLive')
+                    | translate
+                }}</span>
+                <i
+                  class="bi shift-chevron"
+                  [class.bi-chevron-down]="expandedShiftId() !== shift.id"
+                  [class.bi-chevron-up]="expandedShiftId() === shift.id"
+                ></i>
+              </button>
+              @if (expandedShiftId() === shift.id) {
+                <div class="shift-details">
+                  <div class="shift-times">
+                    <span
+                      ><small>{{ 'queueMonitoring.openedAt' | translate }}</small
+                      ><strong>{{
+                        shift.openedAt ? (shift.openedAt | date: 'medium') : '—'
+                      }}</strong></span
+                    ><span
+                      ><small>{{ 'queueMonitoring.endedAt' | translate }}</small
+                      ><strong>{{
+                        shift.endedAt
+                          ? (shift.endedAt | date: 'medium')
+                          : ('queueMonitoring.stillRunning' | translate)
+                      }}</strong></span
+                    >
+                  </div>
+                  @if (shift.tickets.length) {
+                    <div class="ticket-table" role="table">
+                      <div class="ticket-row ticket-row--head">
+                        <strong>{{ 'queueMonitoring.ticket' | translate }}</strong
+                        ><strong>{{ 'queueMonitoring.customer' | translate }}</strong
+                        ><strong>{{ 'queueMonitoring.service' | translate }}</strong
+                        ><strong>{{ 'queueMonitoring.serviceTime' | translate }}</strong
+                        ><strong>{{ 'queueMonitoring.ticketStatus' | translate }}</strong>
+                      </div>
+                      @for (ticket of shift.tickets; track ticket.id) {
+                        <div class="ticket-row" role="row">
+                          <strong [attr.data-label]="'queueMonitoring.ticket' | translate">{{
+                            ticket.number
+                          }}</strong>
+                          <span [attr.data-label]="'queueMonitoring.customer' | translate">{{
+                            ticket.customerName
+                          }}</span>
+                          <span [attr.data-label]="'queueMonitoring.service' | translate">{{
+                            ticket.service.nameAr | localizedText: ticket.service.nameEn
+                          }}</span>
+                          <span [attr.data-label]="'queueMonitoring.serviceTime' | translate">{{
+                            secondsDuration(ticket.serviceDurationSeconds)
+                          }}</span>
+                          <small [attr.data-label]="'queueMonitoring.ticketStatus' | translate">{{
+                            'notifications.status.' + ticket.status.toLowerCase() | translate
+                          }}</small>
+                        </div>
+                      }
+                    </div>
+                  } @else {
+                    <p class="no-shift-tickets">
+                      {{ 'queueMonitoring.noShiftTickets' | translate }}
+                    </p>
+                  }
+                </div>
+              }
+            </article>
+          }
+        }
+      </section>
+    }
+  }
+</section>

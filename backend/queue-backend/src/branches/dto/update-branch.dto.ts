@@ -1,5 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsBoolean, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsBoolean, IsNumber, IsOptional, IsString, Max, MaxLength, Min, MinLength, ValidateIf } from 'class-validator';
 
 export class UpdateBranchDto {
   @ApiPropertyOptional()
@@ -7,13 +7,42 @@ export class UpdateBranchDto {
   @IsString()
   @MinLength(2)
   @MaxLength(100)
-  name?: string;
+  nameAr?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MinLength(2)
+  @MaxLength(100)
+  nameEn?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
   @MaxLength(250)
-  address?: string;
+  addressAr?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MaxLength(250)
+  addressEn?: string;
+
+  @ApiPropertyOptional({ example: 30.0561, nullable: true })
+  @IsOptional()
+  @ValidateIf((_object, value) => value !== null)
+  @IsNumber()
+  @Min(-90)
+  @Max(90)
+  latitude?: number | null;
+
+  @ApiPropertyOptional({ example: 31.33, nullable: true })
+  @IsOptional()
+  @ValidateIf((_object, value) => value !== null)
+  @IsNumber()
+  @Min(-180)
+  @Max(180)
+  longitude?: number | null;
 
   @ApiPropertyOptional()
   @IsOptional()

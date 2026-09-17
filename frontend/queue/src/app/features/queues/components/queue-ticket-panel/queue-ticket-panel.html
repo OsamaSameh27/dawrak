@@ -1,0 +1,139 @@
+<section class="ticket-operations" aria-labelledby="ticket-operations-title">
+  <header class="ticket-operations__header">
+    <div>
+      <span>{{ 'queueManagement.tickets.eyebrow' | translate }}</span>
+      <h3 id="ticket-operations-title">{{ 'queueManagement.tickets.title' | translate }}</h3>
+    </div>
+    <button class="btn ticket-refresh-button" type="button" [disabled]="loading()" (click)="refreshRequested.emit()">
+      <i class="bi bi-arrow-clockwise" [class.spin-icon]="loading()" aria-hidden="true"></i>
+      {{ 'queueManagement.tickets.refresh' | translate }}
+    </button>
+  </header>
+
+  @if (errorKey(); as messageKey) {
+    <div class="workspace-alert" role="alert">
+      <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
+      <span>{{ messageKey | translate }}</span>
+    </div>
+  }
+
+  @if (loading() && tickets().length === 0) {
+    <div class="tickets-loading" role="status">
+      <span class="spinner-border" aria-hidden="true"></span>
+      <span>{{ 'queueManagement.tickets.loading' | translate }}</span>
+    </div>
+  } @else {
+    <div class="ticket-operations__grid">
+      <article class="current-ticket-panel" [class.has-ticket]="activeTicket() !== null">
+        <header>
+          <span>{{ 'queueManagement.tickets.currentTicket' | translate }}</span>
+          @if (activeTicket(); as ticket) {
+            <span class="ticket-status-badge">
+              {{ ('notifications.status.' + ticket.status.toLowerCase()) | translate }}
+            </span>
+          }
+        </header>
+
+        @if (activeTicket(); as ticket) {
+          <strong class="current-ticket-panel__number">{{ ticket.number }}</strong>
+          <dl class="current-ticket-panel__details">
+            <div>
+              <dt>{{ 'queueManagement.tickets.customer' | translate }}</dt>
+              <dd>{{ ticket.customerName }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'queueManagement.tickets.phone' | translate }}</dt>
+              <dd dir="ltr">{{ ticket.customerPhone || ('queueManagement.tickets.noPhone' | translate) }}</dd>
+            </div>
+          </dl>
+          <div class="ticket-actions">
+            @if (ticket.status === 'CALLED') {
+              <button class="btn ticket-action ticket-action--primary" type="button" [disabled]="ticketActionLoading() !== null" (click)="startRequested.emit(ticket.id)">
+                @if (ticketActionLoading() === 'start') { <span class="spinner-border spinner-border-sm" aria-hidden="true"></span> } @else { <i class="bi bi-play-fill" aria-hidden="true"></i> }
+                {{ 'queueManagement.tickets.startService' | translate }}
+              </button>
+              <button class="btn ticket-action" type="button" [disabled]="ticketActionLoading() !== null" (click)="recallRequested.emit(ticket.id)">
+                <i class="bi bi-megaphone" aria-hidden="true"></i>
+                {{ 'queueManagement.tickets.recall' | translate }}
+              </button>
+              <button class="btn ticket-action" type="button" [disabled]="ticketActionLoading() !== null" (click)="noShowRequested.emit(ticket.id)">
+                <i class="bi bi-person-x" aria-hidden="true"></i>
+                {{ 'queueManagement.tickets.noShow' | translate }}
+              </button>
+            } @else if (ticket.status === 'SERVING') {
+              <button class="btn ticket-action ticket-action--success" type="button" [disabled]="ticketActionLoading() !== null" (click)="completeRequested.emit(ticket.id)">
+                @if (ticketActionLoading() === 'complete') { <span class="spinner-border spinner-border-sm" aria-hidden="true"></span> } @else { <i class="bi bi-check2-circle" aria-hidden="true"></i> }
+                {{ 'queueManagement.tickets.completeService' | translate }}
+              </button>
+            }
+            <button class="btn ticket-action ticket-action--danger" type="button" [disabled]="ticketActionLoading() !== null" (click)="skipRequested.emit(ticket.id)">
+              <i class="bi bi-skip-forward" aria-hidden="true"></i>
+              {{ 'queueManagement.tickets.skip' | translate }}
+            </button>
+          </div>
+        } @else {
+          <div class="current-ticket-panel__empty">
+            <i class="bi bi-ticket" aria-hidden="true"></i>
+            <p>{{ 'queueManagement.tickets.noCurrentTicket' | translate }}</p>
+          </div>
+        }
+      </article>
+
+      <article class="call-next-panel">
+        <span class="call-next-panel__icon"><i class="bi bi-megaphone" aria-hidden="true"></i></span>
+        <div>
+          <h4>{{ 'queueManagement.tickets.callNextTitle' | translate }}</h4>
+          @if (counter().status !== 'OPEN') {
+            <p>{{ 'queueManagement.tickets.openToCall' | translate }}</p>
+          } @else if (activeTicket()) {
+            <p>{{ 'queueManagement.tickets.finishCurrent' | translate }}</p>
+          } @else if (waitingTickets().length === 0) {
+            <p>{{ 'queueManagement.tickets.noWaitingTickets' | translate }}</p>
+          } @else {
+            <p>{{ 'queueManagement.tickets.readyToCall' | translate: { count: waitingTickets().length } }}</p>
+          }
+        </div>
+        <button
+          class="btn call-next-button"
+          type="button"
+          [disabled]="counter().status !== 'OPEN' || activeTicket() !== null || waitingTickets().length === 0 || callNextLoading()"
+          (click)="callNextRequested.emit()"
+        >
+          @if (callNextLoading()) {
+            <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+            {{ 'queueManagement.tickets.callingNext' | translate }}
+          } @else {
+            <i class="bi bi-megaphone" aria-hidden="true"></i>
+            {{ 'queueManagement.tickets.callNext' | translate }}
+          }
+        </button>
+      </article>
+    </div>
+
+    <section class="waiting-list" aria-labelledby="waiting-list-title">
+      <header class="waiting-list__header">
+        <div>
+          <span>{{ 'queueManagement.tickets.waitingEyebrow' | translate }}</span>
+          <h4 id="waiting-list-title">{{ 'queueManagement.tickets.waitingList' | translate }}</h4>
+        </div>
+        <strong>{{ waitingTickets().length }}</strong>
+      </header>
+      @if (waitingTickets().length === 0) {
+        <div class="waiting-list__empty">
+          <i class="bi bi-check2-circle" aria-hidden="true"></i>
+          <span>{{ 'queueManagement.tickets.emptyQueue' | translate }}</span>
+        </div>
+      } @else {
+        <div class="waiting-list__items">
+          @for (ticket of waitingTickets(); track ticket.id; let position = $index) {
+            <article class="waiting-ticket">
+              <span class="waiting-ticket__position">{{ position + 1 }}</span>
+              <div><strong>{{ ticket.number }}</strong><span>{{ ticket.customerName }}</span></div>
+              <i class="bi bi-hourglass-split" aria-hidden="true"></i>
+            </article>
+          }
+        </div>
+      }
+    </section>
+  }
+</section>

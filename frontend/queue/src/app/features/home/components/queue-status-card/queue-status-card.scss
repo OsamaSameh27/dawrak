@@ -141,6 +141,11 @@
   font-weight: 600;
 }
 
+.queue-card__unavailable--readonly {
+  background: var(--queue-primary-soft);
+  color: var(--queue-primary-dark);
+}
+
 [dir='ltr'] .directional-icon {
   transform: scaleX(-1);
 }

@@ -1,22 +1,28 @@
 import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma, Role } from '@prisma/client';
+import { NotificationType, Prisma, Role } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 import { assertBranchAccess } from '../common/utils/branch-access';
 import { AuthenticatedUser } from '../common/types/authenticated-user.type';
 import { PrismaService } from '../prisma/prisma.service';
+import { QueueGateway } from '../queues/queue.gateway';
 import { CreateStaffDto } from './dto/create-staff.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly gateway: QueueGateway,
+  ) {}
 
   async list(actor: AuthenticatedUser, branchId?: string) {
     const effectiveBranchId = actor.role === Role.ADMIN ? branchId : actor.branchId ?? undefined;
     return this.prisma.user.findMany({
       where: {
         branchId: effectiveBranchId,
-        role: { in: [Role.STAFF, Role.MANAGER] },
+        role: actor.role === Role.ADMIN
+          ? { in: [Role.STAFF, Role.MANAGER] }
+          : Role.STAFF,
       },
       select: this.safeSelect(),
       orderBy: [{ role: 'asc' }, { fullName: 'asc' }],
@@ -37,7 +43,7 @@ export class UsersService {
     });
     if (duplicate) throw new ConflictException('Email or phone is already registered');
 
-    return this.prisma.user.create({
+    const created = await this.prisma.user.create({
       data: {
         email,
         passwordHash: await bcrypt.hash(dto.password, 12),
@@ -48,6 +54,15 @@ export class UsersService {
       },
       select: this.safeSelect(),
     });
+    if (created.role === Role.MANAGER) {
+      await this.gateway.notifyAdmins({
+        type: NotificationType.TICKET_UPDATED,
+        title: 'notifications.types.managerCreated.title',
+        message: 'notifications.types.managerCreated.message',
+        data: { managerName: created.fullName, branchCode: created.branch?.code ?? '' },
+      });
+    }
+    return created;
   }
 
   async update(actor: AuthenticatedUser, id: string, dto: UpdateUserDto) {
@@ -64,7 +79,7 @@ export class UsersService {
       throw new ForbiddenException('Managers can only update staff accounts');
     }
     try {
-      return await this.prisma.user.update({
+      const updated = await this.prisma.user.update({
         where: { id },
         data: {
           fullName: dto.fullName?.trim(), phone: dto.phone, role: dto.role,
@@ -72,6 +87,15 @@ export class UsersService {
         },
         select: this.safeSelect(),
       });
+      if (target.role === Role.MANAGER || updated.role === Role.MANAGER) {
+        await this.gateway.notifyAdmins({
+          type: NotificationType.TICKET_UPDATED,
+          title: 'notifications.types.managerUpdated.title',
+          message: 'notifications.types.managerUpdated.message',
+          data: { managerName: updated.fullName, branchCode: updated.branch?.code ?? '' },
+        });
+      }
+      return updated;
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
         throw new ConflictException('Phone is already registered');
@@ -84,7 +108,7 @@ export class UsersService {
     return {
       id: true, email: true, fullName: true, phone: true, role: true, branchId: true,
       isActive: true, createdAt: true, updatedAt: true,
-      branch: { select: { id: true, name: true, code: true } },
+      branch: { select: { id: true, name: true, nameAr: true, nameEn: true, code: true } },
     } as const;
   }
 }

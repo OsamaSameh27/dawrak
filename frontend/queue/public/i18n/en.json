@@ -21,6 +21,110 @@
     "switchToEnglish": "Switch to English"
   },
   "home": {
+    "liveTicket": {
+      "eyebrow": "Your current ticket",
+      "loading": "Loading your ticket...",
+      "notServing": "No ticket is being served",
+      "viewTicket": "View ticket details",
+      "emptyTitle": "No current ticket",
+      "emptyDescription": "Book your turn and your real ticket and live updates will appear here."
+    },
+    "workforce": {
+      "eyebrow": "Workforce account",
+      "title": "Manage operations from the dashboard",
+      "description": "Booking and personal ticket tracking are available to customers only. Use the dashboard to access the tools allowed for your role.",
+      "action": "Go to dashboard"
+    },
+    "logoVisual": {
+      "customer": "Book your turn and follow it easily",
+      "staff": "Your counter and queue workspace",
+      "manager": "A clearer view of your branch",
+      "admin": "Manage the system from one place"
+    },
+    "heroJourney": {
+      "eyebrow": "Three simple steps",
+      "title": "From booking until your turn",
+      "footer": "Follow your turn without waiting inside the branch."
+    },
+    "workforceHero": {
+      "staff": {
+        "eyebrow": "Counter staff workspace",
+        "titleHighlight": "Your counter",
+        "titleRest": "and queue in one place",
+        "description": "Start your shift, follow the queue and serve customers through a clear workflow.",
+        "features": { "first": "Organized counter controls", "second": "Live queue updates" }
+      },
+      "manager": {
+        "eyebrow": "Branch management",
+        "titleHighlight": "Your branch",
+        "titleRest": "live at a glance",
+        "description": "Monitor counters, staff and queue activity, then act with a clear operational view.",
+        "features": {
+          "first": "Live operations monitoring",
+          "second": "Reports that support decisions"
+        }
+      },
+      "admin": {
+        "eyebrow": "System management",
+        "titleHighlight": "Every branch",
+        "titleRest": "from one dashboard",
+        "description": "Manage branches and managers and review system-wide performance from one place.",
+        "features": { "first": "A complete branch overview", "second": "Clear access control" }
+      }
+    },
+    "workforceVisual": {
+      "staff": {
+        "eyebrow": "Daily workspace",
+        "title": "An organized shift from start to finish",
+        "footer": "Counter and queue status update in real time.",
+        "steps": {
+          "1": {
+            "title": "Start your counter",
+            "description": "Choose your counter and begin the shift."
+          },
+          "2": {
+            "title": "Serve the queue",
+            "description": "Call customers and follow service status."
+          },
+          "3": { "title": "End safely", "description": "Finish the active service before closing." }
+        }
+      },
+      "manager": {
+        "eyebrow": "Branch operations center",
+        "title": "Understand operations at a glance",
+        "footer": "Your branch data is live and ready to review.",
+        "steps": {
+          "1": {
+            "title": "Monitor counters",
+            "description": "See what is open and who is operating it."
+          },
+          "2": {
+            "title": "Manage branch staff",
+            "description": "Review staff members and their accounts."
+          },
+          "3": {
+            "title": "Review performance",
+            "description": "Use reports to improve service times."
+          }
+        }
+      },
+      "admin": {
+        "eyebrow": "System control center",
+        "title": "The complete view in one place",
+        "footer": "Central management for every branch and role.",
+        "steps": {
+          "1": {
+            "title": "Manage branches",
+            "description": "Review branches, status and services."
+          },
+          "2": { "title": "Manage managers", "description": "Create accounts and control access." },
+          "3": {
+            "title": "Compare performance",
+            "description": "Review reports and operational trends."
+          }
+        }
+      }
+    },
     "hero": {
       "eyebrow": "Better time management starts here",
       "title": "Your turn without the long wait",
@@ -50,14 +154,17 @@
         "description": "Choose a branch and service, then check the wait before booking."
       },
       "track": {
-          "title": "My current tickets",
-          "description": "View your current tickets and queue status without searching by ticket number."
+        "title": "My current tickets",
+        "description": "View your current tickets and queue status without searching by ticket number."
       }
     },
     "queue": {
+      "loading": "Loading live branch and service status...",
+      "loadFailed": "Could not load queue status right now.",
+      "empty": "No services are currently available.",
       "eyebrow": "Branch status",
       "title": "Check the wait before you choose",
-      "description": "These are sample values for the interface and will update automatically after integration."
+      "description": "View live service status, waiting counts and estimated times before visiting a branch."
     },
     "services": {
       "generalExamination": "General examination",
@@ -134,7 +241,7 @@
     "serviceStep": {
       "eyebrow": "Second step",
       "title": "Choose the service you need",
-      "description": "The displayed queue counts and times are sample data until integration.",
+      "description": "The displayed queue counts and times are live system data to help you choose a service.",
       "waiting": "Waiting",
       "estimate": "Estimated time"
     },
@@ -203,6 +310,7 @@
     "servingNotice": "Your service is in progress."
   },
   "myTickets": {
+    "serviceDuration": "Service duration",
     "description": "Here you can find all your current and previous tickets.",
     "refresh": "Refresh tickets",
     "retry": "Try again",
@@ -330,7 +438,15 @@
     "header": {
       "title": "Dashboard",
       "toggleSidebar": "Open or close dashboard navigation",
-      "closeSidebar": "Close dashboard navigation"
+      "closeSidebar": "Close dashboard navigation",
+      "notifications": "Notifications",
+      "notificationsEyebrow": "Latest 4 updates",
+      "roles": {
+        "customer": "Customer",
+        "staff": "Counter staff",
+        "manager": "Branch manager",
+        "admin": "System admin"
+      }
     },
     "navigation": {
       "label": "Dashboard navigation",
@@ -338,6 +454,7 @@
       "management": "Management",
       "overview": "Overview",
       "queue": "Queue management",
+      "monitoring": "Queue monitoring",
       "myTickets": "My tickets",
       "notifications": "Notifications",
       "unreadCount": "Number of unread notifications",
@@ -348,6 +465,7 @@
       "reports": "Reports",
       "backToSite": "Back to website",
       "logout": "Log out",
+      "logoutActiveTicket": "You cannot log out before completing or skipping the current ticket.",
       "logoutFailed": "Could not complete logout. Please try again, or reload the page if the problem persists."
     },
     "pages": {
@@ -363,13 +481,13 @@
     }
   },
   "notificationsPage": {
-    "description": "Keep up with the latest updates about your tickets.",
+    "description": "Keep up with the latest important alerts and account updates.",
     "markAll": "Mark all as read",
     "markingAll": "Updating notifications...",
     "loading": "Loading notifications...",
     "retry": "Try again",
     "emptyTitle": "No notifications",
-    "emptyDescription": "Updates about your tickets will appear here.",
+    "emptyDescription": "Important alerts and account updates will appear here.",
     "unread": "Unread",
     "markRead": "Mark as read",
     "loginRequired": "Sign in to view your notifications.",
@@ -390,11 +508,51 @@
       },
       "ticketCalled": {
         "title": "It is your turn",
-        "message": "Your ticket {{ticketNumber}} was called at {{counterName}}."
+        "message": "Your ticket {{ticketNumber}} was called at counter {{counterNumber}}."
+      },
+      "ticketRecalled": {
+        "title": "Your ticket was called again",
+        "message": "Your ticket {{ticketNumber}} was called again at counter {{counterNumber}}."
       },
       "ticketUpdated": {
         "title": "Ticket updated",
         "message": "Your ticket {{ticketNumber}} is now: {{status}}."
+      },
+      "operatorTicketCreated": {
+        "title": "New ticket in your queue",
+        "message": "Ticket {{ticketNumber}} joined the service you are operating."
+      },
+      "counterOpened": {
+        "title": "Counter opened",
+        "message": "Counter {{counterNumber}} was opened in your branch."
+      },
+      "counterClosed": {
+        "title": "Counter closed",
+        "message": "Counter {{counterNumber}} was closed in your branch."
+      },
+      "shiftStarted": {
+        "title": "New shift started",
+        "message": "{{staffName}} started a shift at counter {{counterNumber}}."
+      },
+      "shiftEnded": {
+        "title": "Shift ended",
+        "message": "{{staffName}} ended the shift at counter {{counterNumber}}."
+      },
+      "branchCreated": {
+        "title": "Branch added",
+        "message": "Branch {{branchCode}} was added to the system."
+      },
+      "branchUpdated": {
+        "title": "Branch updated",
+        "message": "The details of branch {{branchCode}} were updated."
+      },
+      "managerCreated": {
+        "title": "Manager added",
+        "message": "Manager {{managerName}} was added to branch {{branchCode}}."
+      },
+      "managerUpdated": {
+        "title": "Manager account updated",
+        "message": "Manager {{managerName}} was updated in branch {{branchCode}}."
       }
     },
     "status": {
@@ -407,6 +565,383 @@
       "cancelled": "Cancelled"
     }
   },
+  "overview": {
+    "eyebrow": "Your workspace",
+    "welcome": "Welcome, {{name}}",
+    "descriptions": {
+      "customer": "Follow your tickets and turn notifications in one place.",
+      "staff": "Start your counter session and serve the waiting customers.",
+      "manager": "Monitor your branch, staff, and reports in real time.",
+      "admin": "Manage the system, branches, and managers from one dashboard."
+    },
+    "quickActions": "Quick access",
+    "actions": {
+      "myTickets": "My tickets",
+      "notifications": "Notifications",
+      "book": "Book a ticket",
+      "operate": "Operate counter",
+      "monitor": "Queue monitoring",
+      "staff": "Staff",
+      "reports": "Reports",
+      "services": "Services"
+    },
+    "actionDescriptions": {
+      "myTickets": "Review current and previous tickets",
+      "notifications": "See the latest updates about your turn",
+      "book": "Book the appropriate service",
+      "operate": "Open your counter and serve customers",
+      "monitor": "Watch counters and shifts live",
+      "staff": "Manage branch managers and staff",
+      "reports": "Review branch and service performance",
+      "services": "Add services and update their settings"
+    }
+  },
+  "servicesManagement": {
+    "eyebrow": "Operations settings",
+    "title": "Service management",
+    "description": "Add branch services and configure service time and near-turn alerts.",
+    "add": "Add service",
+    "total": "Total services",
+    "active": "Active services",
+    "branchFilter": "Filter by branch",
+    "allBranches": "All branches",
+    "empty": "No matching services.",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "branch": "Branch",
+    "duration": "Average service time",
+    "counters": "Counters",
+    "tickets": "Total tickets",
+    "createTitle": "Add new service",
+    "editTitle": "Edit service",
+    "nameAr": "Arabic name",
+    "nameEn": "English name",
+    "prefix": "Ticket prefix",
+    "descriptionAr": "Arabic description",
+    "descriptionEn": "English description",
+    "threshold": "Turns before near-turn alert",
+    "errors": {
+      "load": "Could not load services.",
+      "duplicate": "This ticket prefix already exists in the branch.",
+      "save": "Could not save the service."
+    }
+  },
+  "countersManagement": {
+    "eyebrow": "Branch setup",
+    "title": "Counter management",
+    "description": "Create counters and assign each one to the service it provides.",
+    "add": "Add counter",
+    "branchFilter": "Filter by branch",
+    "allBranches": "All branches",
+    "empty": "No matching counters.",
+    "counter": "Counter",
+    "branchCode": "Branch code",
+    "noService": "No service assigned",
+    "createTitle": "Add new counter",
+    "editTitle": "Edit counter",
+    "branch": "Branch",
+    "chooseBranch": "Choose branch",
+    "number": "Counter number",
+    "service": "Service",
+    "errors": {
+      "load": "Could not load counters.",
+      "duplicate": "This counter number already exists in the branch.",
+      "save": "Could not save the counter."
+    }
+  },
+  "reports": {
+    "eyebrow": "Performance analytics",
+    "title": "Reports",
+    "description": "Review workload, waiting time, and service time for the selected period.",
+    "branch": "Branch",
+    "from": "From",
+    "to": "To",
+    "apply": "Apply",
+    "loadFailed": "Could not load the report.",
+    "totalTickets": "Total tickets",
+    "completed": "Completed tickets",
+    "avgWait": "Average wait in minutes",
+    "avgService": "Average service in minutes",
+    "servicesBreakdown": "Service performance",
+    "completedShort": "completed",
+    "hourlyLoad": "Bookings by hour",
+    "noData": "No data in this period."
+  },
+  "queueMonitoring": {
+    "eyebrow": "Live operations",
+    "title": "Queue and counter monitoring",
+    "description": "See every counter's status, current operator, and customer service time without operating the counter.",
+    "openCounters": "Open counters",
+    "activeOperators": "Active operators",
+    "loading": "Loading counter status...",
+    "loadFailed": "Could not load counter status.",
+    "counterNumber": "Counter {{number}}",
+    "noService": "No service assigned",
+    "servedCount": "{{count}} customers handled this shift",
+    "noOperator": "No operator at this counter",
+    "currentCustomer": "Current customer",
+    "waitingToStart": "Called and waiting for service to start",
+    "historyEyebrow": "Operations history",
+    "historyTitle": "Counter {{number}} shifts",
+    "loadingHistory": "Loading shift history...",
+    "historyFailed": "Could not load shift history.",
+    "noHistory": "No shifts have been recorded for this counter yet.",
+    "shiftDuration": "Shift duration",
+    "customersCount": "{{count}} customers",
+    "shiftEnded": "Shift ended",
+    "shiftLive": "Live shift",
+    "shiftOperator": "Operator",
+    "shiftStarted": "Shift started",
+    "shiftCustomers": "Customers",
+    "openedAt": "Counter opened",
+    "endedAt": "Counter closed",
+    "stillRunning": "Still running",
+    "ticket": "Ticket",
+    "customer": "Customer",
+    "service": "Service",
+    "serviceTime": "Service time",
+    "ticketStatus": "Status",
+    "noShiftTickets": "No customers were handled during this shift."
+  },
+  "queueManagement": {
+    "description": "Choose the counter you will use to manage the queue.",
+    "loadingCounters": "Loading counters...",
+    "retry": "Try again",
+    "noCounters": "No counters are available for this branch.",
+    "counter": "Counter",
+    "service": "Service",
+    "noService": "No service assigned",
+    "activeTicket": "Current ticket",
+    "noActiveTicket": "No active ticket",
+    "selectCounter": "Operate counter",
+    "counterUnavailable": "Assign a service first",
+    "workspace": {
+      "eyebrow": "Counter workspace",
+      "changeCounter": "Change counter",
+      "endSession": "End counter session",
+      "endingSession": "Ending session...",
+      "statusEyebrow": "Operating status",
+      "statusTitle": "Counter controls",
+      "openCounter": "Open counter",
+      "pauseCounter": "Pause counter",
+      "resumeCounter": "Resume work",
+      "closeCounter": "Close counter",
+      "updating": "Updating...",
+      "activeTicketCloseHint": "Finish the current ticket before closing the counter.",
+      "statusHint": {
+        "open": "The counter is accepting tickets and can call the next customer.",
+        "paused": "Calling new tickets is paused. You can resume work at any time.",
+        "closed": "Open the counter first to start receiving and managing tickets."
+      },
+      "readyTitle": "Next: manage tickets",
+      "readyDescription": "After opening the counter, the waiting queue, current ticket, and service actions will appear here."
+    },
+    "session": {
+      "youAreOperating": "You are operating this counter",
+      "operatedBy": "This counter is operated by",
+      "occupied": "Counter is occupied",
+      "claiming": "Claiming counter...",
+      "continueWork": "Continue work"
+    },
+    "tickets": {
+      "eyebrow": "Queue operation",
+      "title": "Tickets and current service",
+      "waitingCount": "Waiting",
+      "currentTicket": "Current ticket",
+      "refresh": "Refresh",
+      "loading": "Loading tickets...",
+      "customer": "Customer name",
+      "phone": "Phone number",
+      "noPhone": "Not provided",
+      "noCurrentTicket": "There is no active ticket at this counter.",
+      "callNextTitle": "Call the next customer",
+      "openToCall": "Open the counter before calling tickets.",
+      "finishCurrent": "Finish the current ticket before calling another one.",
+      "noWaitingTickets": "There are no tickets waiting right now.",
+      "readyToCall": "{{count}} tickets are ready to be called.",
+      "callNext": "Call next",
+      "callingNext": "Calling...",
+      "startService": "Start service",
+      "completeService": "Complete service",
+      "recall": "Recall",
+      "skip": "Skip ticket",
+      "noShow": "No show",
+      "waitingEyebrow": "Arrival order",
+      "waitingList": "Waiting list",
+      "emptyQueue": "The waiting list is empty."
+    },
+    "status": {
+      "open": "Open",
+      "paused": "Paused",
+      "closed": "Closed"
+    },
+    "errors": {
+      "loginRequired": "Sign in to view counters.",
+      "permissionDenied": "You do not have permission to manage the queue.",
+      "loadCounters": "Could not load counters. Please try again.",
+      "closeActiveCounter": "Finish the current ticket before closing the counter.",
+      "serviceRequired": "Assign a service before opening the counter.",
+      "updateStatus": "Could not update the counter status. Please try again.",
+      "loadTickets": "Could not load the service tickets. Please try again.",
+      "noWaitingTickets": "There are no tickets in the waiting queue.",
+      "counterHasActiveTicket": "This counter already has an active ticket.",
+      "callNext": "Could not call the next ticket. Please try again.",
+      "ticketAction": "Could not update the current ticket. Please try again.",
+      "counterOccupied": "Another staff member is operating this counter.",
+      "claimCounter": "Could not start the counter session. Please try again.",
+      "finishBeforeRelease": "Finish the current ticket before ending the counter session.",
+      "releaseCounter": "Could not end the counter session. Please try again."
+    }
+  },
+  "branchManagement": {
+    "eyebrow": "Branch management",
+    "title": "Branches and locations",
+    "adminDescription": "Add branches, set their locations, and monitor their services and counters.",
+    "managerDescription": "Review your branch details, location, services, and counters.",
+    "add": "Add branch",
+    "edit": "Edit",
+    "openMap": "Open map",
+    "loading": "Loading branches...",
+    "retry": "Try again",
+    "search": "Search branches",
+    "searchPlaceholder": "Search by name, code, or address",
+    "filterStatus": "Branch status",
+    "closeMessage": "Close message",
+    "noAddress": "No address has been added",
+    "filters": {
+      "all": "All statuses",
+      "active": "Active branches",
+      "inactive": "Suspended branches"
+    },
+    "stats": {
+      "total": "Total branches",
+      "active": "Active branches",
+      "services": "Total services"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Suspended"
+    },
+    "card": {
+      "services": "Services",
+      "counters": "Counters",
+      "team": "Team"
+    },
+    "empty": {
+      "title": "No branches",
+      "description": "Add the first branch to start setting up services and counters.",
+      "search": "No branches match the current search or status."
+    },
+    "form": {
+      "eyebrow": "Branch details",
+      "createTitle": "Add a new branch",
+      "editTitle": "Edit branch details",
+      "close": "Close dialog",
+      "basicData": "Basic details",
+      "nameAr": "Arabic branch name",
+      "nameEn": "English branch name",
+      "code": "Branch code",
+      "timezone": "Timezone",
+      "addressAr": "Arabic address — optional",
+      "addressEn": "English address — optional",
+      "location": "Branch map location",
+      "locationHint": "Enter both latitude and longitude, or leave both empty.",
+      "latitude": "Latitude",
+      "longitude": "Longitude",
+      "activeBranch": "Branch is active",
+      "activeHint": "Suspended branches are hidden from customers during booking.",
+      "create": "Create branch",
+      "saving": "Saving..."
+    },
+    "validation": {
+      "name": "Enter a valid name with at least two characters.",
+      "code": "Use 2 to 12 uppercase English letters or numbers.",
+      "coordinates": "Enter valid latitude and longitude values together."
+    },
+    "messages": {
+      "created": "The branch was created successfully.",
+      "updated": "The branch changes were saved successfully."
+    },
+    "errors": {
+      "load": "Could not load branches. Please try again.",
+      "duplicate": "This branch code is already in use.",
+      "permission": "Only administrators can edit branches.",
+      "save": "Could not save the branch. Review the details and try again."
+    }
+  },
+  "staffManagement": {
+    "groups": {
+      "managers": "Branch managers",
+      "staff": "Counter staff",
+      "noStaff": "No staff match your search in this branch."
+    },
+    "eyebrow": "Team management",
+    "title": "Staff and permissions",
+    "description": "Add branch staff and manage their permissions and account status.",
+    "add": "Add staff member",
+    "edit": "Edit",
+    "loading": "Loading staff...",
+    "retry": "Try again",
+    "search": "Search staff",
+    "searchPlaceholder": "Search by name, email, or phone",
+    "filterBranch": "Branch",
+    "allBranches": "All branches",
+    "noPhone": "No phone number",
+    "closeMessage": "Close message",
+    "stats": {
+      "total": "Total team",
+      "active": "Active accounts",
+      "managers": "Branch managers"
+    },
+    "roles": {
+      "staff": "Counter staff",
+      "manager": "Branch manager"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Suspended"
+    },
+    "empty": {
+      "title": "No staff members",
+      "description": "Add the first staff member to start operating branch counters.",
+      "search": "No staff match the current search or branch filter."
+    },
+    "form": {
+      "eyebrow": "Account details",
+      "createTitle": "Add a new staff member",
+      "editTitle": "Edit staff member",
+      "close": "Close dialog",
+      "fullName": "Full name",
+      "email": "Email address",
+      "phone": "Phone number — optional",
+      "password": "Temporary password",
+      "role": "Role",
+      "branch": "Branch",
+      "chooseBranch": "Choose a branch",
+      "managerNotice": "The staff member will be added to your branch with counter staff access.",
+      "activeAccount": "Account is active",
+      "activeHint": "Suspended accounts cannot sign in.",
+      "create": "Create account",
+      "saving": "Saving..."
+    },
+    "validation": {
+      "fullName": "Enter a valid name with at least two characters.",
+      "email": "Enter a valid email address.",
+      "phone": "Enter 8 to 15 digits, optionally starting with +.",
+      "password": "At least 8 characters with uppercase, lowercase, and a number.",
+      "branch": "Choose the branch where this staff member will work."
+    },
+    "messages": {
+      "created": "The staff account was created successfully.",
+      "updated": "The staff changes were saved successfully."
+    },
+    "errors": {
+      "load": "Could not load staff. Please try again.",
+      "duplicate": "The email address or phone number is already used by another account.",
+      "permission": "You do not have permission to make this change.",
+      "save": "Could not save the details. Review them and try again."
+    }
+  },
   "queueStatus": {
     "waitingLabel": "Waiting",
     "timeLabel": "Estimated time",
@@ -414,6 +949,7 @@
     "closedEstimate": "Not available",
     "book": "Book this service",
     "unavailable": "Service is currently closed",
+    "readOnly": "View status only",
     "status": {
       "available": "Available",
       "busy": "Busy",
@@ -428,6 +964,7 @@
     "madeForTime": "Designed because your time matters"
   },
   "common": {
+    "counterNumber": "Counter {{number}}",
     "home": "Home",
     "login": "Log in",
     "register": "Create account",
@@ -438,6 +975,9 @@
     "confirm": "Confirm",
     "save": "Save",
     "loading": "Loading...",
-    "noData": "No data available"
+    "noData": "No data available",
+    "edit": "Edit",
+    "retry": "Try again",
+    "refresh": "Refresh"
   }
 }

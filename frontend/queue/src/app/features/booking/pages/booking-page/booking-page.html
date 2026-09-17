@@ -79,9 +79,9 @@
           @if (selectedBranch(); as branch) {
             @if (selectedService(); as service) {
               <app-booking-summary
-                [branchName]="branch.name"
-                [branchAddress]="branch.address"
-                [serviceName]="service.name"
+                [branchName]="branch.nameAr | localizedText: branch.nameEn"
+                [branchAddress]="branch.addressAr | localizedText: branch.addressEn"
+                [serviceName]="service.nameAr | localizedText: service.nameEn"
                 [loading]="bookingLoading()"
                 [errorKey]="bookingError()"
                 (back)="previousStep()"
@@ -95,8 +95,8 @@
           @if (createdTicket(); as ticket) {
             <app-booking-success
               [ticketNumber]="ticket.number"
-              [branchName]="ticket.branch.name"
-              [serviceName]="ticket.service.name"
+              [branchName]="ticket.branch.nameAr | localizedText: ticket.branch.nameEn"
+              [serviceName]="ticket.service.nameAr | localizedText: ticket.service.nameEn"
               [peopleAhead]="ticket.peopleAhead"
               [estimatedMinutes]="ticket.estimatedWaitMinutes"
               (newBooking)="startNewBooking()"

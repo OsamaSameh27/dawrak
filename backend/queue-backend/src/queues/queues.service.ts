@@ -16,6 +16,7 @@ import { calculateEstimatedWait, canTransition } from './queue.domain';
 import { QueueGateway } from './queue.gateway';
 
 const ACTIVE_TICKET_STATUSES: TicketStatus[] = [TicketStatus.WAITING, TicketStatus.CALLED, TicketStatus.SERVING];
+const COUNTER_SESSION_TTL_MS = 2 * 60 * 1000;
 
 @Injectable()
 export class QueuesService {
@@ -29,7 +30,7 @@ export class QueuesService {
     const manageToken = dto.idempotencyKey
       ? createHmac('sha256', this.config.getOrThrow<string>('JWT_REFRESH_SECRET')).update(dto.idempotencyKey).digest('hex')
       : randomBytes(32).toString('hex');
-    const { ticket } = await this.createTicket({
+    const { ticket, created } = await this.createTicket({
       serviceId: dto.serviceId,
       customerName: dto.customerName.trim(),
       customerPhone: dto.customerPhone,
@@ -37,6 +38,7 @@ export class QueuesService {
       idempotencyKey: dto.idempotencyKey,
       manageTokenHash: this.hashToken(manageToken),
     });
+    if (created) await this.notifyServiceOperator(ticket);
     await this.broadcast(ticket.serviceId, ticket.publicId);
     return { ...(await this.getPublicTicket(ticket.publicId)), manageToken };
   }
@@ -57,6 +59,7 @@ export class QueuesService {
         orderBy: { createdAt: 'desc' },
       });
       if (notification) this.gateway.emitNotification(user.id, notification);
+      await this.notifyServiceOperator(ticket);
     }
     await this.broadcast(ticket.serviceId, ticket.publicId);
     return this.getPublicTicket(ticket.publicId);
@@ -67,11 +70,12 @@ export class QueuesService {
       where: { publicId },
       select: {
         id: true, publicId: true, number: true, status: true, queueDate: true,
-        createdAt: true, calledAt: true, serviceStartedAt: true, completedAt: true, cancelledAt: true,
+        createdAt: true, calledAt: true, serviceStartedAt: true, completedAt: true,
+        serviceDurationSeconds: true, cancelledAt: true,
         serviceId: true, priority: true, sequence: true,
-        service: { select: { name: true, averageServiceMinutes: true } },
-        branch: { select: { id: true, name: true, code: true, timezone: true } },
-        counter: { select: { id: true, name: true } },
+        service: { select: { name: true, nameAr: true, nameEn: true, averageServiceMinutes: true } },
+        branch: { select: { id: true, name: true, nameAr: true, nameEn: true, code: true, timezone: true } },
+        counter: { select: { id: true, name: true, number: true } },
       },
     });
     if (!ticket) throw new NotFoundException('Ticket not found');
@@ -116,7 +120,7 @@ export class QueuesService {
       select: {
         id: true, publicId: true, number: true, customerName: true, customerPhone: true,
         status: true, priority: true, createdAt: true, calledAt: true, serviceStartedAt: true,
-        counter: { select: { id: true, name: true } },
+        counter: { select: { id: true, name: true, number: true } },
       },
       orderBy: [{ priority: 'desc' }, { sequence: 'asc' }],
     });
@@ -125,7 +129,7 @@ export class QueuesService {
   async getSnapshot(serviceId: string) {
     const service = await this.prisma.service.findFirst({
       where: { id: serviceId, isActive: true, branch: { isActive: true } },
-      include: { branch: { select: { id: true, name: true, code: true, timezone: true } } },
+      include: { branch: { select: { id: true, name: true, nameAr: true, nameEn: true, code: true, timezone: true } } },
     });
     if (!service) throw new NotFoundException('Service not found');
     const queueDate = this.queueDate(service.branch.timezone);
@@ -136,7 +140,7 @@ export class QueuesService {
       this.prisma.counter.count({ where: { serviceId, status: CounterStatus.OPEN } }),
       this.prisma.ticket.findMany({
         where: { serviceId, queueDate, status: { in: [TicketStatus.CALLED, TicketStatus.SERVING] } },
-        select: { number: true, status: true, counter: { select: { name: true } } },
+        select: { number: true, status: true, counter: { select: { number: true } } },
         orderBy: { calledAt: 'asc' },
       }),
       this.prisma.ticket.findMany({
@@ -147,7 +151,10 @@ export class QueuesService {
     const counts = Object.fromEntries(Object.values(TicketStatus).map((status) => [status, 0])) as Record<TicketStatus, number>;
     grouped.forEach((item) => { counts[item.status] = item._count._all; });
     return {
-      service: { id: service.id, name: service.name, prefix: service.prefix },
+      service: {
+        id: service.id, name: service.name, nameAr: service.nameAr,
+        nameEn: service.nameEn, prefix: service.prefix,
+      },
       branch: service.branch,
       queueDate,
       openCounters,
@@ -159,10 +166,43 @@ export class QueuesService {
     };
   }
 
+  async getPublicOverview() {
+    const services = await this.prisma.service.findMany({
+      where: { isActive: true, branch: { isActive: true } },
+      select: {
+        id: true, name: true, nameAr: true, nameEn: true, prefix: true,
+        averageServiceMinutes: true,
+        branch: { select: { id: true, name: true, nameAr: true, nameEn: true, code: true, timezone: true } },
+      },
+      orderBy: [{ branch: { nameEn: 'asc' } }, { nameEn: 'asc' }],
+    });
+    return Promise.all(services.map(async (service) => {
+      const queueDate = this.queueDate(service.branch.timezone);
+      const [waitingCount, openCounters, nowServing] = await Promise.all([
+        this.prisma.ticket.count({ where: { serviceId: service.id, queueDate, status: TicketStatus.WAITING } }),
+        this.prisma.counter.count({ where: { serviceId: service.id, status: CounterStatus.OPEN } }),
+        this.prisma.ticket.findFirst({
+          where: { serviceId: service.id, queueDate, status: { in: [TicketStatus.CALLED, TicketStatus.SERVING] } },
+          select: { number: true }, orderBy: { calledAt: 'asc' },
+        }),
+      ]);
+      const estimatedMinutes = openCounters > 0
+        ? calculateEstimatedWait(waitingCount, service.averageServiceMinutes, openCounters)
+        : null;
+      const { timezone: _timezone, ...branch } = service.branch;
+      return {
+        id: service.id, name: service.name, nameAr: service.nameAr, nameEn: service.nameEn,
+        prefix: service.prefix, branch, waitingCount, openCounters,
+        estimatedMinutes, nowServing: nowServing?.number ?? null,
+      };
+    }));
+  }
+
   async callNext(actor: AuthenticatedUser, serviceId: string, dto: CallNextDto) {
     const counter = await this.prisma.counter.findUnique({ where: { id: dto.counterId } });
     if (!counter) throw new NotFoundException('Counter not found');
     assertBranchAccess(actor, counter.branchId);
+    const counterSession = await this.assertCounterSession(actor, counter.id);
     if (counter.serviceId !== serviceId || counter.status !== CounterStatus.OPEN) {
       throw new BadRequestException('Counter must be open and assigned to this service');
     }
@@ -187,14 +227,15 @@ export class QueuesService {
       return tx.ticket.update({
         where: { id: next.id },
         data: {
-          status: TicketStatus.CALLED, counterId: counter.id, calledAt: new Date(),
+          status: TicketStatus.CALLED, counterId: counter.id,
+          counterShiftId: counterSession.shiftId, calledAt: new Date(),
           statusHistory: { create: { fromStatus: TicketStatus.WAITING, toStatus: TicketStatus.CALLED, changedById: actor.id } },
           notifications: {
             create: {
               userId: next.customerId, type: NotificationType.TICKET_CALLED,
               title: 'notifications.types.ticketCalled.title',
               message: 'notifications.types.ticketCalled.message',
-              data: { ticketNumber: next.number, counterName: counter.name },
+              data: { ticketNumber: next.number, counterNumber: counter.number },
             },
           },
         },
@@ -209,20 +250,56 @@ export class QueuesService {
     }
     await this.notifyNearTickets(serviceId, queueDate, service.nearTurnThreshold);
     await this.broadcast(serviceId, ticket.publicId, true);
+    this.gateway.emitCountersUpdated(counter.branchId);
     return this.getPublicTicket(ticket.publicId);
   }
 
   async recall(actor: AuthenticatedUser, id: string, note?: string) {
     const ticket = await this.getInternalTicket(id);
     assertBranchAccess(actor, ticket.branchId);
+    if (!ticket.counterId) throw new BadRequestException('Ticket is not assigned to a counter');
+    await this.assertCounterSession(actor, ticket.counterId);
     if (ticket.status !== TicketStatus.CALLED) throw new BadRequestException('Only called tickets can be recalled');
-    const updated = await this.prisma.ticket.update({
-      where: { id },
-      data: {
-        calledAt: new Date(),
-        statusHistory: { create: { fromStatus: TicketStatus.CALLED, toStatus: TicketStatus.CALLED, changedById: actor.id, note: note ?? 'Recalled' } },
-      },
+    const counter = await this.prisma.counter.findUnique({
+      where: { id: ticket.counterId },
+      select: { number: true },
     });
+    if (!counter) throw new NotFoundException('Counter not found');
+
+    const { updated, notification } = await this.prisma.$transaction(async (tx) => {
+      const updatedTicket = await tx.ticket.update({
+        where: { id },
+        data: {
+          calledAt: new Date(),
+          statusHistory: {
+            create: {
+              fromStatus: TicketStatus.CALLED,
+              toStatus: TicketStatus.CALLED,
+              changedById: actor.id,
+              note: note ?? 'Recalled',
+            },
+          },
+        },
+      });
+      const createdNotification = ticket.customerId
+        ? await tx.notification.create({
+            data: {
+              userId: ticket.customerId,
+              ticketId: ticket.id,
+              type: NotificationType.TICKET_CALLED,
+              title: 'notifications.types.ticketRecalled.title',
+              message: 'notifications.types.ticketRecalled.message',
+              data: { ticketNumber: ticket.number, counterNumber: counter.number },
+            },
+          })
+        : null;
+
+      return { updated: updatedTicket, notification: createdNotification };
+    });
+
+    if (ticket.customerId && notification) {
+      this.gateway.emitNotification(ticket.customerId, notification);
+    }
     await this.broadcast(updated.serviceId, updated.publicId, true);
     return this.getPublicTicket(updated.publicId);
   }
@@ -320,6 +397,8 @@ export class QueuesService {
   private async transition(actor: AuthenticatedUser, id: string, toStatus: TicketStatus, note?: string) {
     const ticket = await this.getInternalTicket(id);
     assertBranchAccess(actor, ticket.branchId);
+    if (!ticket.counterId) throw new BadRequestException('Ticket is not assigned to a counter');
+    await this.assertCounterSession(actor, ticket.counterId);
     const updated = await this.withSerializableRetry(async (tx) => {
       const current = await tx.ticket.findUnique({ where: { id } });
       if (!current) throw new NotFoundException('Ticket not found');
@@ -327,8 +406,14 @@ export class QueuesService {
         throw new BadRequestException(`Cannot change ticket from ${current.status} to ${toStatus}`);
       }
       const timestampData: Prisma.TicketUpdateInput = {};
-      if (toStatus === TicketStatus.SERVING) timestampData.serviceStartedAt = new Date();
-      if (toStatus === TicketStatus.COMPLETED) timestampData.completedAt = new Date();
+      const now = new Date();
+      if (toStatus === TicketStatus.SERVING) timestampData.serviceStartedAt = now;
+      if (toStatus === TicketStatus.COMPLETED || (toStatus === TicketStatus.SKIPPED && current.serviceStartedAt)) {
+        timestampData.completedAt = now;
+        timestampData.serviceDurationSeconds = current.serviceStartedAt
+          ? Math.max(0, Math.floor((now.getTime() - current.serviceStartedAt.getTime()) / 1000))
+          : 0;
+      }
       return tx.ticket.update({
         where: { id },
         data: {
@@ -353,7 +438,22 @@ export class QueuesService {
       if (notification) this.gateway.emitNotification(ticket.customerId, notification);
     }
     await this.broadcast(updated.serviceId, updated.publicId);
+    this.gateway.emitCountersUpdated(ticket.branchId);
     return this.getPublicTicket(updated.publicId);
+  }
+
+  private notifyServiceOperator(ticket: {
+    id: string;
+    serviceId: string;
+    number: string;
+  }): Promise<void> {
+    return this.gateway.notifyServiceOperators(ticket.serviceId, {
+      ticketId: ticket.id,
+      type: NotificationType.TICKET_CREATED,
+      title: 'notifications.types.operatorTicketCreated.title',
+      message: 'notifications.types.operatorTicketCreated.message',
+      data: { ticketNumber: ticket.number },
+    });
   }
 
   private async cancelTicket(id: string, changedById: string | undefined) {
@@ -427,6 +527,27 @@ export class QueuesService {
     const ticket = await this.prisma.ticket.findUnique({ where: { id } });
     if (!ticket) throw new NotFoundException('Ticket not found');
     return ticket;
+  }
+
+  private async assertCounterSession(actor: AuthenticatedUser, counterId: string) {
+    const session = await this.prisma.counterSession.findUnique({ where: { counterId } });
+    const cutoff = new Date(Date.now() - COUNTER_SESSION_TTL_MS);
+    if (!session || session.lastSeenAt < cutoff) {
+      if (session) {
+        await this.prisma.$transaction([
+          this.prisma.counterShift.updateMany({
+            where: { id: session.shiftId, endedAt: null }, data: { endedAt: new Date() },
+          }),
+          this.prisma.counterSession.delete({ where: { id: session.id } }),
+          this.prisma.counter.update({ where: { id: counterId }, data: { status: CounterStatus.CLOSED } }),
+        ]);
+      }
+      throw new ConflictException('Claim this counter before operating it');
+    }
+    if (session.staffId !== actor.id) {
+      throw new ForbiddenException('Counter belongs to another staff member');
+    }
+    return session;
   }
 
   private async broadcast(serviceId: string, publicId: string, called = false) {

@@ -1,7 +1,5 @@
 @use '../../../../shared/styles/dashboard-page';
 
-
-
 .notifications-header {
   display: flex;
   align-items: flex-end;
@@ -103,7 +101,10 @@
   background: rgba(255, 255, 255, 0.72);
   color: var(--queue-primary-dark);
   font-size: 1.1rem;
-  transition: background-color 160ms ease, border-color 160ms ease, transform 160ms ease;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease;
 }
 
 .notification-mark-read:hover:not(:disabled),
@@ -160,14 +161,35 @@
   }
 
   .notifications-header .btn {
-    align-self: flex-start;
+    width: 100%;
+    justify-content: center;
   }
 
   .notification-card {
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: 2.4rem minmax(0, 1fr) auto;
+    gap: 0.75rem;
+    padding: 0.85rem;
+  }
+
+  .notification-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.35rem;
   }
 
   .notification-mark-read {
-    margin-inline-start: 3.3rem;
+    margin: 0;
+  }
+}
+
+@media (max-width: 380px) {
+  .notification-card {
+    grid-template-columns: 2.25rem minmax(0, 1fr);
+  }
+
+  .notification-mark-read {
+    grid-column: 2;
+    justify-self: end;
   }
 }

@@ -1,6 +1,1 @@
-<section class="dashboard-page" aria-labelledby="dashboard-overview-title">
-  <header class="dashboard-page__header">
-    <span class="dashboard-page__eyebrow">{{ 'dashboard.header.title' | translate }}</span>
-    <h1 id="dashboard-overview-title">{{ 'dashboard.pages.overview' | translate }}</h1>
-  </header>
-</section>
+<section class="overview-page"><header><span>{{'overview.eyebrow'|translate}}</span><h1>{{'overview.welcome'|translate:{name:user()?.fullName} }}</h1><p>{{('overview.descriptions.'+(role()??'customer').toLowerCase())|translate}}</p></header><div class="identity-card"><span>{{user()?.fullName?.charAt(0)?.toUpperCase()}}</span><div><strong>{{user()?.fullName}}</strong><small>{{('dashboard.header.roles.'+(role()??'customer').toLowerCase())|translate}}</small></div><i class="bi bi-shield-check"></i></div><section><h2>{{'overview.quickActions'|translate}}</h2><div class="action-grid">@for(action of actions();track action.route){<a [routerLink]="action.route"><i class="bi {{action.icon}}"></i><strong>{{('overview.actions.'+action.key)|translate}}</strong><span>{{('overview.actionDescriptions.'+action.key)|translate}}</span><i class="bi bi-arrow-left"></i></a>}</div></section></section>

@@ -1,6 +1,207 @@
 <section class="dashboard-page" aria-labelledby="staff-title">
-  <header class="dashboard-page__header">
-    <span class="dashboard-page__eyebrow">{{ 'dashboard.header.title' | translate }}</span>
-    <h1 id="staff-title">{{ 'dashboard.pages.staff' | translate }}</h1>
+  <header class="dashboard-page__header staff-header">
+    <div>
+      <span class="dashboard-page__eyebrow">{{ 'staffManagement.eyebrow' | translate }}</span>
+      <h1 id="staff-title">{{ 'staffManagement.title' | translate }}</h1>
+      <p>{{ 'staffManagement.description' | translate }}</p>
+    </div>
+    <button class="btn btn-primary add-staff-button" type="button" (click)="openCreate()">
+      <i class="bi bi-person-plus" aria-hidden="true"></i>
+      <span>{{ 'staffManagement.add' | translate }}</span>
+    </button>
   </header>
+
+  @if (successKey()) {
+    <div class="page-message page-message--success" role="status">
+      <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+      <span>{{ successKey()! | translate }}</span>
+      <button type="button" [attr.aria-label]="'staffManagement.closeMessage' | translate" (click)="successKey.set(null)">
+        <i class="bi bi-x-lg" aria-hidden="true"></i>
+      </button>
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="state-card" role="status">
+      <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+      <span>{{ 'staffManagement.loading' | translate }}</span>
+    </div>
+  } @else if (loadError()) {
+    <div class="state-card state-card--error" role="alert">
+      <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
+      <strong>{{ 'staffManagement.errors.load' | translate }}</strong>
+      <button class="btn btn-outline-primary btn-sm" type="button" (click)="loadPage()">{{ 'staffManagement.retry' | translate }}</button>
+    </div>
+  } @else {
+    <div class="staff-stats">
+      <article><span><i class="bi bi-people" aria-hidden="true"></i></span><div><strong>{{ staff().length }}</strong><small>{{ 'staffManagement.stats.total' | translate }}</small></div></article>
+      <article><span><i class="bi bi-person-check" aria-hidden="true"></i></span><div><strong>{{ activeCount() }}</strong><small>{{ 'staffManagement.stats.active' | translate }}</small></div></article>
+      <article><span><i class="bi bi-person-gear" aria-hidden="true"></i></span><div><strong>{{ managerCount() }}</strong><small>{{ 'staffManagement.stats.managers' | translate }}</small></div></article>
+    </div>
+
+    <div class="staff-panel">
+      <div class="staff-toolbar">
+        <label class="search-field">
+          <span class="visually-hidden">{{ 'staffManagement.search' | translate }}</span>
+          <i class="bi bi-search" aria-hidden="true"></i>
+          <input type="search" [value]="searchTerm()" [placeholder]="'staffManagement.searchPlaceholder' | translate" (input)="setSearch($event)" />
+        </label>
+        @if (isAdmin()) {
+          <label class="branch-filter">
+            <span>{{ 'staffManagement.filterBranch' | translate }}</span>
+            <select [value]="selectedBranchId()" (change)="setBranchFilter($event)">
+              <option value="">{{ 'staffManagement.allBranches' | translate }}</option>
+              @for (branch of branches(); track branch.id) {
+                <option [value]="branch.id">{{ branch.nameAr | localizedText: branch.nameEn }}</option>
+              }
+            </select>
+          </label>
+        }
+      </div>
+
+      @if (filteredStaff().length === 0) {
+        <div class="empty-state">
+          <span><i class="bi bi-person-x" aria-hidden="true"></i></span>
+          <strong>{{ 'staffManagement.empty.title' | translate }}</strong>
+          <p>{{ (staff().length ? 'staffManagement.empty.search' : 'staffManagement.empty.description') | translate }}</p>
+        </div>
+      } @else {
+        @if (isAdmin() && visibleManagers().length) {
+          <h2 class="d-flex align-items-center gap-2 mt-4 mb-3 px-3 fs-6"><i class="bi bi-person-gear" aria-hidden="true"></i>{{ 'staffManagement.groups.managers' | translate }}<span class="badge rounded-pill text-bg-light">{{ visibleManagers().length }}</span></h2>
+          <div class="staff-list">
+            @for (member of visibleManagers(); track member.id) {
+            <article class="staff-card" [class.staff-card--inactive]="!member.isActive">
+              <div class="staff-card__identity">
+                <span class="staff-avatar" aria-hidden="true">{{ member.fullName.charAt(0).toUpperCase() }}</span>
+                <div><strong>{{ member.fullName }}</strong><a [href]="'mailto:' + member.email">{{ member.email }}</a></div>
+              </div>
+              <button class="edit-button" type="button" (click)="openEdit(member)"><i class="bi bi-pencil-square" aria-hidden="true"></i><span>{{ 'staffManagement.edit' | translate }}</span></button>
+              <div class="staff-card__details">
+                <span><i class="bi bi-building" aria-hidden="true"></i>{{ member.branch.nameAr | localizedText: member.branch.nameEn }}</span>
+                <span><i class="bi bi-telephone" aria-hidden="true"></i>{{ member.phone || ('staffManagement.noPhone' | translate) }}</span>
+              </div>
+              <div class="staff-card__badges">
+                <span class="role-badge" [class.role-badge--manager]="member.role === 'MANAGER'">{{ ('staffManagement.roles.' + member.role.toLowerCase()) | translate }}</span>
+                <span class="status-badge" [class.status-badge--inactive]="!member.isActive">
+                  <i class="bi" [class.bi-check-circle-fill]="member.isActive" [class.bi-dash-circle-fill]="!member.isActive" aria-hidden="true"></i>
+                  {{ (member.isActive ? 'staffManagement.status.active' : 'staffManagement.status.inactive') | translate }}
+                </span>
+              </div>
+            </article>
+            }
+          </div>
+        }
+
+        <h2 class="d-flex align-items-center gap-2 mt-4 mb-3 px-3 fs-6"><i class="bi bi-people" aria-hidden="true"></i>{{ 'staffManagement.groups.staff' | translate }}<span class="badge rounded-pill text-bg-light">{{ visibleStaff().length }}</span></h2>
+        @if (visibleStaff().length) {
+          <div class="staff-list">
+            @for (member of visibleStaff(); track member.id) {
+              <article class="staff-card" [class.staff-card--inactive]="!member.isActive">
+                <div class="staff-card__identity">
+                  <span class="staff-avatar" aria-hidden="true">{{ member.fullName.charAt(0).toUpperCase() }}</span>
+                  <div><strong>{{ member.fullName }}</strong><a [href]="'mailto:' + member.email">{{ member.email }}</a></div>
+                </div>
+                <button class="edit-button" type="button" (click)="openEdit(member)"><i class="bi bi-pencil-square" aria-hidden="true"></i><span>{{ 'staffManagement.edit' | translate }}</span></button>
+                <div class="staff-card__details">
+                  <span><i class="bi bi-building" aria-hidden="true"></i>{{ member.branch.nameAr | localizedText: member.branch.nameEn }}</span>
+                  <span><i class="bi bi-telephone" aria-hidden="true"></i>{{ member.phone || ('staffManagement.noPhone' | translate) }}</span>
+                </div>
+                <div class="staff-card__badges">
+                  <span class="role-badge">{{ 'staffManagement.roles.staff' | translate }}</span>
+                  <span class="status-badge" [class.status-badge--inactive]="!member.isActive">
+                    <i class="bi" [class.bi-check-circle-fill]="member.isActive" [class.bi-dash-circle-fill]="!member.isActive" aria-hidden="true"></i>
+                    {{ (member.isActive ? 'staffManagement.status.active' : 'staffManagement.status.inactive') | translate }}
+                  </span>
+                </div>
+              </article>
+            }
+          </div>
+        } @else {
+          <p class="manager-note">{{ 'staffManagement.groups.noStaff' | translate }}</p>
+        }
+      }
+    </div>
+  }
 </section>
+
+@if (dialogMode()) {
+  <div class="dialog-backdrop" role="presentation" (click)="closeDialog()">
+    <section class="staff-dialog" role="dialog" aria-modal="true" [attr.aria-labelledby]="dialogMode() === 'create' ? 'create-staff-title' : 'edit-staff-title'" (click)="$event.stopPropagation()">
+      <header class="staff-dialog__header">
+        <div>
+          <span>{{ 'staffManagement.form.eyebrow' | translate }}</span>
+          <h2 [id]="dialogMode() === 'create' ? 'create-staff-title' : 'edit-staff-title'">{{ (dialogMode() === 'create' ? 'staffManagement.form.createTitle' : 'staffManagement.form.editTitle') | translate }}</h2>
+        </div>
+        <button type="button" [attr.aria-label]="'staffManagement.form.close' | translate" (click)="closeDialog()"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
+      </header>
+
+      @if (formErrorKey()) {
+        <p class="form-error" role="alert"><i class="bi bi-exclamation-circle" aria-hidden="true"></i>{{ formErrorKey()! | translate }}</p>
+      }
+
+      @if (dialogMode() === 'create') {
+        <form [formGroup]="createForm" (ngSubmit)="submitCreate()" novalidate>
+          <div class="form-grid">
+            <label class="form-field form-field--wide">
+              <span>{{ 'staffManagement.form.fullName' | translate }}</span>
+              <input type="text" formControlName="fullName" autocomplete="name" [class.is-invalid]="controlInvalid(createForm.controls.fullName)" />
+              @if (controlInvalid(createForm.controls.fullName)) { <small>{{ 'staffManagement.validation.fullName' | translate }}</small> }
+            </label>
+            <label class="form-field">
+              <span>{{ 'staffManagement.form.email' | translate }}</span>
+              <input type="email" formControlName="email" autocomplete="email" dir="ltr" [class.is-invalid]="controlInvalid(createForm.controls.email)" />
+              @if (controlInvalid(createForm.controls.email)) { <small>{{ 'staffManagement.validation.email' | translate }}</small> }
+            </label>
+            <label class="form-field">
+              <span>{{ 'staffManagement.form.phone' | translate }}</span>
+              <input type="tel" formControlName="phone" autocomplete="tel" dir="ltr" [class.is-invalid]="controlInvalid(createForm.controls.phone)" />
+              @if (controlInvalid(createForm.controls.phone)) { <small>{{ 'staffManagement.validation.phone' | translate }}</small> }
+            </label>
+            <label class="form-field form-field--wide">
+              <span>{{ 'staffManagement.form.password' | translate }}</span>
+              <input type="password" formControlName="password" autocomplete="new-password" dir="ltr" [class.is-invalid]="controlInvalid(createForm.controls.password)" />
+              <small [class.validation-error]="controlInvalid(createForm.controls.password)">{{ 'staffManagement.validation.password' | translate }}</small>
+            </label>
+            @if (isAdmin()) {
+              <label class="form-field">
+                <span>{{ 'staffManagement.form.role' | translate }}</span>
+                <select formControlName="role"><option value="STAFF">{{ 'staffManagement.roles.staff' | translate }}</option><option value="MANAGER">{{ 'staffManagement.roles.manager' | translate }}</option></select>
+              </label>
+              <label class="form-field">
+                <span>{{ 'staffManagement.form.branch' | translate }}</span>
+                <select formControlName="branchId" [class.is-invalid]="controlInvalid(createForm.controls.branchId)">
+                  <option value="" disabled>{{ 'staffManagement.form.chooseBranch' | translate }}</option>
+                  @for (branch of branches(); track branch.id) { <option [value]="branch.id">{{ branch.nameAr | localizedText: branch.nameEn }}</option> }
+                </select>
+                @if (controlInvalid(createForm.controls.branchId)) { <small>{{ 'staffManagement.validation.branch' | translate }}</small> }
+              </label>
+            } @else {
+              <p class="manager-note form-field--wide"><i class="bi bi-info-circle" aria-hidden="true"></i>{{ 'staffManagement.form.managerNotice' | translate }}</p>
+            }
+          </div>
+          <footer class="staff-dialog__actions">
+            <button class="btn btn-light" type="button" (click)="closeDialog()">{{ 'common.cancel' | translate }}</button>
+            <button class="btn btn-primary" type="submit" [disabled]="saving()">@if (saving()) { <span class="spinner-border spinner-border-sm" aria-hidden="true"></span> }{{ (saving() ? 'staffManagement.form.saving' : 'staffManagement.form.create') | translate }}</button>
+          </footer>
+        </form>
+      } @else {
+        <form [formGroup]="editForm" (ngSubmit)="submitEdit()" novalidate>
+          <div class="read-only-email"><span>{{ 'staffManagement.form.email' | translate }}</span><strong dir="ltr">{{ editingStaff()?.email }}</strong></div>
+          <div class="form-grid">
+            <label class="form-field"><span>{{ 'staffManagement.form.fullName' | translate }}</span><input type="text" formControlName="fullName" autocomplete="name" [class.is-invalid]="controlInvalid(editForm.controls.fullName)" />@if (controlInvalid(editForm.controls.fullName)) { <small>{{ 'staffManagement.validation.fullName' | translate }}</small> }</label>
+            <label class="form-field"><span>{{ 'staffManagement.form.phone' | translate }}</span><input type="tel" formControlName="phone" autocomplete="tel" dir="ltr" [class.is-invalid]="controlInvalid(editForm.controls.phone)" />@if (controlInvalid(editForm.controls.phone)) { <small>{{ 'staffManagement.validation.phone' | translate }}</small> }</label>
+            @if (isAdmin()) {
+              <label class="form-field"><span>{{ 'staffManagement.form.role' | translate }}</span><select formControlName="role"><option value="STAFF">{{ 'staffManagement.roles.staff' | translate }}</option><option value="MANAGER">{{ 'staffManagement.roles.manager' | translate }}</option></select></label>
+              <label class="form-field"><span>{{ 'staffManagement.form.branch' | translate }}</span><select formControlName="branchId">@for (branch of branches(); track branch.id) { <option [value]="branch.id">{{ branch.nameAr | localizedText: branch.nameEn }}</option> }</select></label>
+            }
+            <label class="active-toggle form-field--wide"><input type="checkbox" formControlName="isActive" /><span aria-hidden="true"></span><div><strong>{{ 'staffManagement.form.activeAccount' | translate }}</strong><small>{{ 'staffManagement.form.activeHint' | translate }}</small></div></label>
+          </div>
+          <footer class="staff-dialog__actions">
+            <button class="btn btn-light" type="button" (click)="closeDialog()">{{ 'common.cancel' | translate }}</button>
+            <button class="btn btn-primary" type="submit" [disabled]="saving()">@if (saving()) { <span class="spinner-border spinner-border-sm" aria-hidden="true"></span> }{{ (saving() ? 'staffManagement.form.saving' : 'common.save') | translate }}</button>
+          </footer>
+        </form>
+      }
+    </section>
+  </div>
+}

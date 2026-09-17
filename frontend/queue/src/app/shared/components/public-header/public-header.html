@@ -47,35 +47,38 @@
             </a>
           </li>
 
-          <li class="nav-item">
-            <a
-              class="nav-link"
-              routerLink="/booking"
-              routerLinkActive="active"
-              ariaCurrentWhenActive="page"
-              (click)="closeMenu()"
-            >
-              {{ 'common.bookTicket' | translate }}
-            </a>
-          </li>
+          @if (showCustomerNavigation()) {
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                routerLink="/booking"
+                routerLinkActive="active"
+                ariaCurrentWhenActive="page"
+                (click)="closeMenu()"
+              >
+                {{ 'common.bookTicket' | translate }}
+              </a>
+            </li>
 
-          <li class="nav-item">
-            <a
-              class="nav-link"
-              routerLink="/my-tickets"
-              routerLinkActive="active"
-              ariaCurrentWhenActive="page"
-              (click)="closeMenu()"
-            >
-              {{ 'navigation.myTickets' | translate }}
-            </a>
-          </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                routerLink="/my-tickets"
+                routerLinkActive="active"
+                ariaCurrentWhenActive="page"
+                (click)="closeMenu()"
+              >
+                {{ 'navigation.myTickets' | translate }}
+              </a>
+            </li>
+          }
         </ul>
 
         <div class="header-actions">
           <app-language-switcher />
 
           @if (authStore.isAuthenticated()) {
+            <app-notification-menu />
             <a class="btn login-button" routerLink="/dashboard" (click)="closeMenu()">
               <i class="bi bi-speedometer2" aria-hidden="true"></i>
               <span>{{ 'dashboard.header.title' | translate }}</span>

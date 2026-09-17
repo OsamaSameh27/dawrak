@@ -8,6 +8,8 @@ import { ReportQueryDto } from './dto/report-query.dto';
 interface ServiceBucket {
   id: string;
   name: string;
+  nameAr: string;
+  nameEn: string;
   total: number;
   completed: number;
   waitSamples: number[];
@@ -38,7 +40,7 @@ export class ReportsService {
       },
       select: {
         status: true, createdAt: true, calledAt: true, serviceStartedAt: true, completedAt: true,
-        service: { select: { id: true, name: true } },
+        service: { select: { id: true, name: true, nameAr: true, nameEn: true } },
       },
     });
     const byStatus = Object.fromEntries(Object.values(TicketStatus).map((status) => [status, 0])) as Record<TicketStatus, number>;
@@ -54,7 +56,9 @@ export class ReportsService {
       }).format(ticket.createdAt)) % 24;
       hourlyLoad[hour].tickets += 1;
       const bucket = services.get(ticket.service.id) ?? {
-        id: ticket.service.id, name: ticket.service.name, total: 0, completed: 0,
+        id: ticket.service.id, name: ticket.service.name,
+        nameAr: ticket.service.nameAr, nameEn: ticket.service.nameEn,
+        total: 0, completed: 0,
         waitSamples: [], serviceSamples: [],
       };
       bucket.total += 1;
@@ -72,7 +76,10 @@ export class ReportsService {
 
     return {
       range: { from: query.from, to: query.to },
-      branch: { id: branch.id, name: branch.name, code: branch.code },
+      branch: {
+        id: branch.id, name: branch.name, nameAr: branch.nameAr,
+        nameEn: branch.nameEn, code: branch.code,
+      },
       metrics: {
         totalTickets: tickets.length,
         completedTickets: byStatus.COMPLETED,
@@ -83,7 +90,8 @@ export class ReportsService {
       },
       byStatus,
       byService: [...services.values()].map((service) => ({
-        id: service.id, name: service.name, totalTickets: service.total,
+        id: service.id, name: service.name, nameAr: service.nameAr,
+        nameEn: service.nameEn, totalTickets: service.total,
         completedTickets: service.completed,
         averageWaitMinutes: this.average(service.waitSamples),
         averageServiceMinutes: this.average(service.serviceSamples),

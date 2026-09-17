@@ -76,16 +76,16 @@
             <dl class="ticket-details">
               <div>
                 <dt>{{ 'booking.success.branch' | translate }}</dt>
-                <dd dir="auto">{{ ticket.branch.name }}</dd>
+                <dd>{{ ticket.branch.nameAr | localizedText: ticket.branch.nameEn }}</dd>
               </div>
               <div>
                 <dt>{{ 'booking.success.service' | translate }}</dt>
-                <dd dir="auto">{{ ticket.service.name }}</dd>
+                <dd>{{ ticket.service.nameAr | localizedText: ticket.service.nameEn }}</dd>
               </div>
               @if (ticket.counter; as counter) {
                 <div>
                   <dt>{{ 'currentTickets.counter' | translate }}</dt>
-                  <dd dir="auto">{{ counter.name }}</dd>
+                  <dd>{{ 'common.counterNumber' | translate: { number: counter.number } }}</dd>
                 </div>
               }
             </dl>

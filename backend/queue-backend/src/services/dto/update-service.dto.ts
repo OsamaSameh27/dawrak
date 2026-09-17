@@ -7,13 +7,26 @@ export class UpdateServiceDto {
   @IsString()
   @MinLength(2)
   @MaxLength(100)
-  name?: string;
+  nameAr?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MinLength(2)
+  @MaxLength(100)
+  nameEn?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
   @MaxLength(300)
-  description?: string;
+  descriptionAr?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MaxLength(300)
+  descriptionEn?: string;
 
   @ApiPropertyOptional()
   @IsOptional()

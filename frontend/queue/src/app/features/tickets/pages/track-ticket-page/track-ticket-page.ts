@@ -8,10 +8,11 @@ import { finalize, Subscription, timeout } from 'rxjs';
 
 import { TicketsServices } from '../../services/tickets.services';
 import { QueueTicket } from '../../models/ticket.model';
+import { LocalizedTextPipe } from '../../../../shared/pipes/localized-text.pipe';
 
 @Component({
   selector: 'app-track-ticket-page',
-  imports: [ReactiveFormsModule, RouterLink, TranslatePipe],
+  imports: [ReactiveFormsModule, RouterLink, TranslatePipe, LocalizedTextPipe],
   templateUrl: './track-ticket-page.html',
   styleUrl: './track-ticket-page.scss',
 })

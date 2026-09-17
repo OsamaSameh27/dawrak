@@ -10,28 +10,16 @@
   pointer-events: none;
 }
 
-.background-pattern,
-.pointer-light {
+.background-pattern {
   position: absolute;
   inset: 0;
 }
-
 
 .background-pattern {
   background-image: radial-gradient(rgba(23, 63, 75, 0.603) 0.75px, transparent 0.75px);
   background-position: center;
   background-size: 2rem 2rem;
   opacity: 0.75;
-}
-
-.pointer-light {
-  background: radial-gradient(
-    circle 10em at var(--pointer-x) var(--pointer-y),
-    rgba(40, 126, 117, 0.363),
-    rgba(40, 117, 109, 0.12) 45%,
-    transparent 72%
-  );
-  will-change: background;
 }
 
 @media (pointer: coarse), (prefers-reduced-motion: reduce) {

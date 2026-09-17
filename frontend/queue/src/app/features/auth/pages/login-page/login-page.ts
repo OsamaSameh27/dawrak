@@ -61,12 +61,18 @@ export class LoginPage {
         next: (session) => {
           this.authStore.setSession(session);
           const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
-          // Only accept the known customer destination, never an arbitrary URL.
-          const destination =
-            session.user.role === 'CUSTOMER' &&
-            (returnUrl === '/my-tickets' || returnUrl?.startsWith('/my-tickets?'))
-              ? '/my-tickets'
-              : '/dashboard';
+          // Only accept known customer destinations, never an arbitrary URL.
+          let destination = '/dashboard';
+          if (session.user.role === 'CUSTOMER') {
+            if (returnUrl === '/booking' || returnUrl?.startsWith('/booking?')) {
+              destination = returnUrl;
+            } else if (
+              returnUrl === '/my-tickets' ||
+              returnUrl?.startsWith('/my-tickets?')
+            ) {
+              destination = '/my-tickets';
+            }
+          }
           void this.router.navigateByUrl(destination);
         },
         error: () => {

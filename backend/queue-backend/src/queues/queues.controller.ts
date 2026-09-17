@@ -23,6 +23,11 @@ export class QueuesController {
   createGuest(@Body() dto: CreateGuestTicketDto) { return this.queues.createGuest(dto); }
 
   @Public()
+  @Get('public/overview')
+  @ApiOperation({ summary: 'Public live overview for active branch services' })
+  overview() { return this.queues.getPublicOverview(); }
+
+  @Public()
   @Get('public/tickets/:publicId')
   @ApiOperation({ summary: 'Track a ticket without logging in' })
   getPublic(@Param('publicId', ParseUUIDPipe) publicId: string) {
@@ -81,7 +86,7 @@ export class QueuesController {
 
   @Post('services/:serviceId/call-next')
   @ApiBearerAuth()
-  @Roles(Role.STAFF, Role.MANAGER, Role.ADMIN)
+  @Roles(Role.STAFF)
   callNext(
     @CurrentUser() actor: AuthenticatedUser,
     @Param('serviceId', ParseUUIDPipe) serviceId: string,
@@ -90,7 +95,7 @@ export class QueuesController {
 
   @Post('tickets/:id/recall')
   @ApiBearerAuth()
-  @Roles(Role.STAFF, Role.MANAGER, Role.ADMIN)
+  @Roles(Role.STAFF)
   recall(
     @CurrentUser() actor: AuthenticatedUser,
     @Param('id', ParseUUIDPipe) id: string,
@@ -99,7 +104,7 @@ export class QueuesController {
 
   @Post('tickets/:id/start')
   @ApiBearerAuth()
-  @Roles(Role.STAFF, Role.MANAGER, Role.ADMIN)
+  @Roles(Role.STAFF)
   start(
     @CurrentUser() actor: AuthenticatedUser,
     @Param('id', ParseUUIDPipe) id: string,
@@ -108,7 +113,7 @@ export class QueuesController {
 
   @Post('tickets/:id/complete')
   @ApiBearerAuth()
-  @Roles(Role.STAFF, Role.MANAGER, Role.ADMIN)
+  @Roles(Role.STAFF)
   complete(
     @CurrentUser() actor: AuthenticatedUser,
     @Param('id', ParseUUIDPipe) id: string,
@@ -117,7 +122,7 @@ export class QueuesController {
 
   @Post('tickets/:id/skip')
   @ApiBearerAuth()
-  @Roles(Role.STAFF, Role.MANAGER, Role.ADMIN)
+  @Roles(Role.STAFF)
   skip(
     @CurrentUser() actor: AuthenticatedUser,
     @Param('id', ParseUUIDPipe) id: string,
@@ -126,7 +131,7 @@ export class QueuesController {
 
   @Post('tickets/:id/no-show')
   @ApiBearerAuth()
-  @Roles(Role.STAFF, Role.MANAGER, Role.ADMIN)
+  @Roles(Role.STAFF)
   noShow(
     @CurrentUser() actor: AuthenticatedUser,
     @Param('id', ParseUUIDPipe) id: string,

@@ -6,12 +6,13 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { finalize, interval, timeout } from 'rxjs';
 import { QueueTicket, TicketStatus } from '../../models/ticket.model';
 import { TicketsServices } from '../../services/tickets.services';
+import { LocalizedTextPipe } from '../../../../shared/pipes/localized-text.pipe';
 
 const activeStatuses: readonly TicketStatus[] = ['WAITING', 'CALLED', 'SERVING'];
 
 @Component({
   selector: 'app-current-tickets-page',
-  imports: [RouterLink, TranslatePipe],
+  imports: [RouterLink, TranslatePipe, LocalizedTextPipe],
   templateUrl: './current-tickets-page.html',
   styleUrl: './current-tickets-page.scss',
 })

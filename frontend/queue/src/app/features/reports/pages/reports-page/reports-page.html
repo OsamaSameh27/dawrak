@@ -1,6 +1,28 @@
-<section class="dashboard-page" aria-labelledby="reports-title">
-  <header class="dashboard-page__header">
-    <span class="dashboard-page__eyebrow">{{ 'dashboard.header.title' | translate }}</span>
-    <h1 id="reports-title">{{ 'dashboard.pages.reports' | translate }}</h1>
+<section class="reports-page">
+  <header>
+    <div><span>{{ 'reports.eyebrow' | translate }}</span><h1>{{ 'reports.title' | translate }}</h1><p>{{ 'reports.description' | translate }}</p></div>
+    <form class="filters" (ngSubmit)="load()">
+      @if (isAdmin()) { <label>{{ 'reports.branch' | translate }}<select [(ngModel)]="branchId" name="branch">@for (branch of branches(); track branch.id) { <option [value]="branch.id">{{ branch.nameAr | localizedText: branch.nameEn }}</option> }</select></label> }
+      <label>{{ 'reports.from' | translate }}<input type="date" [(ngModel)]="from" name="from" /></label>
+      <label>{{ 'reports.to' | translate }}<input type="date" [(ngModel)]="to" name="to" /></label>
+      <button class="btn btn-primary" type="submit">{{ 'reports.apply' | translate }}</button>
+    </form>
   </header>
+  @if (loading()) { <div class="state"><span class="spinner-border spinner-border-sm"></span>{{ 'common.loading' | translate }}</div> }
+  @else if (error()) { <div class="state error">{{ 'reports.loadFailed' | translate }}</div> }
+  @else if (report(); as data) {
+    <div class="metrics">
+      <article><i class="bi bi-ticket-perforated"></i><strong>{{ data.metrics.totalTickets }}</strong><span>{{ 'reports.totalTickets' | translate }}</span></article>
+      <article><i class="bi bi-check-circle"></i><strong>{{ data.metrics.completedTickets }}</strong><span>{{ 'reports.completed' | translate }}</span></article>
+      <article><i class="bi bi-hourglass-split"></i><strong>{{ data.metrics.averageWaitMinutes }}</strong><span>{{ 'reports.avgWait' | translate }}</span></article>
+      <article><i class="bi bi-stopwatch"></i><strong>{{ data.metrics.averageServiceMinutes }}</strong><span>{{ 'reports.avgService' | translate }}</span></article>
+    </div>
+    <div class="report-grid">
+      <section class="panel"><h2>{{ 'reports.servicesBreakdown' | translate }}</h2>
+        @for (service of data.byService; track service.id) { <div class="service-row"><div><strong>{{ service.nameAr | localizedText: service.nameEn }}</strong><small>{{ service.completedTickets }} / {{ service.totalTickets }} {{ 'reports.completedShort' | translate }}</small></div><span>{{ percentage(service.completedTickets, service.totalTickets) }}%</span><div class="progress"><i [style.width.%]="percentage(service.completedTickets, service.totalTickets)"></i></div></div> }
+        @empty { <p class="empty">{{ 'reports.noData' | translate }}</p> }
+      </section>
+      <section class="panel"><h2>{{ 'reports.hourlyLoad' | translate }}</h2><div class="hour-chart">@for (hour of data.hourlyLoad; track hour.hour) { <span [title]="hour.hour + ':00 — ' + hour.tickets"><i [style.height.%]="hour.tickets / maxHourly() * 100"></i><small>{{ hour.hour }}</small></span> }</div></section>
+    </div>
+  }
 </section>

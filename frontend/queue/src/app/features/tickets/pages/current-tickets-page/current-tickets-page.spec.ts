@@ -15,9 +15,28 @@ function makeTicket(status: TicketStatus): QueueTicket {
     number: `TEST-${status}`,
     status,
     serviceId: 'service',
-    service: { name: 'Service name', averageServiceMinutes: 10 },
-    branch: { id: 'branch', name: 'Branch name', code: 'BR', timezone: 'Africa/Cairo' },
-    counter: status === 'CALLED' ? { id: 'counter', name: 'Counter one' } : null,
+    createdAt: '2026-09-17T10:00:00.000Z',
+    calledAt: null,
+    serviceStartedAt: null,
+    completedAt: null,
+    serviceDurationSeconds: null,
+    cancelledAt: null,
+    service: {
+      name: 'Service name',
+      nameAr: 'اسم الخدمة',
+      nameEn: 'Service name',
+      averageServiceMinutes: 10,
+    },
+    branch: {
+      id: 'branch',
+      name: 'Branch name',
+      nameAr: 'اسم الفرع',
+      nameEn: 'Branch name',
+      code: 'BR',
+      timezone: 'Africa/Cairo',
+    },
+    counter:
+      status === 'CALLED' ? { id: 'counter', name: 'Counter one', number: 1 } : null,
     peopleAhead: 2,
     estimatedWaitMinutes: 20,
   };
@@ -71,7 +90,7 @@ describe('CurrentTicketsPage', () => {
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelectorAll('.ticket-card').length).toBe(3);
     expect(fixture.nativeElement.querySelectorAll('.ticket-wait').length).toBe(1);
-    expect(fixture.nativeElement.textContent).toContain('Counter one');
+    expect(fixture.nativeElement.textContent).toContain('common.counterNumber');
     expect(fixture.nativeElement.textContent).not.toContain('TEST-COMPLETED');
   });
 

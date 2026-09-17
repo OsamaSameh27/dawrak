@@ -1,6 +1,157 @@
 <section class="dashboard-page" aria-labelledby="branches-title">
-  <header class="dashboard-page__header">
-    <span class="dashboard-page__eyebrow">{{ 'dashboard.header.title' | translate }}</span>
-    <h1 id="branches-title">{{ 'dashboard.pages.branches' | translate }}</h1>
+  <header class="dashboard-page__header branches-header">
+    <div>
+      <span class="dashboard-page__eyebrow">{{ 'branchManagement.eyebrow' | translate }}</span>
+      <h1 id="branches-title">{{ 'branchManagement.title' | translate }}</h1>
+      <p>{{ (isAdmin() ? 'branchManagement.adminDescription' : 'branchManagement.managerDescription') | translate }}</p>
+    </div>
+    @if (isAdmin()) {
+      <button class="btn btn-primary add-branch-button" type="button" (click)="openCreate()">
+        <i class="bi bi-plus-lg" aria-hidden="true"></i>
+        {{ 'branchManagement.add' | translate }}
+      </button>
+    }
   </header>
+
+  @if (successKey()) {
+    <div class="page-message" role="status">
+      <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+      <span>{{ successKey()! | translate }}</span>
+      <button type="button" [attr.aria-label]="'branchManagement.closeMessage' | translate" (click)="successKey.set(null)"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="state-card" role="status"><span class="spinner-border spinner-border-sm" aria-hidden="true"></span>{{ 'branchManagement.loading' | translate }}</div>
+  } @else if (loadError()) {
+    <div class="state-card state-card--error" role="alert">
+      <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
+      <strong>{{ 'branchManagement.errors.load' | translate }}</strong>
+      <button class="btn btn-outline-primary btn-sm" type="button" (click)="loadBranches()">{{ 'branchManagement.retry' | translate }}</button>
+    </div>
+  } @else {
+    <div class="branch-stats">
+      <article><span><i class="bi bi-buildings" aria-hidden="true"></i></span><div><strong>{{ branches().length }}</strong><small>{{ 'branchManagement.stats.total' | translate }}</small></div></article>
+      <article><span><i class="bi bi-check-circle" aria-hidden="true"></i></span><div><strong>{{ activeCount() }}</strong><small>{{ 'branchManagement.stats.active' | translate }}</small></div></article>
+      <article><span><i class="bi bi-ui-checks-grid" aria-hidden="true"></i></span><div><strong>{{ servicesCount() }}</strong><small>{{ 'branchManagement.stats.services' | translate }}</small></div></article>
+    </div>
+
+    <div class="branches-panel">
+      <div class="branches-toolbar">
+        <label class="search-field">
+          <i class="bi bi-search" aria-hidden="true"></i>
+          <span class="visually-hidden">{{ 'branchManagement.search' | translate }}</span>
+          <input type="search" [value]="searchTerm()" [placeholder]="'branchManagement.searchPlaceholder' | translate" (input)="setSearch($event)" />
+        </label>
+        <label class="status-filter">
+          <span>{{ 'branchManagement.filterStatus' | translate }}</span>
+          <select [value]="statusFilter()" (change)="setStatusFilter($event)">
+            <option value="ALL">{{ 'branchManagement.filters.all' | translate }}</option>
+            <option value="ACTIVE">{{ 'branchManagement.filters.active' | translate }}</option>
+            <option value="INACTIVE">{{ 'branchManagement.filters.inactive' | translate }}</option>
+          </select>
+        </label>
+      </div>
+
+      @if (filteredBranches().length === 0) {
+        <div class="empty-state">
+          <i class="bi bi-building-x" aria-hidden="true"></i>
+          <strong>{{ 'branchManagement.empty.title' | translate }}</strong>
+          <p>{{ (branches().length ? 'branchManagement.empty.search' : 'branchManagement.empty.description') | translate }}</p>
+        </div>
+      } @else {
+        <div class="branch-grid">
+          @for (branch of filteredBranches(); track branch.id) {
+            <article class="branch-card" [class.branch-card--inactive]="!branch.isActive">
+              <header class="branch-card__header">
+                <span class="branch-card__icon"><i class="bi bi-building" aria-hidden="true"></i></span>
+                <div>
+                  <span>{{ branch.code }}</span>
+                  <h2>{{ branch.nameAr | localizedText: branch.nameEn }}</h2>
+                </div>
+                <span class="status-badge" [class.status-badge--inactive]="!branch.isActive">
+                  {{ (branch.isActive ? 'branchManagement.status.active' : 'branchManagement.status.inactive') | translate }}
+                </span>
+              </header>
+
+              <p class="branch-address">
+                <i class="bi bi-geo-alt" aria-hidden="true"></i>
+                {{ (branch.addressAr | localizedText: branch.addressEn) || ('branchManagement.noAddress' | translate) }}
+              </p>
+
+              <dl class="branch-counts">
+                <div><dt>{{ 'branchManagement.card.services' | translate }}</dt><dd>{{ branch._count.services }}</dd></div>
+                <div><dt>{{ 'branchManagement.card.counters' | translate }}</dt><dd>{{ branch._count.counters }}</dd></div>
+                <div><dt>{{ 'branchManagement.card.team' | translate }}</dt><dd>{{ branch._count.users }}</dd></div>
+              </dl>
+
+              <footer class="branch-card__footer">
+                <span><i class="bi bi-clock" aria-hidden="true"></i>{{ branch.timezone }}</span>
+                <div>
+                  @if (branch.latitude !== null && branch.longitude !== null) {
+                    <a class="card-action" [href]="mapUrl(branch)" target="_blank" rel="noopener noreferrer">
+                      <i class="bi bi-map" aria-hidden="true"></i>{{ 'branchManagement.openMap' | translate }}
+                    </a>
+                  }
+                  @if (isAdmin()) {
+                    <button class="card-action" type="button" (click)="openEdit(branch)"><i class="bi bi-pencil-square" aria-hidden="true"></i>{{ 'branchManagement.edit' | translate }}</button>
+                  }
+                </div>
+              </footer>
+            </article>
+          }
+        </div>
+      }
+    </div>
+  }
 </section>
+
+@if (dialogMode()) {
+  <div class="dialog-backdrop" role="presentation" (click)="closeDialog()">
+    <section class="branch-dialog" role="dialog" aria-modal="true" [attr.aria-labelledby]="dialogMode() === 'create' ? 'create-branch-title' : 'edit-branch-title'" (click)="$event.stopPropagation()">
+      <header class="branch-dialog__header">
+        <div><span>{{ 'branchManagement.form.eyebrow' | translate }}</span><h2 [id]="dialogMode() === 'create' ? 'create-branch-title' : 'edit-branch-title'">{{ (dialogMode() === 'create' ? 'branchManagement.form.createTitle' : 'branchManagement.form.editTitle') | translate }}</h2></div>
+        <button type="button" [attr.aria-label]="'branchManagement.form.close' | translate" (click)="closeDialog()"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
+      </header>
+
+      @if (formErrorKey()) {
+        <p class="form-error" role="alert"><i class="bi bi-exclamation-circle" aria-hidden="true"></i>{{ formErrorKey()! | translate }}</p>
+      }
+
+      @if (dialogMode() === 'create') {
+        <form [formGroup]="createForm" (ngSubmit)="submitCreate()" novalidate>
+          <div class="form-section"><h3>{{ 'branchManagement.form.basicData' | translate }}</h3><div class="form-grid">
+            <label class="form-field"><span>{{ 'branchManagement.form.nameAr' | translate }}</span><input type="text" formControlName="nameAr" dir="rtl" [class.is-invalid]="controlInvalid(createForm.controls.nameAr)" />@if (controlInvalid(createForm.controls.nameAr)) { <small>{{ 'branchManagement.validation.name' | translate }}</small> }</label>
+            <label class="form-field"><span>{{ 'branchManagement.form.nameEn' | translate }}</span><input type="text" formControlName="nameEn" dir="ltr" [class.is-invalid]="controlInvalid(createForm.controls.nameEn)" />@if (controlInvalid(createForm.controls.nameEn)) { <small>{{ 'branchManagement.validation.name' | translate }}</small> }</label>
+            <label class="form-field"><span>{{ 'branchManagement.form.code' | translate }}</span><input type="text" formControlName="code" dir="ltr" maxlength="12" (input)="normalizeCode($event)" [class.is-invalid]="controlInvalid(createForm.controls.code)" />@if (controlInvalid(createForm.controls.code)) { <small>{{ 'branchManagement.validation.code' | translate }}</small> }</label>
+            <label class="form-field"><span>{{ 'branchManagement.form.timezone' | translate }}</span><input type="text" formControlName="timezone" dir="ltr" [class.is-invalid]="controlInvalid(createForm.controls.timezone)" /></label>
+            <label class="form-field"><span>{{ 'branchManagement.form.addressAr' | translate }}</span><input type="text" formControlName="addressAr" dir="rtl" /></label>
+            <label class="form-field"><span>{{ 'branchManagement.form.addressEn' | translate }}</span><input type="text" formControlName="addressEn" dir="ltr" /></label>
+          </div></div>
+          <div class="form-section"><h3>{{ 'branchManagement.form.location' | translate }}</h3><p>{{ 'branchManagement.form.locationHint' | translate }}</p><div class="form-grid">
+            <label class="form-field"><span>{{ 'branchManagement.form.latitude' | translate }}</span><input type="number" step="any" formControlName="latitude" dir="ltr" placeholder="30.0561" /></label>
+            <label class="form-field"><span>{{ 'branchManagement.form.longitude' | translate }}</span><input type="number" step="any" formControlName="longitude" dir="ltr" placeholder="31.3300" /></label>
+          </div>@if (coordinatesInvalid(createForm)) { <small class="coordinates-error">{{ 'branchManagement.validation.coordinates' | translate }}</small> }</div>
+          <footer class="branch-dialog__actions"><button class="btn btn-light" type="button" (click)="closeDialog()">{{ 'common.cancel' | translate }}</button><button class="btn btn-primary" type="submit" [disabled]="saving()">@if (saving()) { <span class="spinner-border spinner-border-sm" aria-hidden="true"></span> }{{ (saving() ? 'branchManagement.form.saving' : 'branchManagement.form.create') | translate }}</button></footer>
+        </form>
+      } @else {
+        <form [formGroup]="editForm" (ngSubmit)="submitEdit()" novalidate>
+          <div class="read-only-code"><span>{{ 'branchManagement.form.code' | translate }}</span><strong>{{ editingBranch()?.code }}</strong></div>
+          <div class="form-section"><h3>{{ 'branchManagement.form.basicData' | translate }}</h3><div class="form-grid">
+            <label class="form-field"><span>{{ 'branchManagement.form.nameAr' | translate }}</span><input type="text" formControlName="nameAr" dir="rtl" [class.is-invalid]="controlInvalid(editForm.controls.nameAr)" /></label>
+            <label class="form-field"><span>{{ 'branchManagement.form.nameEn' | translate }}</span><input type="text" formControlName="nameEn" dir="ltr" [class.is-invalid]="controlInvalid(editForm.controls.nameEn)" /></label>
+            <label class="form-field"><span>{{ 'branchManagement.form.addressAr' | translate }}</span><input type="text" formControlName="addressAr" dir="rtl" /></label>
+            <label class="form-field"><span>{{ 'branchManagement.form.addressEn' | translate }}</span><input type="text" formControlName="addressEn" dir="ltr" /></label>
+            <label class="form-field form-field--wide"><span>{{ 'branchManagement.form.timezone' | translate }}</span><input type="text" formControlName="timezone" dir="ltr" /></label>
+          </div></div>
+          <div class="form-section"><h3>{{ 'branchManagement.form.location' | translate }}</h3><p>{{ 'branchManagement.form.locationHint' | translate }}</p><div class="form-grid">
+            <label class="form-field"><span>{{ 'branchManagement.form.latitude' | translate }}</span><input type="number" step="any" formControlName="latitude" dir="ltr" /></label>
+            <label class="form-field"><span>{{ 'branchManagement.form.longitude' | translate }}</span><input type="number" step="any" formControlName="longitude" dir="ltr" /></label>
+          </div>@if (coordinatesInvalid(editForm)) { <small class="coordinates-error">{{ 'branchManagement.validation.coordinates' | translate }}</small> }</div>
+          <label class="active-toggle"><input type="checkbox" formControlName="isActive" /><span aria-hidden="true"></span><div><strong>{{ 'branchManagement.form.activeBranch' | translate }}</strong><small>{{ 'branchManagement.form.activeHint' | translate }}</small></div></label>
+          <footer class="branch-dialog__actions"><button class="btn btn-light" type="button" (click)="closeDialog()">{{ 'common.cancel' | translate }}</button><button class="btn btn-primary" type="submit" [disabled]="saving()">@if (saving()) { <span class="spinner-border spinner-border-sm" aria-hidden="true"></span> }{{ (saving() ? 'branchManagement.form.saving' : 'common.save') | translate }}</button></footer>
+        </form>
+      }
+    </section>
+  </div>
+}

@@ -113,11 +113,11 @@
         <dl class="ticket-details">
           <div>
             <dt>{{ 'track.result.branch' | translate }}</dt>
-            <dd dir="auto">{{ result.branch.name }}</dd>
+            <dd>{{ result.branch.nameAr | localizedText: result.branch.nameEn }}</dd>
           </div>
           <div>
             <dt>{{ 'track.result.service' | translate }}</dt>
-            <dd dir="auto">{{ result.service.name }}</dd>
+            <dd>{{ result.service.nameAr | localizedText: result.service.nameEn }}</dd>
           </div>
         </dl>
 

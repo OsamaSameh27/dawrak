@@ -1,10 +1,11 @@
 import { Component, input, output } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Branch } from '../../../branches/models/branch.model';
+import { LocalizedTextPipe } from '../../../../shared/pipes/localized-text.pipe';
 
 @Component({
   selector: 'app-branch-selector',
-  imports: [TranslatePipe],
+  imports: [TranslatePipe, LocalizedTextPipe],
   templateUrl: './branch-selector.html',
   styleUrl: './branch-selector.scss',
 })

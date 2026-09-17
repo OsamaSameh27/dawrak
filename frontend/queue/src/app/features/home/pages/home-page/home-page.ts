@@ -1,68 +1,72 @@
-import { Component } from '@angular/core';
+import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
+import { finalize, interval, timeout } from 'rxjs';
 
 import { QueueStatusCard } from '../../components/queue-status-card/queue-status-card';
-import { QueueStatusViewModel } from '../../models/queue-status.model';
-
-interface HomeStep {
-  icon: string;
-  titleKey: string;
-  descriptionKey: string;
-}
+import { HomeQueueOverview, QueueStatusViewModel } from '../../models/queue-status.model';
+import { AuthStore } from '../../../auth/state/auth-store';
+import { TicketsServices } from '../../../tickets/services/tickets.services';
 
 @Component({
   selector: 'app-home-page',
   imports: [QueueStatusCard, RouterLink, TranslatePipe],
   templateUrl: './home-page.html',
-  styleUrl: './home-page.scss'
+  styleUrl: './home-page.scss',
 })
 export class HomePage {
-  protected readonly queues: readonly QueueStatusViewModel[] = [
-    {
-      id: 'general-examination',
-      serviceNameKey: 'home.services.generalExamination',
-      branchNameKey: 'home.branches.nasrCity',
-      waitingCount: 6,
-      estimatedMinutes: 18,
-      status: 'available',
-      icon: 'bi-stethoscope'
-    },
-    {
-      id: 'dental-examination',
-      serviceNameKey: 'home.services.dentalExamination',
-      branchNameKey: 'home.branches.maadi',
-      waitingCount: 14,
-      estimatedMinutes: 35,
-      status: 'busy',
-      icon: 'bi-clipboard2-pulse'
-    },
-    {
-      id: 'customer-service',
-      serviceNameKey: 'home.services.customerService',
-      branchNameKey: 'home.branches.downtown',
-      waitingCount: 0,
-      estimatedMinutes: null,
-      status: 'closed',
-      icon: 'bi-headset'
-    }
-  ];
+  private readonly ticketsApi = inject(TicketsServices);
+  private readonly auth = inject(AuthStore);
+  private readonly destroyRef = inject(DestroyRef);
+  protected readonly queueOverview = signal<HomeQueueOverview[]>([]);
+  protected readonly queuesLoading = signal(true);
+  protected readonly queuesFailed = signal(false);
+  protected readonly canUseCustomerFeatures = computed(
+    () => !this.auth.isAuthenticated() || this.auth.role() === 'CUSTOMER',
+  );
+  protected readonly workforceRole = computed(() => {
+    const role = this.auth.role();
+    return role === 'ADMIN' ? 'admin' : role === 'MANAGER' ? 'manager' : 'staff';
+  });
+  protected readonly queues = computed<readonly QueueStatusViewModel[]>(() =>
+    this.queueOverview().map((item) => ({
+      id: item.id,
+      serviceNameAr: item.nameAr,
+      serviceNameEn: item.nameEn,
+      branchNameAr: item.branch.nameAr,
+      branchNameEn: item.branch.nameEn,
+      waitingCount: item.waitingCount,
+      estimatedMinutes: item.estimatedMinutes,
+      status: item.openCounters === 0 ? 'closed' : item.waitingCount >= 10 ? 'busy' : 'available',
+      icon: 'bi-buildings',
+    })),
+  );
 
-  protected readonly steps: readonly HomeStep[] = [
-    {
-      icon: 'bi-geo-alt',
-      titleKey: 'home.howItWorks.steps.choose.title',
-      descriptionKey: 'home.howItWorks.steps.choose.description'
-    },
-    {
-      icon: 'bi-ticket-perforated',
-      titleKey: 'home.howItWorks.steps.ticket.title',
-      descriptionKey: 'home.howItWorks.steps.ticket.description'
-    },
-    {
-      icon: 'bi-bell',
-      titleKey: 'home.howItWorks.steps.follow.title',
-      descriptionKey: 'home.howItWorks.steps.follow.description'
+  ngOnInit(): void {
+    this.loadOverview();
+    interval(15000)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.loadOverview(false);
+      });
+  }
+
+  protected loadOverview(showLoading = true): void {
+    if (showLoading) {
+      this.queuesLoading.set(true);
+      this.queuesFailed.set(false);
     }
-  ];
+    this.ticketsApi
+      .getHomeOverview()
+      .pipe(
+        timeout(10000),
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => showLoading && this.queuesLoading.set(false)),
+      )
+      .subscribe({
+        next: (value) => this.queueOverview.set(value),
+        error: () => showLoading && this.queuesFailed.set(true),
+      });
+  }
 }

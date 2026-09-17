@@ -5,10 +5,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { finalize, timeout } from 'rxjs';
 
-import {
-  NotificationItem,
-  NotificationsResponse,
-} from '../../models/notification.model';
+import { NotificationItem, NotificationsResponse } from '../../models/notification.model';
 import { NotificationsServices } from '../../services/notifications.services';
 import { NotificationsState } from '../../state/notifications-state';
 
@@ -37,12 +34,22 @@ export class NotificationsPage {
     const params: Record<string, string> = {};
 
     if (data.ticketNumber) params['ticketNumber'] = data.ticketNumber;
-    if (data.counterName) params['counterName'] = data.counterName;
+    if (data.counterName) {
+      params['counterName'] = data.counterName;
+      params['counterNumber'] = data.counterName.replace(/\D+/g, '') || data.counterName;
+    }
+    if (data.counterNumber !== undefined) {
+      params['counterNumber'] = String(data.counterNumber);
+    }
     if (data.status) {
       params['status'] = this.translate.instant(
         `notifications.status.${data.status.toLowerCase()}`,
       );
     }
+
+    if (data.branchCode) params['branchCode'] = data.branchCode;
+    if (data.staffName) params['staffName'] = data.staffName;
+    if (data.managerName) params['managerName'] = data.managerName;
 
     return params;
   }
@@ -59,7 +66,6 @@ export class NotificationsPage {
     this.loading.set(true);
     this.errorKey.set(null);
     this.actionErrorKey.set(null);
-
 
     this.notificationsServices
       .getNotifications()
@@ -137,9 +143,7 @@ export class NotificationsPage {
         next: () => {
           const readAt = new Date().toISOString();
 
-          this.notifications.update((items) =>
-            items.map((item) => ({ ...item, readAt })),
-          );
+          this.notifications.update((items) => items.map((item) => ({ ...item, readAt })));
 
           this.unreadCount.set(0);
           this.notificationsState.clearUnreadCount();

@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString, IsUUID, MaxLength, MinLength } from 'class-validator';
+import { IsInt, IsOptional, IsUUID, Max, Min } from 'class-validator';
 
 export class CreateCounterDto {
   @ApiProperty()
@@ -11,9 +11,9 @@ export class CreateCounterDto {
   @IsUUID()
   serviceId?: string;
 
-  @ApiProperty({ example: 'Desk 1' })
-  @IsString()
-  @MinLength(1)
-  @MaxLength(50)
-  name: string;
+  @ApiProperty({ example: 1 })
+  @IsInt()
+  @Min(1)
+  @Max(999)
+  number: number;
 }

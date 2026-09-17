@@ -19,6 +19,8 @@ export const routes: Routes = [
       },
       {
         path: 'booking',
+        canActivate: [authGuard, roleGuard],
+        data: { roles: ['CUSTOMER'] },
         loadComponent: () =>
           import('./features/booking/pages/booking-page/booking-page').then(
             (component) => component.BookingPage,
@@ -75,11 +77,20 @@ export const routes: Routes = [
         path: 'queue',
         canActivate: [roleGuard],
         data: {
-          roles: ['STAFF', 'MANAGER', 'ADMIN'],
+          roles: ['STAFF'],
         },
         loadComponent: () =>
           import('./features/queues/pages/queue-management-page/queue-management-page').then(
             (component) => component.QueueManagementPage,
+          ),
+      },
+      {
+        path: 'monitoring',
+        canActivate: [roleGuard],
+        data: { roles: ['MANAGER', 'ADMIN'] },
+        loadComponent: () =>
+          import('./features/queues/pages/queue-monitoring-page/queue-monitoring-page').then(
+            (component) => component.QueueMonitoringPage,
           ),
       },
       {
@@ -119,7 +130,7 @@ export const routes: Routes = [
         path: 'counters',
         canActivate: [roleGuard],
         data: {
-          roles: ['STAFF', 'MANAGER', 'ADMIN'],
+          roles: [ 'MANAGER', 'ADMIN'],
         },
         loadComponent: () =>
           import('./features/counters/pages/counters-page/counters-page').then(

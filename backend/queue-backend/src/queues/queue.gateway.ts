@@ -9,6 +9,7 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
+import { NotificationType, Prisma, Role } from '@prisma/client';
 import { Server, Socket } from 'socket.io';
 import { Public } from '../common/decorators/public.decorator';
 import { PrismaService } from '../prisma/prisma.service';
@@ -18,8 +19,16 @@ interface AccessTokenPayload {
   type: 'access';
 }
 
+interface NotificationContent {
+  type: NotificationType;
+  title: string;
+  message: string;
+  data?: Prisma.InputJsonValue;
+  ticketId?: string;
+}
+
 type AuthenticatedSocket = Socket & {
-  data: Socket['data'] & { userId?: string };
+  data: Socket['data'] & { userId?: string; role?: Role; branchId?: string | null };
 };
 
 @Public()
@@ -60,7 +69,7 @@ export class QueueGateway implements OnGatewayConnection {
 
       const user = await this.prisma.user.findUnique({
         where: { id: payload.sub },
-        select: { id: true, isActive: true },
+        select: { id: true, isActive: true, role: true, branchId: true },
       });
 
       if (!user?.isActive) {
@@ -68,7 +77,11 @@ export class QueueGateway implements OnGatewayConnection {
       }
 
       client.data.userId = user.id;
+      client.data.role = user.role;
+      client.data.branchId = user.branchId;
       await client.join(this.userRoom(user.id));
+      if (user.branchId) await client.join(this.branchRoom(user.branchId));
+      if (user.role === Role.ADMIN) await client.join(this.allCountersRoom());
     } catch {
       client.disconnect(true);
     }
@@ -104,11 +117,75 @@ export class QueueGateway implements OnGatewayConnection {
     this.server?.to(this.userRoom(userId)).emit('notification.created', notification);
   }
 
+  async notifyServiceOperators(serviceId: string, content: NotificationContent): Promise<void> {
+    const sessions = await this.prisma.counterSession.findMany({
+      where: {
+        counter: { serviceId },
+        staff: { role: Role.STAFF, isActive: true },
+        lastSeenAt: { gte: new Date(Date.now() - 2 * 60 * 1000) },
+      },
+      select: { staffId: true },
+      distinct: ['staffId'],
+    });
+    await this.createNotifications(sessions.map((session) => session.staffId), content);
+  }
+
+  async notifyBranchManagers(branchId: string, content: NotificationContent): Promise<void> {
+    const managers = await this.prisma.user.findMany({
+      where: { branchId, role: Role.MANAGER, isActive: true },
+      select: { id: true },
+    });
+    await this.createNotifications(managers.map((manager) => manager.id), content);
+  }
+
+  async notifyAdmins(content: NotificationContent): Promise<void> {
+    const admins = await this.prisma.user.findMany({
+      where: { role: Role.ADMIN, isActive: true },
+      select: { id: true },
+    });
+    await this.createNotifications(admins.map((admin) => admin.id), content);
+  }
+
+  emitCountersUpdated(branchId: string): void {
+    this.server
+      ?.to(this.branchRoom(branchId))
+      .to(this.allCountersRoom())
+      .emit('counters.updated', { branchId });
+  }
+
   afterInit(): void {
     this.logger.log('Queue realtime gateway initialized');
+  }
+
+  private async createNotifications(userIds: string[], content: NotificationContent): Promise<void> {
+    const uniqueUserIds = [...new Set(userIds)];
+    if (!uniqueUserIds.length) return;
+
+    try {
+      const notifications = await this.prisma.$transaction(
+        uniqueUserIds.map((userId) => this.prisma.notification.create({
+          data: {
+            userId,
+            ticketId: content.ticketId,
+            type: content.type,
+            title: content.title,
+            message: content.message,
+            data: content.data,
+          },
+        })),
+      );
+
+      notifications.forEach((notification) => {
+        if (notification.userId) this.emitNotification(notification.userId, notification);
+      });
+    } catch (error) {
+      this.logger.error('Failed to create operational notifications', error);
+    }
   }
 
   private serviceRoom(id: string) { return `service:${id}`; }
   private ticketRoom(id: string) { return `ticket:${id}`; }
   private userRoom(id: string) { return `user:${id}`; }
+  private branchRoom(id: string) { return `branch:${id}`; }
+  private allCountersRoom() { return 'counters:all'; }
 }

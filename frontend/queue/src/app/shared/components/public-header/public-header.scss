@@ -168,6 +168,7 @@
   }
 
   .header-actions {
+    flex-wrap: wrap;
     margin-top: 0.8rem;
     padding-top: 0.8rem;
     border-top: 1px solid var(--queue-border);
@@ -175,6 +176,20 @@
 
   .login-button {
     flex: 1;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .navbar > .container {
+    --bs-gutter-x: 1.25rem;
+  }
+
+  .header-actions {
+    align-items: stretch;
+  }
+
+  .login-button {
+    min-width: 100%;
   }
 }
 

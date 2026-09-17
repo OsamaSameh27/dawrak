@@ -1,4 +1,6 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Patch, Post, Query } from '@nestjs/common';
+import {
+  Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseUUIDPipe, Patch, Post, Query,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
@@ -39,10 +41,39 @@ export class CountersController {
   ) { return this.counters.update(actor, id, dto); }
 
   @Patch(':id/status')
-  @Roles(Role.STAFF, Role.MANAGER, Role.ADMIN)
+  @Roles(Role.STAFF)
   updateStatus(
     @CurrentUser() actor: AuthenticatedUser,
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateCounterStatusDto,
   ) { return this.counters.updateStatus(actor, id, dto.status); }
+
+  @Post(':id/claim')
+  @Roles(Role.STAFF)
+  claim(
+    @CurrentUser() actor: AuthenticatedUser,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) { return this.counters.claim(actor, id); }
+
+  @Patch(':id/heartbeat')
+  @Roles(Role.STAFF)
+  heartbeat(
+    @CurrentUser() actor: AuthenticatedUser,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) { return this.counters.heartbeat(actor, id); }
+
+  @Delete(':id/claim')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Roles(Role.STAFF)
+  async release(
+    @CurrentUser() actor: AuthenticatedUser,
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<void> { await this.counters.release(actor, id); }
+
+  @Get(':id/shifts')
+  @Roles(Role.MANAGER, Role.ADMIN)
+  shifts(
+    @CurrentUser() actor: AuthenticatedUser,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) { return this.counters.shiftHistory(actor, id); }
 }

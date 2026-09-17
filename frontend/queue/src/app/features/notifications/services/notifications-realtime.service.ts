@@ -12,9 +12,14 @@ export class NotificationsRealtimeService {
 
   private socket: Socket | null = null;
   private readonly notificationSubject = new Subject<NotificationItem>();
+  private readonly countersUpdatedSubject = new Subject<{ branchId: string }>();
+  private readonly queueUpdatedSubject = new Subject<{ service: { id: string } }>();
+  private readonly queueSubscriptions = new Set<string>();
 
   readonly notification$: Observable<NotificationItem> =
     this.notificationSubject.asObservable();
+  readonly countersUpdated$ = this.countersUpdatedSubject.asObservable();
+  readonly queueUpdated$ = this.queueUpdatedSubject.asObservable();
 
   connect(): void {
     const token = this.authStore.accessToken();
@@ -35,10 +40,27 @@ export class NotificationsRealtimeService {
     this.socket.on('notification.created', (notification: NotificationItem) => {
       this.notificationSubject.next(notification);
     });
+    this.socket.on('counters.updated', (event: { branchId: string }) => {
+      this.countersUpdatedSubject.next(event);
+    });
+    this.socket.on('queue.updated', (snapshot: { service: { id: string } }) => {
+      this.queueUpdatedSubject.next(snapshot);
+    });
+    this.socket.on('connect', () => {
+      this.queueSubscriptions.forEach((serviceId) => {
+        this.socket?.emit('queue.subscribe', { serviceId });
+      });
+    });
+  }
+
+  subscribeQueue(serviceId: string): void {
+    this.queueSubscriptions.add(serviceId);
+    this.socket?.emit('queue.subscribe', { serviceId });
   }
 
   disconnect(): void {
     this.socket?.disconnect();
     this.socket = null;
+    this.queueSubscriptions.clear();
   }
 }

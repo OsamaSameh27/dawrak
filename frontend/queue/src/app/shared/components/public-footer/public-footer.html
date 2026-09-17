@@ -14,8 +14,12 @@
       <nav class="footer-links" [attr.aria-label]="'footer.linksLabel' | translate">
         <strong>{{ 'footer.quickLinks' | translate }}</strong>
         <a routerLink="/">{{ 'common.home' | translate }}</a>
-        <a routerLink="/booking">{{ 'common.bookTicket' | translate }}</a>
-        <a routerLink="/my-tickets">{{ 'navigation.myTickets' | translate }}</a>
+        @if (showCustomerNavigation()) {
+          <a routerLink="/booking">{{ 'common.bookTicket' | translate }}</a>
+          <a routerLink="/my-tickets">{{ 'navigation.myTickets' | translate }}</a>
+        } @else {
+          <a routerLink="/dashboard">{{ 'dashboard.header.title' | translate }}</a>
+        }
       </nav>
     </div>
 

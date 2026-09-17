@@ -133,3 +133,51 @@ a:hover {
   outline: 0.2rem solid rgba(40, 117, 109, 0.35);
   outline-offset: 0.15rem;
 }
+
+@media (max-width: 575.98px) {
+  .dialog-backdrop:has(.branch-dialog),
+  .dialog-backdrop:has(.staff-dialog) {
+    align-items: end;
+    padding: 0.5rem;
+  }
+
+  .branch-dialog,
+  .staff-dialog {
+    width: 100% !important;
+    border-radius: 1rem 1rem 0.5rem 0.5rem !important;
+  }
+
+  .branch-dialog form,
+  .branch-dialog__header,
+  .staff-dialog form,
+  .staff-dialog__header {
+    padding: 1rem !important;
+  }
+
+  .branch-dialog__actions,
+  .staff-dialog__actions {
+    flex-direction: column-reverse;
+  }
+
+  .branch-dialog__actions .btn,
+  .staff-dialog__actions .btn {
+    width: 100%;
+  }
+}
+app-branches-page .branch-stats article > div {
+  display: grid;
+  gap: 0.4rem;
+}
+
+app-branches-page .branch-stats strong {
+  display: block;
+  font-size: 1.55rem;
+}
+
+app-branches-page .branch-stats small {
+  display: block;
+  margin-top: 0;
+  font-size: 0.85rem;
+  font-weight: 650;
+  line-height: 1.4;
+}

@@ -6,11 +6,17 @@ export class CreateServiceDto {
   @IsUUID()
   branchId: string;
 
+  @ApiProperty({ example: 'كشف الأسنان' })
+  @IsString()
+  @MinLength(2)
+  @MaxLength(100)
+  nameAr: string;
+
   @ApiProperty({ example: 'Dental examination' })
   @IsString()
   @MinLength(2)
   @MaxLength(100)
-  name: string;
+  nameEn: string;
 
   @ApiProperty({ example: 'D' })
   @Matches(/^[A-Z0-9]{1,5}$/)
@@ -20,7 +26,13 @@ export class CreateServiceDto {
   @IsOptional()
   @IsString()
   @MaxLength(300)
-  description?: string;
+  descriptionAr?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MaxLength(300)
+  descriptionEn?: string;
 
   @ApiPropertyOptional({ default: 10 })
   @IsOptional()

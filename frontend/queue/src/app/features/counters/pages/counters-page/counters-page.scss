@@ -1,5 +1,193 @@
-@use '../../../../shared/styles/dashboard-page';
-
 :host {
   display: block;
+}
+.counters-page {
+  display: grid;
+  gap: 1.25rem;
+  color: var(--queue-navy);
+}
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 1rem;
+}
+.page-header span,
+.page-header p {
+  color: var(--queue-muted);
+}
+.page-header h1 {
+  margin: 0.25rem 0;
+}
+.filter {
+  display: grid;
+  gap: 0.3rem;
+  max-width: 18rem;
+}
+.filter select,
+.dialog input,
+.dialog select {
+  width: 100%;
+  padding: 0.7rem;
+  border: 1px solid var(--queue-border);
+  border-radius: 0.65rem;
+  background: #fff;
+}
+.counter-list {
+  display: grid;
+  gap: 0.75rem;
+}
+.counter-list article {
+  display: grid;
+  grid-template-columns: 4rem 1fr auto auto auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--queue-border);
+  border-radius: 0.9rem;
+  background: #fff;
+  box-shadow: 0 0.3rem 1rem rgba(15, 55, 60, 0.06);
+}
+.counter-number {
+  display: grid;
+  place-items: center;
+  padding: 0.5rem;
+  border-radius: 0.7rem;
+  background: var(--queue-primary-soft);
+}
+.counter-number small {
+  font-size: 0.65rem;
+}
+.counter-number strong {
+  font-size: 1.3rem;
+}
+.counter-list h2,
+.counter-list p {
+  margin: 0;
+}
+.counter-list h2 {
+  font-size: 1rem;
+}
+.counter-list p {
+  color: var(--queue-muted);
+  font-size: 0.75rem;
+}
+.status {
+  padding: 0.3rem 0.55rem;
+  border-radius: 999px;
+  background: #eef2f2;
+}
+.status.open {
+  color: #087353;
+  background: #e3f6ef;
+}
+.operator {
+  font-size: 0.8rem;
+}
+.counter-list article > button {
+  border: 0;
+  background: transparent;
+  color: var(--queue-primary);
+}
+.state {
+  padding: 3rem;
+  text-align: center;
+  border: 1px dashed var(--queue-border);
+  border-radius: 1rem;
+}
+.dialog-backdrop {
+  position: fixed;
+  z-index: 1100;
+  inset: 0;
+  display: grid;
+  padding: 1rem;
+  place-items: center;
+  background: rgba(7, 29, 34, 0.58);
+}
+.dialog {
+  width: min(30rem, 100%);
+  border-radius: 1rem;
+  background: #fff;
+  box-shadow: 0 2rem 5rem rgba(0, 0, 0, 0.25);
+}
+.dialog > header {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--queue-border);
+}
+.dialog h2 {
+  margin: 0;
+}
+.dialog header button {
+  border: 0;
+  background: transparent;
+}
+.dialog form {
+  display: grid;
+  gap: 1rem;
+  padding: 1.25rem;
+}
+.dialog label {
+  display: grid;
+  gap: 0.35rem;
+}
+.dialog footer {
+  display: flex;
+  justify-content: end;
+  gap: 0.5rem;
+}
+@media (max-width: 750px) {
+  .page-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .counter-list article {
+    grid-template-columns: 3.5rem 1fr;
+  }
+  .status,
+  .operator,
+  .counter-list article > button {
+    justify-self: start;
+  }
+  .counter-list article > button {
+    grid-column: 2;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .filter {
+    max-width: none;
+  }
+
+  .counter-list article {
+    grid-template-columns: 3rem minmax(0, 1fr);
+    gap: 0.75rem;
+  }
+
+  .status,
+  .operator,
+  .counter-list article > button {
+    grid-column: 1 / -1;
+  }
+
+  .counter-list article > button {
+    width: 100%;
+    min-height: 2.5rem;
+    border: 1px solid var(--queue-border);
+    border-radius: 0.6rem;
+  }
+
+  .dialog {
+    max-height: calc(100svh - 1rem);
+    overflow-y: auto;
+  }
+
+  .dialog footer {
+    flex-direction: column-reverse;
+  }
+
+  .dialog footer .btn {
+    width: 100%;
+  }
 }

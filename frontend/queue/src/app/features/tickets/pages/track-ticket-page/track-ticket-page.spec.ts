@@ -13,8 +13,22 @@ const publicId = '11111111-1111-4111-8111-111111111111';
 const otherId = '22222222-2222-4222-8222-222222222222';
 const ticket: QueueTicket = {
   id: 'ticket-id', publicId, number: 'TEST-019', status: 'WAITING', serviceId: 'service-id',
-  service: { name: 'Test service', averageServiceMinutes: 5 },
-  branch: { id: 'branch-id', name: 'Test branch', code: 'TEST', timezone: 'Africa/Cairo' },
+  createdAt: '2026-09-17T10:00:00.000Z', calledAt: null, serviceStartedAt: null,
+  completedAt: null, serviceDurationSeconds: null, cancelledAt: null,
+  service: {
+    name: 'Test service',
+    nameAr: 'خدمة اختبار',
+    nameEn: 'Test service',
+    averageServiceMinutes: 5,
+  },
+  branch: {
+    id: 'branch-id',
+    name: 'Test branch',
+    nameAr: 'فرع اختبار',
+    nameEn: 'Test branch',
+    code: 'TEST',
+    timezone: 'Africa/Cairo',
+  },
   counter: null, peopleAhead: 7, estimatedWaitMinutes: 35,
 };
 
@@ -64,8 +78,8 @@ describe('TrackTicketPage', () => {
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('h2').textContent).toBe(ticket.number);
     expect(fixture.nativeElement.querySelector('.queue-position strong').textContent).toBe('7');
-    expect(fixture.nativeElement.textContent).toContain('Test branch');
-    expect(fixture.nativeElement.textContent).toContain('Test service');
+    expect(fixture.nativeElement.textContent).toContain('فرع اختبار');
+    expect(fixture.nativeElement.textContent).toContain('خدمة اختبار');
     expect(fixture.nativeElement.querySelector('.queue-progress')).toBeNull();
   });
 

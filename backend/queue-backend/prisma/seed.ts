@@ -6,38 +6,56 @@ const prisma = new PrismaClient();
 async function main() {
   const branch = await prisma.branch.upsert({
     where: { code: 'NASR' },
-    update: {},
+    update: {
+      name: 'Nasr City Branch', nameAr: 'فرع مدينة نصر', nameEn: 'Nasr City Branch',
+      address: 'Nasr City, Cairo', addressAr: 'مدينة نصر، القاهرة', addressEn: 'Nasr City, Cairo',
+      latitude: 30.0561, longitude: 31.33,
+    },
     create: {
-      name: 'Nasr City Branch', code: 'NASR', address: 'Nasr City, Cairo', timezone: 'Africa/Cairo',
+      name: 'Nasr City Branch', nameAr: 'فرع مدينة نصر', nameEn: 'Nasr City Branch', code: 'NASR',
+      address: 'Nasr City, Cairo', addressAr: 'مدينة نصر، القاهرة', addressEn: 'Nasr City, Cairo',
+      latitude: 30.0561, longitude: 31.33,
+      timezone: 'Africa/Cairo',
     },
   });
 
   const dental = await prisma.service.upsert({
     where: { branchId_prefix: { branchId: branch.id, prefix: 'D' } },
-    update: {},
+    update: {
+      name: 'Dental examination', nameAr: 'كشف الأسنان', nameEn: 'Dental examination',
+      description: 'General dental examination queue', descriptionAr: 'طابور الكشف العام للأسنان',
+      descriptionEn: 'General dental examination queue',
+    },
     create: {
-      branchId: branch.id, name: 'Dental examination', prefix: 'D',
-      description: 'General dental examination queue', averageServiceMinutes: 15, nearTurnThreshold: 2,
+      branchId: branch.id, name: 'Dental examination', nameAr: 'كشف الأسنان', nameEn: 'Dental examination', prefix: 'D',
+      description: 'General dental examination queue', descriptionAr: 'طابور الكشف العام للأسنان',
+      descriptionEn: 'General dental examination queue', averageServiceMinutes: 15, nearTurnThreshold: 2,
     },
   });
   const general = await prisma.service.upsert({
     where: { branchId_prefix: { branchId: branch.id, prefix: 'G' } },
-    update: {},
+    update: {
+      name: 'General examination', nameAr: 'الكشف العام', nameEn: 'General examination',
+      description: 'General examination queue', descriptionAr: 'طابور الكشف العام',
+      descriptionEn: 'General examination queue',
+    },
     create: {
-      branchId: branch.id, name: 'General examination', prefix: 'G',
+      branchId: branch.id, name: 'General examination', nameAr: 'الكشف العام', nameEn: 'General examination', prefix: 'G',
+      description: 'General examination queue', descriptionAr: 'طابور الكشف العام',
+      descriptionEn: 'General examination queue',
       averageServiceMinutes: 10, nearTurnThreshold: 2,
     },
   });
 
   await prisma.counter.upsert({
-    where: { branchId_name: { branchId: branch.id, name: 'Desk 1' } },
-    update: { serviceId: dental.id },
-    create: { branchId: branch.id, serviceId: dental.id, name: 'Desk 1', status: CounterStatus.CLOSED },
+    where: { branchId_number: { branchId: branch.id, number: 1 } },
+    update: { serviceId: dental.id, name: 'Desk 1' },
+    create: { branchId: branch.id, serviceId: dental.id, name: 'Desk 1', number: 1, status: CounterStatus.CLOSED },
   });
   await prisma.counter.upsert({
-    where: { branchId_name: { branchId: branch.id, name: 'Desk 2' } },
-    update: { serviceId: general.id },
-    create: { branchId: branch.id, serviceId: general.id, name: 'Desk 2', status: CounterStatus.CLOSED },
+    where: { branchId_number: { branchId: branch.id, number: 2 } },
+    update: { serviceId: general.id, name: 'Desk 2' },
+    create: { branchId: branch.id, serviceId: general.id, name: 'Desk 2', number: 2, status: CounterStatus.CLOSED },
   });
 
   const users = [

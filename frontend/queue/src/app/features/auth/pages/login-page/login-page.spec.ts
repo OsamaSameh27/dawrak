@@ -10,6 +10,9 @@ import { LoginPage } from './login-page';
 
 describe('Login return destination', () => {
   it.each([
+    ['/booking', 'CUSTOMER', '/booking'],
+    ['/booking?service=dental', 'CUSTOMER', '/booking?service=dental'],
+    ['/booking', 'MANAGER', '/dashboard'],
     ['/my-tickets', 'CUSTOMER', '/my-tickets'],
     ['/my-tickets?publicId=old-link', 'CUSTOMER', '/my-tickets'],
     ['/my-tickets', 'ADMIN', '/dashboard'],

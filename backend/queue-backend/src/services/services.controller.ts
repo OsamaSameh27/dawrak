@@ -19,6 +19,14 @@ export class ServicesController {
   @ApiOperation({ summary: 'List active services in a branch' })
   list(@Query('branchId', ParseUUIDPipe) branchId: string) { return this.services.listPublic(branchId); }
 
+  @Get('management/list')
+  @ApiBearerAuth()
+  @Roles(Role.MANAGER, Role.ADMIN)
+  managementList(
+    @CurrentUser() actor: AuthenticatedUser,
+    @Query('branchId', new ParseUUIDPipe({ optional: true })) branchId?: string,
+  ) { return this.services.listManagement(actor, branchId); }
+
   @Public()
   @Get(':id')
   get(@Param('id', ParseUUIDPipe) id: string) { return this.services.getPublic(id); }

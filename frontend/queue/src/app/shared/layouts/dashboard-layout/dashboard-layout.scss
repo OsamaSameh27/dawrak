@@ -8,7 +8,8 @@
   min-height: 100vh;
   min-height: 100svh;
   grid-template-columns: 17.5rem minmax(0, 1fr);
-  background: #f3f6f5;
+  background:
+    radial-gradient(circle at 85% 8%, rgba(40, 117, 109, 0.08), transparent 24rem), #f2f6f5;
 }
 
 app-dashboard-sidebar {
@@ -21,13 +22,14 @@ app-dashboard-sidebar {
 
 .dashboard-workspace {
   min-width: 0;
+  min-height: 100svh;
 }
 
 .dashboard-main {
   width: 100%;
-  max-width: 100rem;
+  max-width: 96rem;
   margin-inline: auto;
-  padding: clamp(1.25rem, 3vw, 2.5rem);
+  padding: clamp(1rem, 2.4vw, 2rem);
 }
 
 .sidebar-backdrop {
@@ -66,7 +68,9 @@ app-dashboard-sidebar {
     background: rgba(16, 47, 56, 0.42);
     opacity: 0;
     pointer-events: none;
-    transition: opacity 180ms ease, visibility 180ms ease;
+    transition:
+      opacity 180ms ease,
+      visibility 180ms ease;
   }
 
   .is-sidebar-open .sidebar-backdrop {
@@ -78,7 +82,7 @@ app-dashboard-sidebar {
 
 @media (max-width: 575.98px) {
   .dashboard-main {
-    padding: 1rem;
+    padding: 0.85rem;
   }
 }
 

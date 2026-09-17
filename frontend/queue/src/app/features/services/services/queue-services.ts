@@ -3,7 +3,7 @@ import { inject, Service } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { environment } from '../../../../environments/environment';
-import { QueueService } from '../models/queue-service.model';
+import { CreateQueueServiceRequest, ManagedQueueService, QueueService, UpdateQueueServiceRequest } from '../models/queue-service.model';
 
 @Service()
 export class QueueServices {
@@ -16,5 +16,19 @@ export class QueueServices {
         branchId,
       },
     });
+  }
+
+  getManaged(branchId?: string): Observable<ManagedQueueService[]> {
+    return this.http.get<ManagedQueueService[]>(`${this.baseUrl}/management/list`, {
+      params: branchId ? { branchId } : {},
+    });
+  }
+
+  create(payload: CreateQueueServiceRequest): Observable<ManagedQueueService> {
+    return this.http.post<ManagedQueueService>(this.baseUrl, payload);
+  }
+
+  update(id: string, payload: UpdateQueueServiceRequest): Observable<ManagedQueueService> {
+    return this.http.patch<ManagedQueueService>(`${this.baseUrl}/${encodeURIComponent(id)}`, payload);
   }
 }

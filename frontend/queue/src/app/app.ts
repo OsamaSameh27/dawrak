@@ -7,6 +7,7 @@ import { NotificationItem } from './features/notifications/models/notification.m
 import { NotificationsRealtimeService } from './features/notifications/services/notifications-realtime.service';
 import { NotificationsState } from './features/notifications/state/notifications-state';
 import { AuthStore } from './features/auth/state/auth-store';
+import { CounterSessionState } from './features/queues/state/counter-session-state';
 
 @Component({
   selector: 'app-root',
@@ -20,6 +21,7 @@ export class App {
   private readonly notificationsState = inject(NotificationsState);
   private readonly translate = inject(TranslateService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly counterSessionState = inject(CounterSessionState);
 
   protected readonly toastNotification = signal<NotificationItem | null>(null);
   protected readonly toastClosing = signal(false);
@@ -34,8 +36,13 @@ export class App {
 
     if (this.authStore.isAuthenticated()) {
       this.realtime.connect();
+      const role = this.authStore.role();
+      if (role === 'STAFF' || role === 'MANAGER' || role === 'ADMIN') {
+        this.counterSessionState.resume();
+      }
     } else {
       this.realtime.disconnect();
+      this.counterSessionState.stop();
     }
   });
 
@@ -89,9 +96,7 @@ export class App {
     }, 220);
   }
 
-  protected notificationParams(
-    notification: NotificationItem,
-  ): Record<string, string> {
+  protected notificationParams(notification: NotificationItem): Record<string, string> {
     const data = notification.data ?? {};
     const params: Record<string, string> = {};
 
@@ -101,6 +106,11 @@ export class App {
 
     if (data.counterName) {
       params['counterName'] = data.counterName;
+      params['counterNumber'] = data.counterName.replace(/\D+/g, '') || data.counterName;
+    }
+
+    if (data.counterNumber !== undefined) {
+      params['counterNumber'] = String(data.counterNumber);
     }
 
     if (data.status) {
@@ -108,6 +118,10 @@ export class App {
         `notifications.status.${data.status.toLowerCase()}`,
       );
     }
+
+    if (data.branchCode) params['branchCode'] = data.branchCode;
+    if (data.staffName) params['staffName'] = data.staffName;
+    if (data.managerName) params['managerName'] = data.managerName;
 
     return params;
   }

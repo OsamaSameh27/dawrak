@@ -4,25 +4,60 @@
       <div class="col-lg-7">
         <span class="section-eyebrow">
           <i class="bi bi-clock" aria-hidden="true"></i>
-          {{ 'home.hero.eyebrow' | translate }}
+          {{
+            (canUseCustomerFeatures()
+              ? 'home.hero.eyebrow'
+              : 'home.workforceHero.' + workforceRole() + '.eyebrow'
+            ) | translate
+          }}
         </span>
 
         <h1 class="d-flex flex-wrap gap-2">
-          <span class="hero-title-highlight">{{ 'home.hero.titleHighlight' | translate }}</span>
-          <span>{{ 'home.hero.titleRest' | translate  }} </span>
+          <span class="hero-title-highlight">
+            {{
+              (canUseCustomerFeatures()
+                ? 'home.hero.titleHighlight'
+                : 'home.workforceHero.' + workforceRole() + '.titleHighlight'
+              ) | translate
+            }}
+          </span>
+          <span>
+            {{
+              (canUseCustomerFeatures()
+                ? 'home.hero.titleRest'
+                : 'home.workforceHero.' + workforceRole() + '.titleRest'
+              ) | translate
+            }}
+          </span>
         </h1>
-        <p class="hero-description "> {{ 'home.hero.description' | translate }}</p>
+        <p class="hero-description">
+          {{
+            (canUseCustomerFeatures()
+              ? 'home.hero.description'
+              : 'home.workforceHero.' + workforceRole() + '.description'
+            ) | translate
+          }}
+        </p>
 
         <div class="hero-actions d-flex flex-wrap gap-2">
-          <a class="btn btn-primary btn-lg" routerLink="/booking">
-            {{ 'common.bookTicket' | translate }}
-            <i class="bi bi-arrow-left-short directional-icon" aria-hidden="true"></i>
-          </a>
+          @if (canUseCustomerFeatures()) {
+            <a class="btn btn-primary btn-lg" routerLink="/booking">
+              {{ 'common.bookTicket' | translate }}
+              <i class="bi bi-arrow-left-short directional-icon" aria-hidden="true"></i>
+            </a>
+          } @else {
+            <a class="btn btn-primary btn-lg" routerLink="/dashboard">
+              {{ 'home.workforce.action' | translate }}
+              <i class="bi bi-speedometer2" aria-hidden="true"></i>
+            </a>
+          }
 
-          <a class="btn btn-light btn-lg" routerLink="/my-tickets">
-            <i class="bi bi-search" aria-hidden="true"></i>
-            {{ 'navigation.myTickets' | translate }}
-          </a>
+          @if (canUseCustomerFeatures()) {
+            <a class="btn btn-light btn-lg" routerLink="/my-tickets">
+              <i class="bi bi-search" aria-hidden="true"></i>
+              {{ 'navigation.myTickets' | translate }}
+            </a>
+          }
         </div>
 
         <ul
@@ -31,44 +66,50 @@
         >
           <li class="d-flex align-items-center gap-2">
             <i class="bi bi-check-circle-fill text-success" aria-hidden="true"></i>
-            {{ 'home.hero.features.noCrowds' | translate }}
+            {{
+              (canUseCustomerFeatures()
+                ? 'home.hero.features.noCrowds'
+                : 'home.workforceHero.' + workforceRole() + '.features.first'
+              ) | translate
+            }}
           </li>
           <li class="d-flex align-items-center gap-2">
             <i class="bi bi-check-circle-fill text-success" aria-hidden="true"></i>
-            {{ 'home.hero.features.liveUpdates' | translate }}
+            {{
+              (canUseCustomerFeatures()
+                ? 'home.hero.features.liveUpdates'
+                : 'home.workforceHero.' + workforceRole() + '.features.second'
+              ) | translate
+            }}
           </li>
         </ul>
       </div>
 
       <div class="col-lg-5">
-        <div class="ticket-preview">
-          <div class="ticket-preview__header">
-            <div>
-              <span>{{ 'home.hero.preview.exampleLabel' | translate }}</span>
-              <h2>{{ 'home.hero.preview.title' | translate }}</h2>
-            </div>
-            <i class="bi bi-ticket-perforated" aria-hidden="true"></i>
-          </div>
+        <div class="logo-showcase" aria-hidden="true">
+          <span class="logo-showcase__orb logo-showcase__orb--one"></span>
+          <span class="logo-showcase__orb logo-showcase__orb--two"></span>
 
-          <div class="ticket-number">
-            <span>{{ 'home.hero.preview.ticketLabel' | translate }}</span>
-            <strong>G-024</strong>
-          </div>
+          <svg class="hero-logo" viewBox="0 0 320 320" role="img">
+            <rect class="hero-logo__tile" x="35" y="35" width="250" height="250" rx="72" />
+            <path
+              class="hero-logo__ticket"
+              d="M91 100H229C229 118 243 132 261 132V188C243 188 229 202 229 220H91C91 202 77 188 59 188V132C77 132 91 118 91 100Z"
+            />
+            <path class="hero-logo__perforation" d="M122 119V201" />
+            <path class="hero-logo__details" d="M151 137H211M151 160H211M151 183H191" />
+          </svg>
 
-          <div class="serving-now">
-            <span>{{ 'home.hero.preview.nowServing' | translate }}</span>
-            <strong>G-021</strong>
-          </div>
-
-          <div class="ticket-preview__metrics">
-            <div class="d-flex align-items-center gap-2 text-secondary small">
-              <i class="bi bi-people" aria-hidden="true"></i>
-              <span>{{ 'home.hero.preview.peopleAhead' | translate: { count: 3 } }}</span>
-            </div>
-            <div class="d-flex align-items-center gap-2 text-secondary small">
-              <i class="bi bi-clock" aria-hidden="true"></i>
-              <span>{{ 'home.hero.preview.estimated' | translate: { minutes: 12 } }}</span>
-            </div>
+          <div class="logo-showcase__copy">
+            <strong>{{ 'app.name' | translate }}</strong>
+            <span>
+              {{
+                (canUseCustomerFeatures()
+                  ? 'home.logoVisual.customer'
+                  : 'home.logoVisual.' + workforceRole()
+                ) | translate
+              }}
+            </span>
           </div>
         </div>
       </div>
@@ -76,39 +117,43 @@
   </div>
 </section>
 
-<section class="quick-actions-section" [attr.aria-labelledby]="'quick-actions-title'">
-  <div class="container">
-    <div class="section-heading mx-auto text-center">
-      <span class="section-eyebrow">{{ 'home.quickActions.eyebrow' | translate }}</span>
-      <h2 id="quick-actions-title">{{ 'home.quickActions.title' | translate }}</h2>
-      <p>{{ 'home.quickActions.description' | translate }}</p>
-    </div>
-
-    <div class="row g-3 justify-content-center">
-      <div class="col-md-6 col-lg-5">
-        <a class="action-card" routerLink="/booking">
-          <span class="action-icon"><i class="bi bi-ticket-perforated" aria-hidden="true"></i></span>
-          <span class="action-copy">
-            <strong>{{ 'home.quickActions.book.title' | translate }}</strong>
-            <small>{{ 'home.quickActions.book.description' | translate }}</small>
-          </span>
-          <i class="bi bi-chevron-left action-arrow" aria-hidden="true"></i>
-        </a>
+@if (canUseCustomerFeatures()) {
+  <section class="quick-actions-section" [attr.aria-labelledby]="'quick-actions-title'">
+    <div class="container">
+      <div class="section-heading mx-auto text-center">
+        <span class="section-eyebrow">{{ 'home.quickActions.eyebrow' | translate }}</span>
+        <h2 id="quick-actions-title">{{ 'home.quickActions.title' | translate }}</h2>
+        <p>{{ 'home.quickActions.description' | translate }}</p>
       </div>
 
-      <div class="col-md-6 col-lg-5">
-        <a class="action-card" routerLink="/my-tickets">
-          <span class="action-icon"><i class="bi bi-search" aria-hidden="true"></i></span>
-          <span class="action-copy">
-            <strong>{{ 'home.quickActions.track.title' | translate }}</strong>
-            <small>{{ 'home.quickActions.track.description' | translate }}</small>
-          </span>
-          <i class="bi bi-chevron-left action-arrow" aria-hidden="true"></i>
-        </a>
+      <div class="row g-3 justify-content-center">
+        <div class="col-md-6 col-lg-5">
+          <a class="action-card" routerLink="/booking">
+            <span class="action-icon"
+              ><i class="bi bi-ticket-perforated" aria-hidden="true"></i
+            ></span>
+            <span class="action-copy">
+              <strong>{{ 'home.quickActions.book.title' | translate }}</strong>
+              <small>{{ 'home.quickActions.book.description' | translate }}</small>
+            </span>
+            <i class="bi bi-chevron-left action-arrow" aria-hidden="true"></i>
+          </a>
+        </div>
+
+        <div class="col-md-6 col-lg-5">
+          <a class="action-card" routerLink="/my-tickets">
+            <span class="action-icon"><i class="bi bi-search" aria-hidden="true"></i></span>
+            <span class="action-copy">
+              <strong>{{ 'home.quickActions.track.title' | translate }}</strong>
+              <small>{{ 'home.quickActions.track.description' | translate }}</small>
+            </span>
+            <i class="bi bi-chevron-left action-arrow" aria-hidden="true"></i>
+          </a>
+        </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
+}
 
 <section class="queues-section" [attr.aria-labelledby]="'queues-title'">
   <div class="container">
@@ -118,38 +163,28 @@
       <p>{{ 'home.queue.description' | translate }}</p>
     </div>
 
-    <div class="row g-4">
-      @for (queue of queues; track queue.id) {
-        <div class="col-md-6 col-xl-4">
-          <app-queue-status-card [queue]="queue" />
-        </div>
-      }
-    </div>
-  </div>
-</section>
-
-<section class="how-section" [attr.aria-labelledby]="'how-title'">
-  <div class="container">
-    <div class="section-heading mx-auto text-center">
-      <span class="section-eyebrow">{{ 'home.howItWorks.eyebrow' | translate }}</span>
-      <h2 id="how-title">{{ 'home.howItWorks.title' | translate }}</h2>
-      <p>{{ 'home.howItWorks.description' | translate }}</p>
-    </div>
-
-    <div class="row g-4">
-      @for (step of steps; track step.titleKey; let stepNumber = $index) {
-        <div class="col-md-4">
-          <article class="step-card h-100">
-            <div class="step-card__top">
-              <span class="step-icon"><i class="bi" [class]="step.icon" aria-hidden="true"></i></span>
-              <span class="step-number">0{{ stepNumber + 1 }}</span>
-            </div>
-            <h3>{{ step.titleKey | translate }}</h3>
-            <p>{{ step.descriptionKey | translate }}</p>
-          </article>
-        </div>
-      }
-    </div>
+    @if (queuesLoading()) {
+      <div class="home-state">
+        <span class="spinner-border spinner-border-sm"></span>{{ 'home.queue.loading' | translate }}
+      </div>
+    } @else if (queuesFailed()) {
+      <div class="home-state home-state--error">
+        <span>{{ 'home.queue.loadFailed' | translate }}</span
+        ><button class="btn btn-outline-primary btn-sm" type="button" (click)="loadOverview()">
+          {{ 'common.retry' | translate }}
+        </button>
+      </div>
+    } @else if (!queues().length) {
+      <div class="home-state">{{ 'home.queue.empty' | translate }}</div>
+    } @else {
+      <div class="row g-4">
+        @for (queue of queues(); track queue.id) {
+          <div class="col-md-6 col-xl-4">
+            <app-queue-status-card [queue]="queue" [canBook]="canUseCustomerFeatures()" />
+          </div>
+        }
+      </div>
+    }
   </div>
 </section>
 
@@ -157,11 +192,21 @@
   <div class="container">
     <div class="cta-panel">
       <div>
-        <h2>{{ 'home.cta.title' | translate }}</h2>
-        <p>{{ 'home.cta.description' | translate }}</p>
+        <h2>
+          {{ (canUseCustomerFeatures() ? 'home.cta.title' : 'home.workforce.title') | translate }}
+        </h2>
+        <p>
+          {{
+            (canUseCustomerFeatures() ? 'home.cta.description' : 'home.workforce.description')
+              | translate
+          }}
+        </p>
       </div>
-      <a class="btn btn-light btn-lg" routerLink="/booking">
-        {{ 'home.cta.action' | translate }}
+      <a
+        class="btn btn-light btn-lg"
+        [routerLink]="canUseCustomerFeatures() ? '/booking' : '/dashboard'"
+      >
+        {{ (canUseCustomerFeatures() ? 'home.cta.action' : 'home.workforce.action') | translate }}
         <i class="bi bi-arrow-left-short directional-icon" aria-hidden="true"></i>
       </a>
     </div>

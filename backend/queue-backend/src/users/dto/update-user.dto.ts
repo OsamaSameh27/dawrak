@@ -1,6 +1,6 @@
 import { Role } from '@prisma/client';
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsBoolean, IsIn, IsOptional, IsString, IsUUID, Matches, MaxLength, MinLength } from 'class-validator';
+import { IsBoolean, IsIn, IsOptional, IsString, IsUUID, Matches, MaxLength, MinLength, ValidateIf } from 'class-validator';
 
 export class UpdateUserDto {
   @ApiPropertyOptional()
@@ -12,8 +12,9 @@ export class UpdateUserDto {
 
   @ApiPropertyOptional()
   @IsOptional()
+  @ValidateIf((_object, value) => value !== null)
   @Matches(/^\+?[0-9]{8,15}$/)
-  phone?: string;
+  phone?: string | null;
 
   @ApiPropertyOptional({ enum: [Role.STAFF, Role.MANAGER] })
   @IsOptional()
