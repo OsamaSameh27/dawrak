@@ -11,7 +11,7 @@
   "theme_color": "#28756d",
   "icons": [
     {
-      "src": "/favicon.svg",
+      "src": "/dawrak-icon.svg?v=2",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
