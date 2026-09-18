@@ -28,9 +28,7 @@ export class NotificationsRealtimeService {
       return;
     }
 
-    const socketUrl = environment.production
-      ? window.location.origin
-      : 'http://localhost:3000';
+    const socketUrl = new URL(environment.apiBaseUrl, window.location.origin).origin;
 
     this.socket = io(`${socketUrl}/queue`, {
       transports: ['websocket'],

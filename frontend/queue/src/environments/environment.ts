@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiBaseUrl: '/api/v1',
+  apiBaseUrl: 'https://dawrak-api.vercel.app/api/v1',
 } as const;

@@ -31,10 +31,27 @@ type AuthenticatedSocket = Socket & {
   data: Socket['data'] & { userId?: string; role?: Role; branchId?: string | null };
 };
 
+const websocketCorsOrigin = (
+  origin: string | undefined,
+  callback: (error: Error | null, allow?: boolean) => void,
+): void => {
+  const allowedOrigins = (process.env.CORS_ORIGINS ?? 'http://localhost:4200')
+    .split(',')
+    .map((value) => value.trim())
+    .filter(Boolean);
+
+  if (!origin || allowedOrigins.includes(origin)) {
+    callback(null, true);
+    return;
+  }
+
+  callback(new Error('Origin is not allowed'));
+};
+
 @Public()
 @WebSocketGateway({
   namespace: '/queue',
-  cors: { origin: true, credentials: true },
+  cors: { origin: websocketCorsOrigin, credentials: true },
   transports: ['websocket', 'polling'],
 })
 export class QueueGateway implements OnGatewayConnection {

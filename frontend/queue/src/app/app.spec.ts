@@ -6,6 +6,7 @@ import { EMPTY } from 'rxjs';
 import { App } from './app';
 import { AuthStore } from './features/auth/state/auth-store';
 import { NotificationsRealtimeService } from './features/notifications/services/notifications-realtime.service';
+import { NotificationsServices } from './features/notifications/services/notifications.services';
 import { NotificationsState } from './features/notifications/state/notifications-state';
 import { CounterSessionState } from './features/queues/state/counter-session-state';
 
@@ -28,7 +29,11 @@ describe('App', () => {
           provide: NotificationsRealtimeService,
           useValue: { notification$: EMPTY, connect: () => {}, disconnect: () => {} },
         },
-        { provide: NotificationsState, useValue: { increaseUnreadCount: () => {} } },
+        { provide: NotificationsServices, useValue: { getNotifications: () => EMPTY } },
+        {
+          provide: NotificationsState,
+          useValue: { increaseUnreadCount: () => {}, setUnreadCount: () => {} },
+        },
         { provide: CounterSessionState, useValue: { resume: () => {}, stop: () => {} } },
       ],
     }).compileComponents();

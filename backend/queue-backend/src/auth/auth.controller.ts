@@ -11,7 +11,7 @@ import {
 import { ConfigService } from "@nestjs/config";
 import { ApiCookieAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { Throttle } from "@nestjs/throttler";
-import { Request, Response } from "express";
+import { CookieOptions, Request, Response } from "express";
 import { CurrentUser } from "../common/decorators/current-user.decorator";
 import { Public } from "../common/decorators/public.decorator";
 import { AuthenticatedUser } from "../common/types/authenticated-user.type";
@@ -73,7 +73,7 @@ export class AuthController {
     @Res({ passthrough: true }) response: Response,
   ) {
     await this.auth.logout(user.id);
-    response.clearCookie("refresh_token", { path: "/api/v1/auth" });
+    response.clearCookie("refresh_token", this.refreshCookieOptions());
   }
 
   @Get("me")
@@ -86,12 +86,20 @@ export class AuthController {
     response: Response,
   ) {
     response.cookie("refresh_token", session.refreshToken, {
-      httpOnly: true,
-      secure: this.config.get<boolean>("COOKIE_SECURE", false),
-      sameSite: "lax",
-      path: "/api/v1/auth",
+      ...this.refreshCookieOptions(),
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
     return { accessToken: session.accessToken, user: session.user };
+  }
+
+  private refreshCookieOptions(): CookieOptions {
+    const secure = this.config.get<boolean>("COOKIE_SECURE", false);
+
+    return {
+      httpOnly: true,
+      secure,
+      sameSite: secure ? "none" : "lax",
+      path: "/api/v1/auth",
+    };
   }
 }

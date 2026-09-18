@@ -2,9 +2,12 @@ import { Component, DestroyRef, effect, inject, signal } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { EMPTY, Subscription, timer } from 'rxjs';
+import { catchError, exhaustMap } from 'rxjs/operators';
 
 import { NotificationItem } from './features/notifications/models/notification.model';
 import { NotificationsRealtimeService } from './features/notifications/services/notifications-realtime.service';
+import { NotificationsServices } from './features/notifications/services/notifications.services';
 import { NotificationsState } from './features/notifications/state/notifications-state';
 import { AuthStore } from './features/auth/state/auth-store';
 import { CounterSessionState } from './features/queues/state/counter-session-state';
@@ -18,6 +21,7 @@ import { CounterSessionState } from './features/queues/state/counter-session-sta
 export class App {
   private readonly authStore = inject(AuthStore);
   private readonly realtime = inject(NotificationsRealtimeService);
+  private readonly notificationsService = inject(NotificationsServices);
   private readonly notificationsState = inject(NotificationsState);
   private readonly translate = inject(TranslateService);
   private readonly destroyRef = inject(DestroyRef);
@@ -28,6 +32,9 @@ export class App {
 
   private toastTimer: ReturnType<typeof setTimeout> | null = null;
   private toastCloseTimer: ReturnType<typeof setTimeout> | null = null;
+  private notificationPollSubscription: Subscription | null = null;
+  private readonly seenNotificationIds = new Set<string>();
+  private notificationBaselineLoaded = false;
 
   private readonly authConnectionEffect = effect(() => {
     if (!this.authStore.initialized()) {
@@ -36,12 +43,14 @@ export class App {
 
     if (this.authStore.isAuthenticated()) {
       this.realtime.connect();
+      this.startNotificationPolling();
       const role = this.authStore.role();
       if (role === 'STAFF' || role === 'MANAGER' || role === 'ADMIN') {
         this.counterSessionState.resume();
       }
     } else {
       this.realtime.disconnect();
+      this.stopNotificationPolling();
       this.counterSessionState.stop();
     }
   });
@@ -50,23 +59,72 @@ export class App {
     this.realtime.notification$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((notification) => {
-        if (this.toastCloseTimer) {
-          clearTimeout(this.toastCloseTimer);
-          this.toastCloseTimer = null;
-        }
-
-        this.toastClosing.set(false);
-        this.toastNotification.set(notification);
+        this.seenNotificationIds.add(notification.id);
         this.notificationsState.increaseUnreadCount();
+        this.displayNotification(notification);
+      });
+  }
 
-        if (this.toastTimer) {
-          clearTimeout(this.toastTimer);
+  private startNotificationPolling(): void {
+    if (this.notificationPollSubscription) {
+      return;
+    }
+
+    this.notificationPollSubscription = timer(0, 15000)
+      .pipe(
+        exhaustMap(() =>
+          this.notificationsService.getNotifications(true).pipe(catchError(() => EMPTY)),
+        ),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((response) => {
+        this.notificationsState.setUnreadCount(response.unreadCount);
+
+        if (!this.notificationBaselineLoaded) {
+          response.items.forEach((notification) =>
+            this.seenNotificationIds.add(notification.id),
+          );
+          this.notificationBaselineLoaded = true;
+          return;
         }
 
-        this.toastTimer = setTimeout(() => {
-          this.beginToastClose();
-        }, 7000);
+        const newNotifications = response.items.filter(
+          (notification) => !this.seenNotificationIds.has(notification.id),
+        );
+        response.items.forEach((notification) =>
+          this.seenNotificationIds.add(notification.id),
+        );
+
+        if (newNotifications.length > 0) {
+          this.displayNotification(newNotifications[0]);
+        }
       });
+  }
+
+  private stopNotificationPolling(): void {
+    this.notificationPollSubscription?.unsubscribe();
+    this.notificationPollSubscription = null;
+    this.notificationBaselineLoaded = false;
+    this.seenNotificationIds.clear();
+    this.notificationsState.setUnreadCount(0);
+  }
+
+  private displayNotification(notification: NotificationItem): void {
+    if (this.toastCloseTimer) {
+      clearTimeout(this.toastCloseTimer);
+      this.toastCloseTimer = null;
+    }
+
+    this.toastClosing.set(false);
+    this.toastNotification.set(notification);
+
+    if (this.toastTimer) {
+      clearTimeout(this.toastTimer);
+    }
+
+    this.toastTimer = setTimeout(() => {
+      this.beginToastClose();
+    }, 7000);
   }
 
   protected dismissToast(): void {
